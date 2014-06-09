@@ -1,0 +1,11 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{1}{section.1}
+\contentsline {section}{\numberline {2}Ruido en canal simetrico binario}{1}{section.2}
+\contentsline {section}{\numberline {3}Entropia}{4}{section.3}
+\contentsline {section}{\numberline {4}Entropia condicional}{4}{section.4}
+\contentsline {section}{\numberline {5}Informaci\IeC {\'o}n m\IeC {\'u}tua}{5}{section.5}
+\contentsline {section}{\numberline {6}Capacidad de canal}{5}{section.6}
+\contentsline {section}{\numberline {7}Z-channel}{6}{section.7}
+\contentsline {section}{\numberline {8}Par\IeC {\'a}metro de seguridad}{7}{section.8}
+\contentsline {subsection}{\numberline {8.1}algoritmo1}{7}{subsection.8.1}
+\contentsline {section}{\numberline {9}mediciones}{8}{section.9}

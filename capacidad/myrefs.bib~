@@ -1,0 +1,22 @@
+@string{jgr = "J.~Geophys.~Res."}
+
+@MISC{primes,
+   author = "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin",
+   note = "A strong form of the prime number theorem, 19th century",
+   year = 1879
+   }
+
+@INBOOK{chicago,
+   title = "The Chicago Manual of Style",
+   publisher = "University of Chicago Press",
+   edition = "Thirteenth",
+   year = 1982,
+   pages = "400--401",
+   key = "Chicago"
+   }
+
+@MISC{tallini,
+   author = "Tallini, Al-Bassam",
+   note = "On the capacity and codes for the Z-channel",
+   year = 1984
+   }

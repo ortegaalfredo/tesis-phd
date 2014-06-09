@@ -378,29 +378,25 @@ Repetido en \ref{espectroensanchado} ??
 
 \subsection{Minimización de peso de Hamming}
 %% extraido de dline-pub.text
-This scheme based on time-hopping CDMA relies on symbol interference for confidentiality as data from other end users effectively acts as noise.
-Symbol interference, as discussed in section \ref{principle}, causes errors that need to be corrected.
-As these errors reduce the usable channel bandwidth, it is desirable to decrease interference to a point where it still provides security while maximising bandwidth usage.
-In order to decrease interference it is not advisable to modify the cryptographically secure random generator, since it would compromise the security of the whole system by introducing predictability in the symbol positions (e.g., using orthogonal codes as in Ref.~\cite{Nadarajah2006}.)
-Instead, a strategy based on the fact that an optical channel can be modelled as a Z-channel is pursued.
+
+Repasando, el esquema propuesto basado en time-hopping CDMA se basa en la interferencia entre símbolos para obtener confidencialidad, ya que los datos de los otros usuarios actuan efectívamente como ruido.
+La interferencia inter-símbolo, como fue discutida en la seccion \ref{principle}, causa errores que debe ser corregidos. Como dichos errores reducen el ancho de banda utilizable del canal, es deseable reducir la interferencia hasta un punto donde se maximize, sin comprometer la seguridad del sistema. Para reducir la interferencia, no es aconsejable modificar o introducir patrones en el generador criptograficamente seguro de numeros aleatorios, ya que comprometeria la seguridad de todo el sistema al introducir predictabilidad en las posiciones de los símbolos (Ej. usando códigos ortogonales como en Ref.~\cite{Nadarajah2006}.), efectivamente dejando de ser criptograficamente seguro.
+En lugar de esto, se adopto una estrategia que aprovecha el echo que un sistema óptico puede ser modelado como un canal-Z.
+
 %This channel presents a Shannon limit of $ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right),$ where $p$ is the probability of error~\cite{Tallini:02}.
 
-%Our proposal relies on the characteristic asymmetric nature of this channel type in which only the '1' symbol causes interference.
-%In other words, interference is proportional to the Hamming weight of the transmitted symbol.
-Hamming-weight of a symbol is the number of bits `1', which is directly related to interferences in the Z-channel.
-The Hamming-weight minimisation algorithm consists on coding every binary symbol into an equivalent longer one, having more `0's and less `1's than in the original symbol.
-Applying a Hamming-weight minimising algorithm thus decreases interference.
-Intuitively, a longer symbol would decrease the channel bandwidth; but as numerical simulations shown (see section \ref{simulations}) as intersymbol interference decreases the FEC overhead can also decrease, compensating for the increase in symbol length and yielding a net bandwidth gain.
-Normal binary symbols of length L have variable Hamming weight, with L/2 being the average, zero being the minimum and L being the maximum weight.
-We propose decreasing this Hamming weight (HW) to HW=2 a small number, as a good compromise between interference reduction and symbol length.
-Additionally, for security purposes we use a fixed Hamming weight for all symbols. This causes a slight loss of bandwidth but makes it impossible to infer any information about the transmitted symbol by analysing statistics of the transmitted data.
-
-
+Esta propuesta, y aqui esta el nucleo de la invencion propuesta en esta tesis, es la de aprovechar la naturaleza asimetrica del este tipo de canal, en donde solamente el símbolo ``1'' causa interferencia, ya que los ``0'' no se interfieren. \footnote{Aunque en un sistema óptico real, existe efectivamente una pequeña diferencia ya que un ``0'' nunca es representado con una potencia de laser de cero watts.}
+En otras palabras, la interferencia de un canal-Z es proporcional al peso de hamming del símbolo transmitido.
+El peso de Hamming de un símbolo es simplemente la cantidad de bits en ``1'' del mismo. El algoritmo de Minimización de peso de Hamming consiste en una codificación en donde cada símbolo binario es convertido en un equivalente de mayor longitud, tieniendo solamente una mínima cantidad de dígitos en ``1''. Aplicando esta codificación que minimiza el peso de Hamming y transmitiendo el símbolo resultante, se obtiene una menor interferencia en un canal Z.
+Intuitivamente, expandir el símbolo original a uno de mayor longitud decrementaria el ancho de banda del canal; pero como las simulaciones numéricas muestran (ver sección \ref{simulations}) a medida que la interferencia inter-símbolo se reduce, el ancho de banda adicional utilizado por los algoritmos de FEC tambien se reducen, compensando por el incremento del largo del símbolo y logrando un mayor ancho de banda neto del sistema.
+Podemos decir que un número binario normal de largo L posee un peso variable de Hamming, con L/2 siendo el promedio, cero siendo el mínimo y L siendo el máximo peso de Hamming.
+La técnica de reduccion de peso de Hamming (HW) da buenos resultados reduciendo a HW=2, logrando un buen balance entre la reducción de interferencia y el largo de símbolo.
+Adicionalmente, es deseable en un sistema de seguridad que no se revele ninguna información acerca de los símbolos transmitidos. Por ejemplo si transmitieramos el número cero, representado por todos sus dígitos en cero, seria trivial identificarlo sin importar si se aplica cualquier tipo de time-hopping. Para evitar estos ataques que utilizan estadísticas acerca del peso de hamming, la codificación exige que el peso de hamming sea fijo en todos los símbolos. Esto causa una ligera perdida en el ancho de banda pero hace imposible inferir cualquier tipo de información acerca del símbolo transmitido analizando estadisticas de tráfico de los datos transmitidos.
 
 \begin{table}[t]
 \begin{center}
 \begin{tabular}{c c c}
-Data & Input HW= 0 to 3 & Expanded HW=2\\
+Datos & entrada HW= 0 to 3 & Expandida HW=2\\
 \hline\hline
 0 & 000 & 00011\\
 1 & 001 & 00110\\
@@ -411,7 +407,7 @@ Data & Input HW= 0 to 3 & Expanded HW=2\\
 6 & 110 & 10001\\
 7 & 111 & 10010\\
 \end{tabular}
-\caption{Hamming minimisation table for 3-bit symbols}
+\caption{Tambla de minimización de Hamming para símbolos de 3-bits}
 \label{hwtable}
 \end{center}
  \end{table}
