@@ -412,15 +412,13 @@ Datos & entrada HW= 0 to 3 & Expandida HW=2\\
 \end{center}
  \end{table}
  
-\subsection{How the Hamming weight is minimised}
-The symbol expansion can be implemented as a lookup table (see table~\ref{hwtable}), where a symbol of length L is used as the index.
-The coded symbol has a length N\textgreater L.
-For practical implementation purposes it is desirable for L to be either 8 or 16 bits, so the table will have either 256 or 65536 entries.
-We apply the Hamming weight minimisation to symbols of 8 or 16 bits of length, thus it is needed a 256 or 65535 output symbols with a HW=2, respectively.
-To encode a 16-bits input symbol and HW=2, output symbols of 363 bits long are needed.
-% \footnote{For a 8-bit symbol the expanded symbol with HW=2 is 24 bits long}.
-Note that the number of unique symbols with HW=2 and N=363 is not exactly 65536 but 65703, so the expansion table is not unique.
-The ordering of the symbol conversion is not important as long as the same table is used in all the nodes trying to communicate.
+\subsection{Expansión de símbolo}
+La minimización del peso de hamming conlleva una necesaria conversión del símbolo original a otro que necesariamente tendra mayor longitud, o sea, una expansión del símbolo.
+Esta operación puede realizarse de muchas maneras, pero un algoritmo muy eficiente es utilizar una tabla de lookup (ver tabla~\ref{hwtable}), donde un símbolo de largo L es utilizado como el índice en la tabla, y el resultado es el símbolo expandido, que tiene un largo N\textgreater L.
+Por motivos prácticos y de optimización, es deseable que L sea 8 u 16 bits, por lo que la tabla contendrá 256 o 65536 entradas respectivamente.
+Al aplicar la minimización de peso de hamming a símbolos de 8 o 16 bits de longitud, son necesarios 256 o 65536 símbolos de salida con un HW=2. En el caso de símbolos de entrada de 8 bits, la longitud del símbolo de salida sera de 363 bits, mientras que para 8 bits de entrada, el simbolo expandido con HW=2 tendra 24 bits de longitud.
+Puede observarse que el número de símbolos únicos con HW=2 y N=363 no es exáctamente 65536 sino 65703, esto significa que existen muchas tablas de expansión.
+La tabla seleccionada y el orden de la misma no son importantes para el resultado final, observando la condición que dos nodos comunicandose deberan utilizar idénticas tablas.
 %In general more bits transmitted per frame the more efficient the protocol will be. \textbf{PORQUE IN GENERAL? CUANDO FALLA?} 
 
 
