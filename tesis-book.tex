@@ -1,0 +1,178 @@
+\documentclass[12pt,twoside,openright]{moddalthesis}
+
+\usepackage{hyperref}
+%\usepackage[spanish,english]{babel}
+\usepackage[spanish]{babel}
+%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+
+%-------------------------------------
+
+\usepackage{graphicx}
+\usepackage{color}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{subfig}
+
+
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+
+
+%\includeonly{FrontBackmatter/Contents,Chapters/Chapter03,Chapters/Chapter04,Chapters/Chapter05,Chapters/Chapter06,Chapters/Chapter0A,FrontBackmatter/Bibliography}
+
+%\includeonly{Chapters/Chapter01,Chapters/Chapter02}
+
+%-------------------------------------
+
+
+\begin{document}
+\title{\textbf{Sistema de transmisión segura punto a punto y multipunto en medios compartidos.}}
+\author{Alfredo Adrián Ortega}
+\dept{Doctorado}
+\faculty{Faculty}
+\university{Instituto Tecnológico de Buenos Aires}
+\address{Buenos Aires, Argentina}
+
+\submitdate{6 de Agosto, 2014}
+\defencedate{Mes Día, 2014}
+\copyrightyear{2014}
+\convocation{Mes}{Año}
+
+%\phd
+\degree{Doctor en Informática}
+\degreeinitial{Doctor en Informática}
+
+\supervisor{Dr. Ignacio Alvarez-Hamelin}
+
+\firstreader{Dra. Jurado}
+\secondreader{Dr. Jurado}
+\thirdreader{Dr. Jurado}
+
+
+%%% ZONA PARA LA PRIMERA PAGINA EN SP
+%\title{\textbf{Titulo en Espanol}}
+%\dept{Ingenier\'ia en Inform\'atica}
+%\faculty{Ingenier\'ia}
+%\university{Instituto Tecnol\'ogico de Buenos Aires}
+%\address{Buenos Aires, Argentina}
+%%
+%\submitdate{Month Day, Year}
+%\defencedate{Month Day, Year}
+%\copyrightyear{Year}
+%\convocation{Month}{Year}
+% FINNNNN
+
+
+%\dedicate{This is the optional\\
+%dedication page.\\
+%Break lines up\\
+%like this.}
+
+
+\nodedicationpage
+%\notableofcontents
+\nolistoftables
+\nolistoffigures
+
+
+%{
+%\typeout{:?000000000} % Don't bother with over/under-full boxes
+\beforepreface
+%\typeout{:?111111111} % Process All Errors from Here on
+%}
+ 
+\begin{abstract}
+En este trabajo se presenta una tecnica novedosa de transmisión de datos en redes de tipo broadcast de manera criptograficamente segura utilizando tecnicas de espectro expandido.
+\end{abstract}
+
+% \newpage
+% \mbox{}
+% \newpage
+
+% \begin{abstract}
+% Aquí la versi\'on en ingl\'es del abstract (la segunda).
+% \end{abstract}
+
+
+\begin{listofpubs}
+Lo reportado en las siguientes publicaciones conforma la base de la
+presente tesis.
+
+\begin{itemize}
+\item publicación 1
+\item publicación 2
+\end{itemize}
+\end{listofpubs}
+
+
+\begin{acknowledgements}
+Agradecimientos...
+\end{acknowledgements}
+
+
+
+\include{Chapters/Chapter00_notacion}
+\addcontentsline{toc}{chapter}{Notaciones}
+
+% \listoftables
+% \addcontentsline{toc}{chapter}{List of Tables}
+\listoffigures
+\addcontentsline{toc}{chapter}{Lista de Figuras}
+
+
+
+\afterpreface
+\linespread{1.5}
+% ------------------------------------------------------------------------
+
+%AQUI CHAPTERS
+
+% \chapter[Introduction]{Introduction}
+% ...
+% \chapter[Future Work]{Future Work}
+
+\include{Chapters/Chapter01}
+\include{Chapters/Chapter02}
+\include{Chapters/Chapter03}
+%\include{Chapters/Chapter04}
+%\include{Chapters/Chapter05}
+%\include{Chapters/Chapter06}
+%\include{Chapters/Chapter07}
+
+% ********************************************************************
+% Backmatter
+%*******************************************************
+\appendix
+\cleardoublepage
+%\part{Apéndice}
+\include{Chapters/Chapter0A}
+
+
+
+% ------------------------------------------------------------------------
+
+%BIBLIOGRAFIA
+\linespread{1.44}
+\bibliographystyle{amsplain}
+\bibliography{vb_fgct,IEEEabrv,IEEEorte,confEUA}
+
+% =================================================================
+% Dummy directive
+% Included for Gather Purpose only:
+% %input "Xbib.bib"
+% is no longer necessary because
+%  \bibliography{xbib}
+% is now defined as an input directive
+% (see Options -> Advanced -> Tree [INPUT_DIRECTIVES] for details...
+% It can be reconfigured!
+% =================================================================
+\end{document}
+% ------------------------------------------------------------------------
