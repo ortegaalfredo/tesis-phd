@@ -251,14 +251,21 @@ $$ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right) $$
 
 
 \subsection{Filtros de bloom}
-As discussed in section 2, this leads to collisions. Since the modulation format is OOK, only transmitted ‘1’s can interfere with ‘0’s.
-This behaviour can be modelled as a Z-channel because the superposition of individual light pulses representing ‘1’s
-can only be identified as a ‘1’, but a received ‘0’ is an unmistakable sign of the absence of pulses in a given time slot.
-We found that the Bloom filter [2] provides a convenient structure to correct for errors in this type of channel. This
-technique is borrowed from hashing algorithms and is used to test whether an element is member of a given set. The
-way that we implement this algorithm relies on copying every bit in K slots of the transmitted frame. On the receiving
-end it is sufficient to receive a single ‘0’ out of K copies in order to correctly retrieve the original transmitted ‘0’,
-whereas collisions have no effect on ‘1’s.
+Como se discutió en la seccion [TODO], la colisiones de símbolos son inherentes a la modulación seleccionada.
+En la modulacion OOK utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s.
+Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s, por que la interferencia solamente puede ser aditiva. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el slot de tiempo leido.
+Una buena estructura para representar este tipo de datos es el filtro de Bloom [TODO], que se utiliza generalmente en técnicas de hashing, utilizándolo para tests muy rápidos (O=1) de pertenencia de un miembro en un set.
+La manera en que se implementó este algoritmo en el sistema propuesto se basa es copiar cada bit en K slots del frame transmitido, siendo el frame la representación física del filtro de Bloom. 
+En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K copias del bit, para correctamente inferir que el bit original era originalmente un ‘0’, mientras que si el bit original era un ‘1’, las colisiones no tienen efecto debido a la naturaleza del canal-Z.
+
+%As discussed in section 2, this leads to collisions. Since the modulation format is OOK, only transmitted ‘1’s can interfere with ‘0’s.
+%This behaviour can be modelled as a Z-channel because the superposition of individual light pulses representing ‘1’s
+%can only be identified as a ‘1’, but a received ‘0’ is an unmistakable sign of the absence of pulses in a given time slot.
+%We found that the Bloom filter [2] provides a convenient structure to correct for errors in this type of channel. This
+%technique is borrowed from hashing algorithms and is used to test whether an element is member of a given set. The
+%way that we implement this algorithm relies on copying every bit in K slots of the transmitted frame. On the receiving
+%end it is sufficient to receive a single ‘0’ out of K copies in order to correctly retrieve the original transmitted ‘0’,
+%whereas collisions have no effect on ‘1’s.
 
 \section{Espectro ensanchado}
 

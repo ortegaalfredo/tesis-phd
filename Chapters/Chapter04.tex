@@ -4,23 +4,34 @@
 \subsection{Bloom-filter}
 \subsection{Simulador de ruido óptico}
 %% de orte.text
-The physical optical channel simulation block provides an estimate of
-the BER performance of the optical channel. Simulation steps are as
-follows: RZ upstream traffic coming from all ONUs is assumed to arrive
-at the $128\times1$ splitter with perfect time synchronization, i.e., there is no timing jitter. 
+
+El bloque de simulación del canal óptico provee una estimación del BER propio de la fibra óptica del sistema. Los pasos de la simulación son los siguientes:
+
+El tráfico RZ upstream proveniente de todas las ONUs se asume que alcanza al spliter de $128\times1$ con perfecta Sincronización de bit, o sea, sin fluctuaciones (timing jitter).
+Los slots correspondientes al bit `0' contienen una pequeña intensidad óptica de CW dada por el razón de extinción de Tx.
+Cada ONU on-line en el sistema agrega su propia intensidad de bit `0', incrementando la potencia base total.
+Se asume que cada bit `1' agrega un pulso super-Gaussiano ($m=4$) al nivel de potencia base, con un ciclo de trabajo (duty cycle) de $1/3$.
+
+
+%The physical optical channel simulation block provides an estimate of
+%the BER performance of the optical channel. Simulation steps are as
+%follows: RZ upstream traffic coming from all ONUs is assumed to arrive
+%at the $128\times1$ splitter with perfect time synchronization, i.e., there is no timing jitter. 
 %This allows to simulate merged traffic as a simple addition of optical intensities at bit slots for either `0' or `1' bits. % borrar!
-The `0'-bit slots contain a small CW optical intensity given by the Tx extinction ratio. 
-Each on-line ONU adds its `0'-bit optical intensity yielding a base power level.
+%The `0'-bit slots contain a small CW optical intensity given by the Tx extinction ratio. 
+%Each on-line ONU adds its `0'-bit optical intensity yielding a base power level.
 % As many bit `0' optical intensities are added as on-line ONUs to produce a base power level.  
-Each `1'-bit adds a super-Gaussian ($m=4$) pulse, duty cycle $1/3$, to the base power level. %, with rising edge at slot start and peak amplitude accordingly to Tx optical mean output power.
+%Each `1'-bit adds a super-Gaussian ($m=4$) pulse, duty cycle $1/3$, to the base power level. %, with rising edge at slot start and peak amplitude accordingly to Tx optical mean output power.
 % As many bit `1' intensities are added to base level as active Tx there are at each simulation bit slot.
- 
-Upstream and downstream merged traffic suffers from attenuation due to
-splitter, fiber, and
-splice losses. The power budget is balanced by an EDFA with $27$~dB constant gain.
-Amplified spontaneous emission from the EDFA is modeled by white Gaussian
-noise, with intensity proportional to the amplifier noise figure ($7$~dB), and is added
-after the EDFA. 
+
+Tanto el tráfico saliente como el entrante sufren atenuaciónes debidas a múltiples factores que incluyen pérdidas en el splitter, fibra y empalme (Splice). El presupuesto de potencia (Power budget) se balancea mediante un EDFA con una ganancia constante de $27$~dB. La emisión espontanea amplificada del EDFA es modelada como ruido blanco gaussiano, con una intensidad proporcional a la figura de ruido del amplificador ($7$~dB), y es agregada luego del EDFA.
+
+%Upstream and downstream merged traffic suffers from attenuation due to
+%splitter, fiber, and
+%splice losses. The power budget is balanced by an EDFA with $27$~dB constant gain.
+%Amplified spontaneous emission from the EDFA is modeled by white Gaussian
+%noise, with intensity proportional to the amplifier noise figure ($7$~dB), and is added
+%after the EDFA. 
 
 %Real EDFAs gain increases with higher input power, i.e. amplification is not
 %linear with number of active Txs. Settling for worst case scenario simulation
@@ -36,10 +47,13 @@ after the EDFA.
 %amounting to a $27.5\,dB$ attenuation; so for one active Tx input power at each
 %Rx would be $-27\,dBm$.
 
-The input optical signal at the receiver is filtered (2nd order low-pass Butterworth filter, $25$~GHz bandwidth) and photodetected assuming a standard PD responsivity (see section 4.4.3 of~\cite{Agrawal:xx}).
-White Gaussian noise accounting for thermal and shot noise is then added
-to the photocurrent, and 
-electrical filtering is applied (2nd order low-pass Butterworth filter, $14$~GHz bandwidth).
+La señal de entrada óptica al receptor es filtrada (con un filtro Butterworth de 2do orden y $25$~GHz de ancho de banda) y fotodetectada asumiendo la respuesta de un dispositivo PD estandard (Ver seccion 4.4.3 de ~\cite{Agrawal:xx}).
+Posteriormente, ruido blanco gaussiano es agregado, para representar el ruido térmico y ruido de disparo o ruido shot, y un nuevo filtro eléctrico es aplicado (en este caso es un filtro Butterworth de 2do orden y $14$~GHz de ancho de banda). [TODO: Porque?]
+
+%The input optical signal at the receiver is filtered (2nd order low-pass Butterworth filter, $25$~GHz bandwidth) and photodetected assuming a standard PD responsivity (see section 4.4.3 of~\cite{Agrawal:xx}).
+%White Gaussian noise accounting for thermal and shot noise is then added
+%to the photocurrent, and 
+%electrical filtering is applied (2nd order low-pass Butterworth filter, $14$~GHz bandwidth).
 %Simulating the decision process a mean of samples around maximum eye opening is compared to a threshold current. 
 %Current in case of `1' bits collision is higher than that of a single active Tx, so threshold is established assuming that later case.
 
@@ -65,24 +79,32 @@ optical channel simulation output.
 
 
 %\section{Simulation results}
-Noise fluctuations at power levels near the PD sensitivity limit have an important effect on signal detection. 
+
+Las fluctuaciones a niveles de potencia cercanos al límite de sensibilidad del dispositivo PD tienen un importante efecto en la detección de la señal.
+El ruido de shot es particularmente preocupante ya que es proporcional al la fotocorriente media. En nuestra propuesta, este ruido es mas alto que en PONs comunes ya que la intensidad del bit `0' de todas las ONUs presentes contribuyen al mismo.
+La intensidad resultante de la potencia de base óptica es por lo tanto altamente dependiente del razón de extinción de Tx.
+En la Fig.~\ref{sim:optical} se muestra el nivel de razín de extinción mínimo requerido para lograr un BER arbitrario en la capa física como una función del número de ONUs presentes on-line.
+%Noise fluctuations at power levels near the PD sensitivity limit have an important effect on signal detection. 
 %Detection being made at power levels near PD sensitivity is highly sensitive to changes in noise.
-Shot noise is of particular concern as it is proportional to the mean photocurrent.
-In our network proposal the later is higher than in PONs as bit
-`0' optical intensities from all ONUs are added.
-The resulting base-level optical intensity is then heavily dependent on the Tx extinction ratio.
-Fig.~\ref{sim:optical} shows minimal extinction ratios required to
-achieve an arbitrary BER in the physical layer as a function of the
-number of on-line ONUs.
+%Shot noise is of particular concern as it is proportional to the mean photocurrent.
+%In our network proposal the later is higher than in PONs as bit
+%`0' optical intensities from all ONUs are added.
+%The resulting base-level optical intensity is then heavily dependent on the Tx extinction ratio.
+%Fig.~\ref{sim:optical} shows minimal extinction ratios required to
+%achieve an arbitrary BER in the physical layer as a function of the
+%number of on-line ONUs.
 \begin{figure}[!t]
     \centering
       \includegraphics[angle= 270, width=3.5 in]{orte03.pdf}
-      \caption{Physical layer simulation result: Minimal extinction ratio required to assure a given BER}
+%      \caption{Physical layer simulation result: Minimal extinction ratio required to assure a given BER}
+      \caption{Resultado de simulaciones de la capa física: Nivel de razón de extinción mínimo requerido para asegurar un cierto BER}
       \label{sim:optical}
 \end{figure}
-In the $128$ ONUs scenario a  BER$<10^{-3}$ can be achieved using
-commercially available transmitters with an extinction ratio $\simeq16.6$~dB.
-This BER is low enough to allow for logical-channel error-correction routines that guarantee error-free transmission, while still making use of a fair fraction of channel capacity.
+En el escenario de $128$ ONUs presentes, un BER de $<10^{-3}$ puede ser logrado utilizando transmisores del tipo comercial con un razón de extinción de $\simeq16.6$~dB.
+Este BER es lo suficientemente bajo para permitir rutinas de corrección de errores al nivel del canal lógico, que garanticen la transmisión libre de errores realizando una utilización acotada de la capacidad total del canal.
+%In the $128$ ONUs scenario a  BER$<10^{-3}$ can be achieved using
+%commercially available transmitters with an extinction ratio $\simeq16.6$~dB.
+%This BER is low enough to allow for logical-channel error-correction routines that guarantee error-free transmission, while still making use of a fair fraction of channel capacity.
 % perform correctly and still use a fair fraction of channel capacity.
 % Fig.~\ref{sim:optical} shows simulation results for the BER vs OSNR
 % for different numbers of ONUs with fixed electrical SNR $\simeq 42$~dB.
@@ -102,18 +124,27 @@ This BER is low enough to allow for logical-channel error-correction routines th
 \begin{figure}[!t]
     \centering
       \includegraphics[angle=270 ,width=3.5 in]{orte04.pdf}
-    \caption{Simulation results: Logical channel}
+%    \caption{Simulation results: Logical channel}
+    \caption{Resultados de la simulación: canal lógico}
       \label{sim:access}
 \end{figure}
-Fig.~\ref{sim:access} shows simulation results for the fraction of the total
-capacity and the BER of one channel at the coding level (circles) and 
-including physical layer impairments (squares). These results were obtained by
-sending one Gigabit of data for each ONU simultaneously.
-This figure shows a channel utilization of $15.7\%$ when all of $128$ ONUs
-are transmitting simultaneously, with a BER$<10^{-8}$. 
-From Fig. \ref{arch:fig1} we observe a penalty of $8$ ONUs when
-impairments from the optical layer (mainly extinction ratio and noise from EDFA and PDs) are taken into account.
-Considering that the system was designed to support asynchronous communications (e.g., Ethernet), it is not likely that all the ONUs will transmit simultaneously (e.g., Internet links often operate at most at $90\%$ load); and therefore our system has a BER $<10^{-8}$ for each channel when 119 ONUs are transmitting at a same time ($119/128>0.9$).
+
+La Fig.~\ref{sim:access} muestra los resultados de la simulación del canal, comparando el porcentaje logrado con respecto a la capacidad total del canal y el BER medido en un solo canal, con respecto la número de ONUs on-line. Se observan dos mediciones, la primera (círculos) sin incluir el efecto de ruido producido en la capa física, y la segunda (cuadrados) incluyéndolo.
+Los resultados fueron obtenidos enviando un gigabit de datos por cada ONU simultáneamente. Esta figura muestra una utilización de canal de $15.7\%$ cuando todos los $128$ ONUs estan transmitiendo simultáneamente, con un BER de $<10^{-8}$. 
+De la figura \ref{arch:fig1} podemos observar una penalización de $8$ ONUs cuando el ruido de la capa óptica es tomado en cuenta (Mayormente la razón de extinción y el ruido producido por el EDFA y los PDs).
+Considerando que el sistema fue diseñado para soportar comunicaciones asincrónicas (Ej. Ethernet), no es probable que en el uso normal todas las ONUs transmitan simultáneamente; por lo tanto este sistema tiene un BER de $<10^{-8}$ para cada canal cuando 119 ONUs estan transmitiendo al mismo tiempo lo que supone una carga máxima del $90\%$ ($119/128>0.9$). 
+
+%Fig.~\ref{sim:access} shows simulation results for the fraction of the total
+%capacity and the BER of one channel at the coding level (circles) and 
+%including physical layer impairments (squares). 
+
+%These results were obtained by
+%sending one Gigabit of data for each ONU simultaneously.
+%This figure shows a channel utilization of $15.7\%$ when all of $128$ ONUs
+%are transmitting simultaneously, with a BER$<10^{-8}$. 
+%From Fig. \ref{arch:fig1} we observe a penalty of $8$ ONUs when
+%impairments from the optical layer (mainly extinction ratio and noise from EDFA and PDs) are taken into account.
+%Considering that the system was designed to support asynchronous communications (e.g., Ethernet), it is not likely that all the ONUs will transmit simultaneously (e.g., Internet links often operate at most at $90\%$ load); and therefore our system has a BER $<10^{-8}$ for each channel when 119 ONUs are transmitting at a same time ($119/128>0.9$).
 %, removing only one ONU re-establish the desired BER. 
 %
 %It is worth to remark that, even if the optical channel can induce a
@@ -121,10 +152,10 @@ Considering that the system was designed to support asynchronous communications 
 %very large number of errors (it is based on
 %LDPC+Reed-Solomon+Bloom-Filters), as can be seen on the curve with squares
 %at fig.~\ref{sim:access}.
-Observe that the high error rates correspond to a
-worst-case scenario when all ONUs are transmitting simultaneously at
-full capacity, and also 
-there is a low penalty due to physical layer impairments.
+%Observe that the high error rates correspond to a
+%worst-case scenario when all ONUs are transmitting simultaneously at
+%full capacity, and also 
+%there is a low penalty due to physical layer impairments.
 %Figure~\ref{sim:optical} presents the simulation's BER vs optical OSNR
 %for different numbers of ONUs. %[VAB]
 %As the number of ONUs increases higher BERs are obtained at the same optical SNR (electrical SNR is fixed at $\simeq 42\,dB$). In particular there is a penalty of about $30\;dB$ for 128 ONUs in comparison to 1 ONU. This is expected as a consequence of the higher probability of simultaneous bit `1' transmissions (collisions) yielding pulses (logical `1's) of different powers (sum of the power of each transmitter). Higher powers demand more time to settle post filtering current to logical `0' levels. If the following bit slot is indeed a logical `0' an erroneous determination is more possible with a higher collision probability. Nevertheless it can be inferred from simulation results that optical channel should not add significantly to the BER for the whole link as the estimated optical SNR of $\geq 100\,dB$ even for the worst case scenario with 128 ONUs present.
@@ -299,12 +330,30 @@ ese módulo fue desactivado.
 
 \subsection{Implementación del sistema sobre 8B/10B}
 \section{Redes acústicas}
-\subsection{Sincronización}
-% de newJIS_140512
-On-Off Keying modulation of sound waves, following the Z-channel interface model described in Section 2.2., encode the transmitted bits as pulses. Carrier frequency can vary from 10 kHz to 16 kHz. Good results can be obtained with a rate of 1000 bps at frame level. In experiments, delay (the time for a bit to traverse the network) was very high, due to Reed-Solomon 223/255 coding, a frame to support up to 16 users and the low capacity of the physical media. A more sensible choice of FEC algorithm (like BCH [12]) could drastically reduce data delay. Simple pulse shaping is realized using a pass-band filter at the output of the modulation and also at the input of the demodulator. This filter also helps reject unwanted interference.
-As it follows from the description of the communication channel, synchronization between the transmitter and receiver is essential for the correct decoding of information. For this purpose, an initial synchronization pattern is sent, so the receiver can adjust parameters like phase and decision level (see Figure 3). For the data bits transmission a duty cycle of 50\% showed in our experiments an enhanced detection. Clock drift and jitter are not significant at this low transmission speed and so no correction is required, making the software modem implementation very simple. Decision level is dynamic, meaning it is constantly re-calculated from averaged input data. The receiver symbol phase is also corrected using the input data as reference. Notice that this simple synchronization method allows detecting the frame start as well as the bit slot; both are needed at every communication. Moreover, once the data began to be transmitted, the communication becomes indecipherable thanks to the CS-PRNG.
 
 \subsection{Modulación}
+% de newJIS_140512
+El medio de transmisión sónico utiliza ondas de presión en lugar de electromagnética pero las técnicas de modulación que pueden utilizarse son las mismas.
+Sin embargo, no todas las modulaciones siguen el comportamiento de canal Z descrito en la Seccion [TODO].
+La modulación On-Off Keying (Un caso especial de modulación ASK, Amplitude Shift Keying), es uno de los tipos de modulación que permite implementar un canal Z sobre un medio acústico si se utiliza sobre cierto rango de parámetros. Utilizando transductores (micrófonos y parlantes) comerciales del tipo presentes en la mayoría de los dispositivos móviles probados, la frecuencia de portadora puede variar de 10 Khz a 16 Khz. Se obtienen resultados buenos con una tasa de transmisión de 1000 bps al nivel de frame. En los experimentos que se detallaran en las secciones siguientes, el retraso (delay) o tiempo que le lleva a un bit atravesar la red, fue extremadamente alto debido a una combinación de baja velocidad de transmisión y la necesidad de un buffer muy grande (1024 bits) necesario para la utilización del esquema de corrección de errores seleccionado (Reed-Solomon 223/255). Si bien aumentar la velocidad de transmisión no es sencillo, modificar el algoritmo de corrección de errores o sus parámetros (Por ejemplo, utilizar algún esquema tipo BCH [12]) podria reducir el delay de datos drásticamente.
+
+Como tecnica de ``pulse-shaping'' se utiliza un simple filtro FIR pasa-banda a la salida de la etapa de modulación, así como también en la entrada de la etapa de demodulación. Este filtro además de reducir el ancho de banda utilizado, ayuda a rechazar interferencias.
+Adicionalmente un duty-cycle de 50\% demostró ser el óptimo para la modulación.
+%On-Off Keying modulation of sound waves, following the Z-channel interface model described in Section 2.2., encode the transmitted bits as pulses. Carrier frequency can vary from 10 kHz to 16 kHz. Good results can be obtained with a rate of 1000 bps at frame level. In experiments, delay (the time for a bit to traverse the network) was very high, due to Reed-Solomon 223/255 coding, a frame to support up to 16 users and the low capacity of the physical media. A more sensible choice of FEC algorithm (like BCH [12]) could drastically reduce data delay. 
+
+%Simple pulse shaping is realized using a pass-band filter at the output of the modulation and also at the input of the demodulator. This filter also helps reject unwanted interference.
+\subsection{Sincronización}
+% de newJIS_140512
+Como se desprende de la descripción del canal de comunicaciones, la sincronización entre el transmisor y el receptor es esencial para la correcta decodificación de la información. 
+En el caso del medio óptico la sincronización de bit y word debe realizarse a tasas tan elevadas que requiere necesariamente soporte de hardware por parte del transceptor.
+Sin embargo a las reducidas tasas (1000 bps) utilizadas en el canal acústico permiten realizar una sincronización por software sin ningún soporte de hardware adicional. 
+El método es muy similar al utilizado en el canal óptico: Un patrón inicial de sincronización es enviado, para que el receptor pueda realizar un ajuste de parámetros tales como fase y umbral de decisión (Ver Fig. [TODO]). La deriva y fluctuación del reloj del sistema (drift y jitter) no son significantes a esta baja velocidad de transmisión por lo que no se requiere corrección de ningun tipo, haciendo que la Implementación del modem por software sea muy sencilla.
+Ciertos parámetros si bien son inicializados en la etapa de sincronización, son por naturaleza dinámicos y se ajustan periódicamente, como por ejemplo el umbral de decisión, que es recalculado a partir de un promedio de los datos de entrada. La fase es también corregida utilizando los datos de entrada como referencia. Notar que este método de sincronización simple permite detectar el comienzo de frame a su vez que se alinea a nivel de bit; ambas alineaciones son necesarias en cada comunicación (pero la alineación de frame solamente entre los ONUs comunicantes). Adicionalmente, una vez comenzada la transmisión, los datos seran indecifrables gracias al algoritmo de time-hopping guiado por un CS-PRNG.
+
+%As it follows from the description of the communication channel, synchronization between the transmitter and receiver is essential for the correct decoding of information. For this purpose, an initial synchronization pattern is sent, so the receiver can adjust parameters like phase and decision level (see Figure 3). For the data bits transmission a duty cycle of 50\% showed in our experiments an enhanced detection. Clock drift and jitter are not significant at this low transmission speed and so no correction is required, making the software modem implementation very simple. Decision level is dynamic, meaning it is constantly re-calculated from averaged input data. The receiver symbol phase is also corrected using the input data as reference. Notice that this simple synchronization method allows detecting the frame start as well as the bit slot; both are needed at every communication. Moreover, once the data began to be transmitted, the communication becomes indecipherable thanks to the CS-PRNG.
+
+
+
 \subsection{Medición multi-usuario}
 \subsection{Medición distintas distancias}
 
