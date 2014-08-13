@@ -36,6 +36,7 @@ A su vez, se puede expandir la señal en tres dominios:
 La desventaja de la técnica del espectro expandido, que es utilizar mucho espectro por bits transmitido, o lo que también se denomina baja densidad espectral, a veces no afecta demasiado al tener el canal una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI, en todas sus versiones.
 
 \subsection{Códigos de generación pseudo-aleatorio}
+\label{PRNGs} 
 Para que un código CDMA pueda utilizarse para obtener privacidad en la comunicación, es necesario que el parámetro a expandir, sea la frecuencia, el tiempo o el código utilizado, sea guiado o seleccionado por un generado pseudo-aleatorio o PRBS, que son algoritmos que basados en un parámetro de inicialización o semilla, son capaces de generar un stream de numeros aparentemente aleatorios, pero en realidad totalmente determinísticos. 
 Es necesario que los nodos que participen de la comunicación puedan generar exactamente la misma secuencia y compartan el parámetro de generación o semilla. Esto es equivalente a lo que en criptografía se denomina un algoritmo criptográfico simétrico.
 Existen muchas maneras y algoritmos de generar streams pseudo-aleatorios. Algunos algoritmos están optimizados para que su periodo (la cantidad de números en su salida antes que el patrón se repita) sea enorme, como por ejemplo el algoritmo Mersenne-twister.

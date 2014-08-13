@@ -1,7 +1,19 @@
-\chapter{Sistema propuesto (teoría y simulaciones)}
+\chapter{Sistema propuesto: teoría y simulaciones}
 
-Se propone un sistema de comunicaciones óptico con una estructura de hub como se aprecia en la figura \ref{fig_hub}. Utilizando este Diseño físico con una etapa adicional de codificación y correccion de errores. El hub central es una etapa totalmente óptica que puede o no estar amplificada. Con la amplificacion optica se incrementa notablemente el rango, de 5 km a mas de 20 km.
-La pila de codificación se detalla en la figura \ref{fig_stack} donde puede verse un arreglo convencional, excepto en la ultima 
+Se propone un sistema de comunicaciones punto a punto y punto a multipunto de medio compartido o tambien denominado de broadcast. En la figura \ref{fig_hub} se aprecia su estructura logica del sistema, que en la versión óptica equivale a una red de tipo estrella con un hub amplificador central.
+Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el medio por un intérvalo determinado de tiempo denominado slot. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un slot diferente. La diferencia del sistema propuesto con un sistema TDMA común en donde el slot es asignado a cada cliente de manera periódica, en el sistema propuesto el slot se asigna mediante un algoritmo pseudo aleatorio criptograficamente seguro. Esto tiene dos efectos fundamentales: 
+
+\begin{itemize}
+ \item Un atacante no puede predecir los datos que esta transmitiendo un cliente en particular\footnote{Algunos parametros adicionales son necesarios para obtener privacidad, tales como el tamaño del slot}
+ \item Existira una inevitable inteferencia entre los clientes, lo que requiere la utilización de algoritmos de corrección de errores.
+\end{itemize}
+
+Como se describe en el capítulo \ref{PRNGs}, existen varios algoritmos de generación de numeros pseudo aleatorios criptograficamente seguros estandarizados, cuya mayor dificultad es la implementación sobre silicio de manera eficiente. Esta tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera, mientras sea un algoritmo estandarizado por la industria.
+
+Sin embargo, es en la corrección de errores donde se presenta un aporte, ya que se necesitó desarrollar algoritmos adaptados al medio de transmisión y a la grán cantidad de interferencia producida por el método de selección de slot.
+
+%Utilizando este Diseño físico con una etapa adicional de codificación y correccion de errores. El hub central es una etapa totalmente óptica que puede o no estar amplificada. Con la amplificacion optica se incrementa notablemente el rango, de 5 km a mas de 20 km.
+La pila de codificación se detalla en la figura \ref{fig_stack} donde puede apreciarse un arreglo convencional, excepto que en la ultima etapa de correccion de errores se aplica el algoritmo de Bloom filters, que es la etapa que optimiza la corrección de errores convencional (Reed Solomon).
 
 \begin{figure}[t]
 \centering
@@ -267,10 +279,7 @@ En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K co
 %end it is sufficient to receive a single ‘0’ out of K copies in order to correctly retrieve the original transmitted ‘0’,
 %whereas collisions have no effect on ‘1’s.
 
-\section{Espectro ensanchado}
-
-Repetido en \ref{espectroensanchado} ??
-\subsection{Time-hopping con filtros de bloom}
+\section{Time-hopping con filtros de bloom}
 
 \section{Minimización de peso de Hamming}
 %% extraido de dline-pub.text
