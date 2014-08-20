@@ -2,6 +2,9 @@
 
 \subsection{Códigos correctores de errores}
 En toda comunicación es importante la confiabilidad de la misma, y como ningún sistema es perfecto es esperable que se produzcan errores en la transmisión que se presentan como bits erroneos detectados por el receptor. 
+
+La idea de un código corrector de errores esta relacionada con la técnica de espectro expandido, siendo ambos métodos que ayudan a la transmisión de la información reduciendo la entropía de la información transmitida, o lo que es lo mismo, aumentando la redundancia de la información. 
+
 La manera mas simple de corregir estos errores es usar un algoritmo de detección de errores como puede ser un Checksum, CRC o hash[CITA], e iniciar un proceso de retransmisión de la porción o trama de datos afectada. Esto posee la desventaja de ser costoso tanto en ancho de banda perdido, como en delay de transmisión. En enlaces de muy alta velocidad las elevadas tasas de retransmisiones hacen a este algoritmo sumamente ineficiente. 
 Por lo que es deseable utilizar un algoritmo que pueda detectar y corregir errores basado solamente en los bits recibidos, sin utilizar retransmisiones. Esto se denomina Forward Error Correction Codes, o FEC Codes [CITA] de los cuales existen diferentes tipos de acuerdo con sus aplicación, performance y parámetros.
 
@@ -10,6 +13,58 @@ Los códigos BCH y Reed-Solomon son usados ampliamente en multitud de industria 
 Este tipo de código si bien es relativamente antiguo, es todavía utilizado en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps [CITA: IEEE P802.3bj  o ``FORWARD ERROR CORRECTION FOR 400G: INITIAL THOUGHTS''] debido a su robustez, bajo over
 
 \subsubsection{LDPC}
+El esquema de corrección de errores LDPC (Low Density Parity Check) es muy utilizado actualmente debido a su gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
+Antes de ahondar en la descripción de este algoritmo cabe aclarar que a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una performance similar desde el punto de vista de corrección de errores.
+Básicamente es un código lineal que utiliza una matriz de paridad grande y dispersa.
+La matriz H es tal que cualquier codeword valido x cumple con $H*x=0$
+
+\paragraph{LDPC: Generador de matriz}
+La matriz generadora puede crearse facilmente si H es de la forma $[D|I]$, simplemente formando la matriz:
+$$G=[I|D']$$
+Donde D' es la transpuesta de la matriz D
+Para la generacion de la matriz se opto por utilizar un algoritmo random y luego aplicando algunos tests, para lograr una matriz sistemática de rate entero (1/2, 1/3, etc.)
+Para verificar se G genera vectores cuya matriz de paridad es H, puede verificarse que:
+$$ H*G'=0 $$
+
+Podemos definir la matriz de paridad H como una matriz de paridad que tenga mas de 3 unos por fila y una cantidad similar por columna. Buenos resultados se obtienen a partir de matrices de 200x100.
+Se puede comenzar por una matriz vacía $H = 0$ del tamaño deseado, y ir agregándole unos al azar. Cierto análisis es necesario para garantizar que no se cumplan ciclos y que la cantidad de unos por columna y por fila es la deseada. De esto se encargan los algoritmos llamados evencol y evenrow.
+
+El generador puede generar matrices de cualquier tamaño, de esta manera:
+
+$$ ./genMatrix <width> <height> <ones per row>$$
+
+La matriz se genera en la salida estandard. El formato es el utilizado por la libreria boost:ublas.
+
+NOTA: La matriz siempre esta compuesta de simbolos en GF(2) (O sea, ceros y unos)
+
+\paragraph{LDPC: encoder}
+
+El vector inicial se toma de la entrada estandard y el codeword se emite en la salida estandard. La sintaxis es muy sencilla:
+
+$$ ./ldpcen <matriz> < in >out $$
+\paragraph{LDPC: decoder}
+Si se invoca este filtro mediante el nombre decodificador, tomara el codeword de la entrada estandard, aplicara el algoritmo de belief-propagation (Hard-decision) y se emite el vector original por la salida estandard:
+La diferencia radica que en nuestro caso, al ser un canal asimetrico no se permite el bit-flip de un valor cero a un valor uno, ya que es imposible que se produzca ese error.
+La linea de comando es la siguiente:
+
+$$ ./ldpcdec <matriz> <in >out $$
+
+La conversion codeword->vector es sencilla, ya que al ser un codigo sistemático solo se necesita eliminar la parte del vector que representa la paridad añadida.
+
+Se generaron muchas matrices, desde 256x128 hasta matrices muy grandes de 10000x5000, pero el tiempo de decodificacion crece enormemente para matrices grandes.
+
+\paragraph{LDPC: optimizacion}
+
+Debido a la naturaleza iterativa del decodificador ldpc, pronto se convirtio en el cuello de botella de la simulacion. Para acelerar el sistema, se opto por realizar la siguiente optimizacion:
+LDPC consta basicamente de varios loops, dentro de los cuales se accede a la matriz de paridad, y a otras matrices que acumulan datos intermedios. Primeramente la implementacion fue realizada como mencionamos utilizando boost:ublas, pero luego se comprobo que una implementacion utilizando arrays de C era hasta 3 veces mas rapida.
+Luego se procedio a realizar un algoritmo de ``unrolling'' de estos loops, generando codigo especifico a una matriz dada, sin ningun tipo de loop. Obviamente este codigo es mucho mas grande, pero la aceleracion provista es aun mayor, del orden de 8 veces mas rapido que en implementaciones iniciales.
+La manera de invocar el generador de codigo es la siguiente:
+
+$$ ./genLdpcDecoder matriz  > decodeGen.h $$
+
+El archivo generado decodeGen.h es el decodificador especifico para la matriz dada. Este header de C es luego incluido desde el decodificador ldpcenc.cpp y compilado. Al ser generalmente un archivo de un megabyte para una matriz pequeña de 1024x512, el proceso de compilacion el largo y requiere de mucha memoria.
+Por otra parte, no se optimizo el proceso de codificacion ldpc, ya que consiste solo de una multiplicacion de un vector por una matriz, y es una de las tareas en la que boost:ublas es especialmente eficiente.
+
 
 \subsubsection{Viterbi/Convolucional}
 

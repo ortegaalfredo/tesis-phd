@@ -8,12 +8,12 @@ Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el me
  \item Existira una inevitable inteferencia entre los clientes, lo que requiere la utilización de algoritmos de corrección de errores.
 \end{itemize}
 
-Como se describe en el capítulo \ref{PRNGs}, existen varios algoritmos de generación de numeros pseudo aleatorios criptograficamente seguros estandarizados, cuya mayor dificultad es la implementación sobre silicio de manera eficiente. Esta tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera, mientras sea un algoritmo estandarizado por la industria.
+Como se describe en el capítulo \ref{PRNGs}, existen varios algoritmos de generación de numeros pseudo aleatorios criptograficamente seguros estandarizados, cuya mayor dificultad es la implementación sobre silicio de manera eficiente. Esta tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera mientras sea un algoritmo estandarizado por la industria y no posea ninguna vulnerabilidad conocida. Otra virtud que debe poseer el algoritmo seleccionado es una alta relacion de bits generados por unidad de tiempo o clock, ya que al ser utilizados para seleccionar la posición de cada bit en el frame, se necesitan $\log_2(M)$ bits aleatorios por cada bit de datos, por lo que en general la velocidad del PRNG afectara directamente la velocidad total de codificación y decodificación del sistema.
 
-Sin embargo, es en la corrección de errores donde se presenta un aporte, ya que se necesitó desarrollar algoritmos adaptados al medio de transmisión y a la grán cantidad de interferencia producida por el método de selección de slot.
+El aporte mas importante de esta tesis es en la etapa de corrección de errores, ya que se necesitó desarrollar algoritmos adaptados al medio de transmisión y a la grán cantidad de interferencia producida por el método aleatorio de selección de slot de transmisión.
 
 %Utilizando este Diseño físico con una etapa adicional de codificación y correccion de errores. El hub central es una etapa totalmente óptica que puede o no estar amplificada. Con la amplificacion optica se incrementa notablemente el rango, de 5 km a mas de 20 km.
-La pila de codificación se detalla en la figura \ref{fig_stack} donde puede apreciarse un arreglo convencional, excepto que en la ultima etapa de correccion de errores se aplica el algoritmo de Bloom filters, que es la etapa que optimiza la corrección de errores convencional (Reed Solomon).
+La pila de codificación se detalla en la figura \ref{fig_comstack} donde puede apreciarse un arreglo convencional, excepto que en la ultima etapa de correccion de errores se aplica el algoritmo de filtros de Bloom, donde se aprovecha la caracteristicas asimétrica del canal Z para una corrección de errores adicional.
 
 \begin{figure}[t]
 \centering
@@ -24,68 +24,58 @@ La pila de codificación se detalla en la figura \ref{fig_stack} donde puede apr
 
 \section{Códigos correctores de errores}
 
-Todo sistema de comunicaciones posee errores que deben ser corregidos antes que los datos sean procesados. Una técnica muy utilizada es la de utilizar un algoritmo de detección y retransmisión.
-La idea de un código corrector de errores esta relacionada con la técnica de espectro expandido, siendo ambas métodos que ayudan a la transmisión de la información reduciendo la entropía de la información transmitida, o lo que es lo mismo, aumentando la redundancia de la información. En particular, los sistemas de comunicaciones modernos hacen uso de los métodos de Forward Error Correction (FEC) que no necesitan de retransmisiones.
+La selección del código corrector de errores debe ser guiada por los parámetros del sistema, sin olvidarse de las posibles limitaciones de calculo del sistema, que es una limitación importante al operar con enlaces con tasas de transmisión elevadas.
 
+En nuestro caso se utilizó un típico arreglo de dos códigos de corrección, uno denominado exterior, encandenado con el segundo denominado interior.
+La idea de utilizar dos codigos distintos es la de aprovechar las virtudes de dos tipos de corrección. El código exterior suele ser un código itearativo o convolucional, con una elevada cantidad de paridad y alto poder de detección y corrección. Ciertos tipos de códigos tales como LDPC o codigos Turbo se caracterizan por poseer un piso de error elevado, que es un fenomeno en donde el código pierde efectividad con SNR altos. Esto se soluciona utilizando un segundo codigo corrector denominado interior, que si bien no es tan efectivo a SNR altos como el codigo exterior, es efectivo con SNR bajos, haciendo que el sistema sea efectivo en cualquier condición.
 
+Un parámetro importante en estos algoritmos es el delay, o sea la cantidad de tiempos (medida usualmente en clocks del procesador) que tarda un bit que entra a la etapa de corrección en salir de la misma, luego de la aplicación de la corrección. Este delay es variable segun el algoritmo, algunos algoritmos con un delay importante no pueden ser utilizados en aplicaciones de bajo ancho de banda, ya que retrasan enormemente las comunicaciones. A continuación se detalla el algoritmo de corrección seleccionado.
 
 \subsection{Reed-Solomon}
-Se utilizó un codigo de Reed-Solomon standard 223/255, esto significa que se tienen 32 bytes de paridad por cada 223 bytes de datos, y se pueden corregir hasta 16 bytes. Se utilizo la librería de Phil Karn, y no se utilizaron los bits de sindrome para mejorar la correccion. Todo error conocido es descartado.
+Como código interior se seleccionó el algoritmo Reed-Solomon, un código de bloque con alta efectividad en SNR bajos. Los parametros seleccionados para dicho código son (255,223) o sea, 223 bytes de datos y 32 bytes de paridad. Estos parámetros lograran que el código pueda detectar hasta 32 errores de byte y corregir hasta 16 errores de byte en los 223 bytes del bloque. La selección de estos parametros responde a que el algoritmo de reed-solomon posee implementaciones muy eficientes si se utiliza un tamaño de bloque de 255 bytes. 
+Al ser un estandard muy utilizado, existen implementaciones muy eficientes de reed-solomon con estos parametros especificos, tanto en software como en hardware.
+Existen dos problemas con este algoritmo:
+
+1) Elevado delay: Si bien el delay de codificación es mínimo, el delay de decodificacion es muy elevado, pudiendo sobrepasar facilmente los 1200 clocks.
+2) Si bien el delay de decodificacion es elevado y requiere mucho procesamiento, el solo echo de tener que acumular un bloque de 256 bytes de datos solo para comenzar con la decodificacion, introduce un retraso muy importante especialmente si el sistema se utiliza con bajo ancho de banda, tal como es el caso en la implementacion acustica del sistema.
+
+Ambos problemas se solucionan seleccionando parametros de Reed-Solomon con un menor tamaño de bloque, o un algoritmo similar con menor tamaño de bloque tal como BCH. El problema en este caso es encontrar implementaciones eficientes de los decodificadores ya que no son algoritmos muy utilizados, por lo que la seleccion final fue el estandard Reed-Solomon (255, 223).
+
+Para la simulación numérica por software se utilizó la biblioteca libfec de Phil Karn~\cite{libfec}. Para la implementacion en FPGA se utilizo la implementacion del algoritmo provista de manera gratuita en la biblioteca de nucleos de IP de Xilinx.
 Con posibilidad de error de simbolo P, la posibilidad de error de un codigo reed-solomon R(n/k) es:
 $$P_{rs}= \sum_{k=(\frac{n-k}{2}+1)}^{n} \binom{L}{i} * P^{i} * (1-P)^{L-i} $$
 
-\subsection{LDPC}
-El esquema de corrección de errores LDPC (Low Density Parity Check) es muy utilizado actualmente debido a su gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
-Antes de ahondar en la descripción de este algoritmo cabe aclarar que a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una performance similar desde el punto de vista de corrección de errores.
-Básicamente es un código lineal que utiliza una matriz de paridad grande y dispersa.
-La matriz H es tal que cualquier codeword valido x cumple con $H*x=0$
+Por ejemplo, una ventaja muy importante es que el codigo de correccion exterior puede facilmente detectar la presencia de un error aunque no pueda corregirlo. Esta informacion es una lista con las posiciones en las cuales se tiene la certeza que los símbolos fueron interferidos denominada lista de síndromes, y puede suministrarse al algoritmo de correccion de errores para que la capacidad de corrección del mismo puede aumentar hasta un 100\%~\cite{Moon:05}.
 
-\paragraph{LDPC: Generador de matriz}
-La matriz generadora puede crearse facilmente si H es de la forma $[D|I]$, simplemente formando la matriz:
-$$G=[I|D']$$
-Donde D' es la transpuesta de la matriz D
-Para la generacion de la matriz se opto por utilizar un algoritmo random y luego aplicando algunos tests, para lograr una matriz sistemática de rate entero (1/2, 1/3, etc.)
-Para verificar se G genera vectores cuya matriz de paridad es H, puede verificarse que:
-$$ H*G'=0 $$
+\subsubsection{Características fisicas}
+Un parámetro importante en la selección del algoritmo es la facilidad de implementación sobre hardware digital. Ciertas caracteristicas se vuelven importantes al pasar de implementaciones de software a hardware, tales como tamaño, memoria utilizada y velocidad máxima alcanzada con el hardware disponible, apuntando a que el sistema debe funcionar a tasas de gigabit.
 
-Podemos definir la matriz de paridad H como una matriz de paridad que tenga mas de 3 unos por fila y una cantidad similar por columna. Buenos resultados se obtienen a partir de matrices de 200x100.
-Se puede comenzar por una matriz vacía $H = 0$ del tamaño deseado, y ir agregándole unos al azar. Cierto análisis es necesario para garantizar que no se cumplan ciclos y que la cantidad de unos por columna y por fila es la deseada. De esto se encargan los algoritmos llamados evencol y evenrow.
+A continuación se nombraran las características de la implementación en hardware (FPGA) de Reed-Solomon utilizada.
+El bloque de IP se denomina Reed-Solomon Encoder/Decoder 7.1 de LogiCORE IP. La complejidad espacio-temporal y ciclomática de los algoritmos de codificación de Reed-Solomon son muy distintas a las de su correspondiente algoritmo de decodificación. En general, la decodificación es mucho mas costosa en terminos de recursos de hardware y de latencia agregada al sistema.
 
-El generador puede generar matrices de cualquier tamaño, de esta manera:
+Segun la especificacion de esta implementación~\cite{Xilinx:DS252} el decodificador Reed-Solomon con configuracion CCSDS (que implementa el estandard (255,223)) posee un tamaño de 1364 LUTS (Look-up tables) y 3 bloques de RAM. Como comparación, el diseño completa posee un tamaño de aprox. 20000 LUTS, y la FPGA utilizada posee una capacidad de 50000 LUTS y unos 200 bloques de RAM. La velocidad maxima de este algoritmo en la FPGA utilizada es de unos 350 Mhz.
+Mucho menor es la cantidad de recursos utilizados por el codificador: Son necesarios solo unos 300 LUTS y solo 1 bloque de memoria aunque la velocidad máxima es similar~\cite{Xilinx:DS251}.
 
-$$ ./genMatrix <width> <height> <ones per row>$$
+\subsubsection{Cálculo de latencia}
+La latencia en un sistema esta dada por el tiempo en que un bit tarda en atravesarlo en su totalidad. Específicamente la latencia de esta estapa es importante ya que la latencia agregada por este algoritmo representa un porcentaje importante de la latencia total de la pila de comunicacion del sistema. Es importante notar que los calculos son específicos de una implementación en particular. 
 
-La matriz se genera en la salida estandard. El formato es el utilizado por la libreria boost:ublas.
+La latencia total estara dada por la introducida por la codificación adicionada a la de la decodificación ya que los datos deben atravesar ambas etapas. Pero los tiempos de latencia para la codificación son despreciables, en el orden de 5 clocks. 
 
-NOTA: La matriz siempre esta compuesta de simbolos en GF(2) (O sea, ceros y unos)
+La latencia de la etapa de decodificación es muy superior y puede ser calculada de manera exacta mediante ecuaciones provistas por la hoja de datos. Una manera simplificada es utilizar la figura \ref{fig_rslat} para obtener el delay de procesamiento. El parámetro $t$ se calcula como $t=(n-k)/2$ donde $n$ es la cantidad de simbolos totales en el bloque (en nuestro caso 255) y $k$ es la cantidad de símbolos de datos en el bloque (223 en nuestro caso) por lo que la variable $t=16$.  El retraso total introducida por la decodificación estara dada por la latencia (en nuestro caso aprox. 650 clocks) mas el retraso producto de cargar un bloque entero de datos en el decodificador, que no es despreciable ya que deben ingresarse los datos al bloque IP por medio de un bus serial de un byte de capacidad, por lo que se necesitan de 255 clocks adicionales por cada bloque. 
 
-\paragraph{LDPC: encoder}
+Sumando ambos valores e ignorando la mínima latencia de codificación, podemos afirmar que la latencia introducida por el algoritmo Reed-Solomon en el sistema es de 900 clocks.
 
-El vector inicial se toma de la entrada estandard y el codeword se emite en la salida estandard. La sintaxis es muy sencilla:
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.6 \textwidth]{graphs/rsDelay.pdf} 
+  \caption{Delay de proceso de la implementación de Reed-Solomon utilizada.}
+  \label{fig_rslat}
+\end{figure}
 
-$$ ./ldpcen <matriz> < in >out $$
-\paragraph{LDPC: decoder}
-Si se invoca este filtro mediante el nombre decodificador, tomara el codeword de la entrada estandard, aplicara el algoritmo de belief-propagation (Hard-decision) y se emite el vector original por la salida estandard:
-La diferencia radica que en nuestro caso, al ser un canal asimetrico no se permite el bit-flip de un valor cero a un valor uno, ya que es imposible que se produzca ese error.
-La linea de comando es la siguiente:
 
-$$ ./ldpcdec <matriz> <in >out $$
-
-La conversion codeword->vector es sencilla, ya que al ser un codigo sistemático solo se necesita eliminar la parte del vector que representa la paridad añadida.
-
-Se generaron muchas matrices, desde 256x128 hasta matrices muy grandes de 10000x5000, pero el tiempo de decodificacion crece enormemente para matrices grandes.
-
-\paragraph{LDPC: optimizacion}
-
-Debido a la naturaleza iterativa del decodificador ldpc, pronto se convirtio en el cuello de botella de la simulacion. Para acelerar el sistema, se opto por realizar la siguiente optimizacion:
-LDPC consta basicamente de varios loops, dentro de los cuales se accede a la matriz de paridad, y a otras matrices que acumulan datos intermedios. Primeramente la implementacion fue realizada como mencionamos utilizando boost:ublas, pero luego se comprobo que una implementacion utilizando arrays de C era hasta 3 veces mas rapida.
-Luego se procedio a realizar un algoritmo de ``unrolling'' de estos loops, generando codigo especifico a una matriz dada, sin ningun tipo de loop. Obviamente este codigo es mucho mas grande, pero la aceleracion provista es aun mayor, del orden de 8 veces mas rapido que en implementaciones iniciales.
-La manera de invocar el generador de codigo es la siguiente:
-
-$$ ./genLdpcDecoder matriz  > decodeGen.h $$
-
-El archivo generado decodeGen.h es el decodificador especifico para la matriz dada. Este header de C es luego incluido desde el decodificador ldpcenc.cpp y compilado. Al ser generalmente un archivo de un megabyte para una matriz pequeña de 1024x512, el proceso de compilacion el largo y requiere de mucha memoria.
-Por otra parte, no se optimizo el proceso de codificacion ldpc, ya que consiste solo de una multiplicacion de un vector por una matriz, y es una de las tareas en la que boost:ublas es especialmente eficiente.
+\subsection{Optimizaciones propuestas}
+ 
+Existen ciertas optimizaciones que podrian haberse realizado si se hubiera optado por reimplementar el algoritmo desde cero, pero que al utilizar una implementacion pre-existente no se realizaron. Estas optimizaciones estan relacionadas con la caracteristicas del canal asimétrico, que presenta las ventajas de tener la certeza de que ciertos símbolos fueron transmitidos correctamente. Una posible optimizacion de Reed-Solomon para su utilización sobre canales Z se plantea para una trabajo futuro.
 
 \section{Canal Z con filtros de bloom}
 
