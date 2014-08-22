@@ -42,10 +42,12 @@ Existen dos problemas con este algoritmo:
 Ambos problemas se solucionan seleccionando parametros de Reed-Solomon con un menor tamaño de bloque, o un algoritmo similar con menor tamaño de bloque tal como BCH. El problema en este caso es encontrar implementaciones eficientes de los decodificadores ya que no son algoritmos muy utilizados, por lo que la seleccion final fue el estandard Reed-Solomon (255, 223).
 
 Para la simulación numérica por software se utilizó la biblioteca libfec de Phil Karn~\cite{libfec}. Para la implementacion en FPGA se utilizo la implementacion del algoritmo provista de manera gratuita en la biblioteca de nucleos de IP de Xilinx.
-Con posibilidad de error de simbolo P, la posibilidad de error de un codigo reed-solomon R(n/k) es:
-$$P_{rs}= \sum_{k=(\frac{n-k}{2}+1)}^{n} \binom{L}{i} * P^{i} * (1-P)^{L-i} $$
 
-Por ejemplo, una ventaja muy importante es que el codigo de correccion exterior puede facilmente detectar la presencia de un error aunque no pueda corregirlo. Esta informacion es una lista con las posiciones en las cuales se tiene la certeza que los símbolos fueron interferidos denominada lista de síndromes, y puede suministrarse al algoritmo de correccion de errores para que la capacidad de corrección del mismo puede aumentar hasta un 100\%~\cite{Moon:05}.
+%Con posibilidad de error de simbolo P, la posibilidad de error de un codigo reed-solomon R(n/k) es:
+%$$P_{rs}= \sum_{k=(\frac{n-k}{2}+1)}^{n} \binom{L}{i} * P^{i} * (1-P)^{L-i} $$
+El código (255,223) es particularmente eficiente de implementar digitalmente ya que cada símbolo puede representarse con un byte (existen 255 símbolos). El código posee 32 bytes de paridad y 223 bytes de datos, lo que representa una adicion de 14\% a la cantidad total de datos a transmitir. Este código permite corregir hasta 16 bytes errados, que pueden estar consecutivos, por lo que RS suele utilizarse en canales con errores de tipo ``Erasure'' o errores tipo ráfaga, donde los errores no estan uniformemente distribuidos sino que estan agrupados temporal o espacialmente.
+
+%En ciertas ona ventaja muy importante es que el codigo de correccion exterior puede facilmente detectar la presencia de un error aunque no pueda corregirlo. Esta informacion es una lista con las posiciones en las cuales se tiene la certeza que los símbolos fueron interferidos denominada lista de síndromes, y puede suministrarse al algoritmo de correccion de errores para que la capacidad de corrección del mismo puede aumentar hasta un 100\%~\cite{Moon:05}.
 
 \subsubsection{Características fisicas}
 Un parámetro importante en la selección del algoritmo es la facilidad de implementación sobre hardware digital. Ciertas caracteristicas se vuelven importantes al pasar de implementaciones de software a hardware, tales como tamaño, memoria utilizada y velocidad máxima alcanzada con el hardware disponible, apuntando a que el sistema debe funcionar a tasas de gigabit.
@@ -79,8 +81,16 @@ Existen ciertas optimizaciones que podrian haberse realizado si se hubiera optad
 
 \section{Canal Z con filtros de bloom}
 
-En esta sección vamos a modelar el canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. Es este modelo de ruido, distinto de canales convencionales como por ejemplo ruido Gaussiano, que nos permite innovar en el diseño de algoritmos.
-Empezaremos primeramente estudiando un modelo simplificado del canal por el cual vamos a trasmitir, un simple canal simétrico binario, para despues ahondar en un caso especial de este mismo, denominado Canal Z.
+En esta sección vamos a modelar el canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. 
+Un canal de comunicaciones puede clasificarse primeramente segun el tipo de información transmitida, sea binaria o analógica, por lo cual tendremos canales binarios o analógicos [TODO:CITA].
+Una sub-clasificación del canal de comunicación es segun el comportamiento del ruido del mismo.
+Por ejemplo las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN (Additive White Gaussian Noise). 
+El tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (Z-Channel), un canal digital en el que el ruido afecta solo uno de los símbolos a transmitir.
+
+Es este modelo de ruido lo que nos permite innovar en el diseño de algoritmos adaptándolos y optimizandolos para aprovechar la naturaleza del error, ya que la mayoria de los algoritmos de corrección de errores estan pensados para un canal de ruido simétrico y generalmente analógico.
+Empezaremos primeramente estudiando un modelo simplificado del canal por el cual vamos a trasmitir, el mencionado canal simétrico binario, para despues ahondar en un caso especial de este mismo, denominado Canal Z.
+
+\section{Probabilidad de error de canal binario simétrico}
 \begin{figure}[t]
   \begin{center}
     \includegraphics[scale=0.43]{capacidad/canalBinario.png}

@@ -1,5 +1,5 @@
-Justificacion de porque se utilizo reed-solomon u otros algoritmos. - implenetacion fgpaa
-Mover LDPC al capitulo 2
+Listo - Justificacion de porque se utilizo reed-solomon u otros algoritmos. - implenetacion fgpaa
+Listo - Mover LDPC al capitulo 2
 Agregar optimizaciones LDPC y mover cosas especificas a apendices
 Agregar citas a calculos de entropia y minimizar la explicacion
 Agregar bloque de expansion de simbolo, al lado de bloomfilter
