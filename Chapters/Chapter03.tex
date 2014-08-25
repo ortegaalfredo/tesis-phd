@@ -13,7 +13,7 @@ Como se describe en el capítulo \ref{PRNGs}, existen varios algoritmos de gener
 El aporte mas importante de esta tesis es en la etapa de corrección de errores, ya que se necesitó desarrollar algoritmos adaptados al medio de transmisión y a la grán cantidad de interferencia producida por el método aleatorio de selección de slot de transmisión.
 
 %Utilizando este Diseño físico con una etapa adicional de codificación y correccion de errores. El hub central es una etapa totalmente óptica que puede o no estar amplificada. Con la amplificacion optica se incrementa notablemente el rango, de 5 km a mas de 20 km.
-La pila de codificación se detalla en la figura \ref{fig_comstack} donde puede apreciarse un arreglo convencional, excepto que en la ultima etapa de correccion de errores se aplica el algoritmo de filtros de Bloom, donde se aprovecha la caracteristicas asimétrica del canal Z para una corrección de errores adicional.
+La pila de codificación se detalla en la figura \ref{fig_comstack} donde se aprecia un diseño convencional, excepto que en la ultima etapa de correccion de errores se aplica el algoritmo de filtros de Bloom, que aprovecha la caracteristica de error asimétrico del canal Z para una corrección de errores adicional.
 
 \begin{figure}[t]
 \centering
@@ -82,8 +82,8 @@ Existen ciertas optimizaciones que podrian haberse realizado si se hubiera optad
 \section{Canal Z con filtros de bloom}
 
 En esta sección vamos a modelar el canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. 
-Un canal de comunicaciones puede clasificarse primeramente segun el tipo de información transmitida, sea binaria o analógica, por lo cual tendremos canales binarios o analógicos [TODO:CITA].
-Una sub-clasificación del canal de comunicación es segun el comportamiento del ruido del mismo.
+Un canal de comunicaciones puede clasificarse primeramente segun el tipo de información transmitida, sea binaria o analógica, por lo cual tendremos canales binarios o analógicos \cite{MacKay:2002}.
+Una sub-clasificación del canal de comunicación puede realizarse segun el comportamiento del ruido del mismo.
 Por ejemplo las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN (Additive White Gaussian Noise). 
 El tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (Z-Channel), un canal digital en el que el ruido afecta solo uno de los símbolos a transmitir.
 
@@ -137,6 +137,7 @@ P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{-1/2}
 
 \noindent Donde la última aproximación vale para $n=m$ y $n$ grande.
 
+\iffalse
 
 \vspace{5mm}
 
@@ -208,6 +209,7 @@ La información mútua entre X e Y es:
 $$I(X;Y) = H(X)-H(X|Y)$$
 Mide el promedio de reduccion de la incertidumbre acerca de x que resulta de saber el valor de y, o viceversa: la cantidad promedio de informacion que x revela acerca de y.
 
+\fi
 \subsection{Capacidad de canal}
 
 La capacidad C de un canal discreto sin memoria es :
@@ -217,11 +219,11 @@ C = \max_{{\cal{P}}_x} I(X;Y)
 \end{equation}
 
 O sea, la máxima información mutua entre los alfabetos X de entrada e Y de salida.
-Para hallar el maximo podemos derivar $I(X;Y)$ con respecto a la probabilidad $P_x$.
-Para un canal binario asimétrico sin memoria con probabilidad de error $p$, la capacidad máxima $C$ es:
+Para hallar el máximo podemos derivar $I(X;Y)$ con respecto a la probabilidad $P_x$.
+De \cite{MacKay:2002}, para un canal binario asimétrico sin memoria con probabilidad de error $p$, la capacidad máxima $C$ es:
 
 \begin{equation}\label{Cap}
-C = 1 - H(p) 
+C \approx 1 - H(p) 
 \end{equation}
 
 Si expandimos H(p) en \ref{Cap}:
@@ -230,7 +232,7 @@ $$ c = 1-\left(p \times \log_2\left(\frac{1}{p}\right) + (1-p) \cdot \log_2\left
 Simplificada:
 $$ c = 1 + p * \log_2(p) + (1 - p) * \log_2(1-p) $$
 
-Sin embargo esta capacidad es menor que la que realmente tenemos en nuestro canal, ya que un Z-channel se adecua mayormente a los medios de transmisión ópticos. Describiremos en detalle este caso especial en la siguiente sección.
+%Sin embargo esta capacidad es menor que la que realmente tenemos en nuestro canal, ya que un Z-channel se adecua mayormente a los medios de transmisión ópticos. Describiremos en detalle este caso especial en la siguiente sección. ??
 
 \subsection{Canal Z}
 Un canal Z (Z-channel) difiere de un canal binario, ya que las probabilidades de bit-flip son asimetricas.
@@ -244,29 +246,31 @@ Los Z-channel se usan generalmente para modelar sistemas de transmision opticos.
   \label{fig:Gal}
 \end{figure}
 
-Para un Z-channel, la distribucion de probabilidades de I(X;Y) es diferente, por lo que obtenemos un máximo diferente:
+Para un Z-channel, la distribucion de probabilidades de I(X;Y) es diferente \cite{Tallini:02}, por lo que obtenemos un máximo diferente:
 
-$$ C_{Z} = 1 - \left(\frac{1}{2}*H(p)\right) $$ \cite{tallini}
+\begin{equation}\label{CapA}
+C_{Z} \approx 1 - \left(\frac{1}{2}*H(p)\right)
+\end{equation}
 
-Por lo tanto,
+Por lo tanto, expandiendo H(p) en \ref{CapA}:
 
 $$ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right) $$
 
+La diferencia entre las capacidades de ambos tipos de canal puede apreciarse facilmente en la figura \ref{fig:CompBZ}, donde no tiene sentido hablar de una probabilidad de error mayor a 0.5 en un canal binario simétrico, es totalmente válido en un canal-Z y el mínimo de capacidad en este caso no es cuando $p=0.5$ sino cuando $p=1.0$.
 
 \begin{figure}[th]
   \begin{center}
     \includegraphics[scale=0.9]{capacidad/comparacionBZ}
   \end{center}
-  \caption{Diagrama: Azul: Capacidad de canal binario Verde: Capacidad de canal Z}
+  \caption{Diagrama: Azul: Capacidad de canal binario, Verde: Capacidad de canal Z}
   \label{fig:CompBZ}
 \end{figure}
 
 
 \subsection{Filtros de bloom}
 Como se discutió en la seccion [TODO], la colisiones de símbolos son inherentes a la modulación seleccionada.
-En la modulacion OOK utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s.
-Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s, por que la interferencia solamente puede ser aditiva. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el slot de tiempo leido.
-Una buena estructura para representar este tipo de datos es el filtro de Bloom [TODO], que se utiliza generalmente en técnicas de hashing, utilizándolo para tests muy rápidos (O=1) de pertenencia de un miembro en un set.
+En la modulacion OOK utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s. Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s, por que la interferencia solamente puede ser aditiva. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el slot de tiempo leido.
+Una buena estructura para representar este tipo de datos es el filtro de Bloom \cite{Bloom70space/timetrade-offs}, que se utiliza generalmente en técnicas de hashing, utilizándolo para tests muy rápidos (O=1) de pertenencia de un miembro en un set.
 La manera en que se implementó este algoritmo en el sistema propuesto se basa es copiar cada bit en K slots del frame transmitido, siendo el frame la representación física del filtro de Bloom. 
 En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K copias del bit, para correctamente inferir que el bit original era originalmente un ‘0’, mientras que si el bit original era un ‘1’, las colisiones no tienen efecto debido a la naturaleza del canal-Z.
 
