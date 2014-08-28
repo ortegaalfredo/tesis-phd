@@ -88,7 +88,7 @@ A su vez, se puede expandir la señal en tres dominios:
 \end{enumerate} 
 
 
-La desventaja de la técnica del espectro expandido, que es utilizar mucho espectro por bits transmitido, o lo que también se denomina baja densidad espectral, a veces no afecta demasiado al tener el canal una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI, en todas sus versiones.
+La desventaja de la técnica del espectro expandido, que es utilizar mucho espectro por bits transmitido, o lo que también se denomina baja densidad espectral, a veces no afecta demasiado al tener el canal una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI, en todas sus versiones, que utiliza un codigo DSS (Direct-sequence spread spectrum) para compartir una misma frecuencia entre varios nodos.
 
 \subsection{Códigos de generación pseudo-aleatorio}
 \label{PRNGs} 
@@ -98,8 +98,11 @@ Existen muchas maneras y algoritmos de generar streams pseudo-aleatorios. Alguno
 Otro parámetro deseable en un PRBS es su sencillez y rapidez. Un generadores PRBS muy popular se denomina Lineal Congruential Generator y solo precisa de dos operaciones, una multiplicación y una suma.
 
 Estos ejemplos carecen de una característica fundamental requerida en nuestro sistema: Que no se puedan predecir. Esta simple característica no es en realidad trivial ya que muchas técnicas existen para inferir datos acerca del generador PRBS, lo que supondría una falla en la seguridad de un sistema basado en dicho generador. Para evitar estos problemas existen los llamados generadores PRBS criptográficamente seguros. Como ejemplo podemos nombrar a los generadores shrinking o self-shrinking.
+Constantemente surgen nuevos ataque a generadores ampliamente utilizados, tales como RC4~\cite{vaudenay2007passive}, por lo que es imprescindible estar actualizado en los avances de investigación criptográfica para diseñar un sistema seguro.
+
 
 \subsection{Seguridad}
+\label{Seguridad}
 La propuesta es utilizar un sistema de espectro expandido con el objetivo principal de lograr la privacidad del canal al nivel físico.
 Se fijaron los siguientes parámetros de seguridad:
 
@@ -112,7 +115,7 @@ Varios algoritmos de asignación del time-slot fueron analizados. Se necesita qu
 
 Se decidió utilizar una codificación trivial: Seleccionar el time-slot de acuerdo a una secuencia criptográficamente segura estandard, totalmente independiente de los otros nodos. Es demostrable que esta decisión produce un sistema extremadamente simple y seguro. Como contrapartida, produce una cantidad muy elevada de colisiones que aumenta exponencialmente con el numero de clientes. Sin embargo, estas colisiones pueden ser corregidas mediante codificación adicional, y se logro una utilización de canal muy cercana al máximo teórico como se demostrara en la próxima sección. De echo, es en esta codificación adicional donde reside el principal aporte de esta tesis.
 
-\subsubsection{Consideraciones de seguridad y fuerza de cifrado}\label{security}
+\subsubsection{Consideraciones de seguridad y fuerza de cifrado}\label{Seguridad-fuerza}
 %% extraido de dline-pub.tex
 Existen varios aspectos de seguridad en un canal de comunicaciones: Autenticación, confiabilidad, confidencialidad e integridad.
 El esquema presentado en esta tesis utiliza la técnica de CDMA para proveer confidencialidad, confiabilidad e integridad entre dos o mas partes, y es equivalente a un esquema de clave simétrica donde la clave compartida es utilizada para inicializar el PRNG. Aspectos adicionales tales como la autenticación puede ser implementados luego utilizando protocolos de alto nivel.

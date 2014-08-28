@@ -85,6 +85,11 @@ En esta sección vamos a modelar el canal por el cual estamos transmitiendo dato
 Un canal de comunicaciones puede clasificarse primeramente segun el tipo de información transmitida, sea binaria o analógica, por lo cual tendremos canales binarios o analógicos \cite{MacKay:2002}.
 Una sub-clasificación del canal de comunicación puede realizarse segun el comportamiento del ruido del mismo.
 Por ejemplo las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN (Additive White Gaussian Noise). 
+
+Específicamente, un canal digital suele clasificarse como canal discreto sin memoria (Discrete memoryless channel), ya que posee un alfabeto de símbolos de entrada $A_{x}$, que son los datos que se desea transmitir, y un alfabeto de símbolos de salida $A_{y}$ , que son los símbolos actualmente sensados por el receptor. El canal es discreto ya que la cantidad de símbolos posible es finita. Los datos a transmitir deberan codificarse en el alfabeto de símbolos de entrada.
+Otro parámetro importante que define a un canal discreto es la distribución de probabilidades condicionales $P(y|x)$ entre ambos alfabetos, o sea la posibilidad de que al recibir el símbolo $x$ se haya transmitido el símbolo $y$. Esta distribución puede representarse como un diagrama (ver figura \ref{fig:canbin} para la representación de distribución de probabilidades de un canal binario simétrico) o una matriz.
+
+De acuerdo con la distribución de probabilidades de error que mejor represente al canal físico de transmisión, 
 El tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (Z-Channel), un canal digital en el que el ruido afecta solo uno de los símbolos a transmitir.
 
 Es este modelo de ruido lo que nos permite innovar en el diseño de algoritmos adaptándolos y optimizandolos para aprovechar la naturaleza del error, ya que la mayoria de los algoritmos de corrección de errores estan pensados para un canal de ruido simétrico y generalmente analógico.
@@ -101,26 +106,24 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 
 Para calcular el ruido en un canal simétrico binario, calculamos la probabilidad de no-colision que tendra un usuario determinado, ya que las colisiones seran el ruido del canal (En esta etapa no consideramos otros tipos de ruido que pueda tener el canal físico).
 
-\noindent Cantidad de slots por trama: $m$
-\noindent Cantidad de usuarios: $n$
+Sea $M$ la cantidad de slots por frame y $n$ la cantidad de clientes o usuarios.
 
-\noindent Probabilidad de no colisión para un usuario en un canal simétrico:
+Entonces la probabilidad de no colisión para un usuario en un canal simétrico esta dada por:
 \begin{equation}
-P_{nc}=\left(\frac{m-1}{m}\right)^{n-1}
+P_{nc}=\left(\frac{M-1}{M}\right)^{n-1}
 \end{equation}
 
 
-\noindent Probabilidad de no colisión para un usuario en un canal óptico:
+\noindent Probabilidad de no colisión para un usuario en un canal Z:
 \begin{eqnarray}
 P_{nc} & = & P(1) \cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) \\
 P_{nc} & = & \frac{1}{2} \cdot 1 +  \frac{1}{2} \cdot \sum_{i=0}^{n-1} 
-C^{n-1}_{i} \left(\frac{m-1}{m}\right)^i  \left(\frac{1}{m}\right)^{n-1-i}  \left(\frac{1}{2}\right)^{n-1-i} 
+C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{M}\right)^{n-1-i}  \left(\frac{1}{2}\right)^{n-1-i} 
 \end{eqnarray}
 
-\noindent Donde $\left(\frac{m-1}{m}\right)^i$ es la probabilidad de no
-colisión de $i$ canales (se suma para todo posible número de canales no
+\noindent Donde $\left(\frac{M-1}{M}\right)^i$ es la probabilidad de no colisión de $i$ canales (se suma para todo posible número de canales no
 colisionando: $1\leq i\leq n$, que están en otro slot), $
-\left(\frac{1}{m}\right)^{n-1-i}$ es la probilidad de colisión de los restantes
+\left(\frac{1}{M}\right)^{n-1-i}$ es la probilidad de colisión de los restantes
 $n-1-i$ (estos están en el mismo slot que el canal actual, el `$-1$' es para no
 contar el canal actual), y la colisión se produce cuando los otros canales
 transmiten $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$. El
@@ -128,14 +131,14 @@ factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales no
 colisionando, que son hechos independientes.
 
 \noindent Teniendo en cuenta que $ \sum_{i=0}^{n-1}
-C^{n-1}_{i} \left(\frac{m-1}{m}\right)^i  \left(\frac{1}{2m}\right)^{n-1-i}$ es la potencia $n-1$ de un binomio, reemplanzando tenemos
+C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{2M}\right)^{n-1-i}$ es la potencia $n-1$ de un binomio, reemplanzando tenemos
 \begin{eqnarray}
-P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(\frac{m-1}{m} + \frac{1}{2m} \right)^{n-1} \\
-P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2m} \right)^{n-1} \\
-P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{-1/2} 
+P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(\frac{M-1}{M} + \frac{1}{2M} \right)^{n-1} \\
+P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2M} \right)^{n-1} \\
+P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{-1/2} REVISAR ESTO
 \end{eqnarray}
 
-\noindent Donde la última aproximación vale para $n=m$ y $n$ grande.
+\noindent Donde la última aproximación vale para $n=M$ y $n$ grande.
 
 \iffalse
 
@@ -212,15 +215,18 @@ Mide el promedio de reduccion de la incertidumbre acerca de x que resulta de sab
 \fi
 \subsection{Capacidad de canal}
 
+Existe una relación entre la probabilidad de error $Pb$ de un canal y la máxima velocidad de transmisión de datos posible en el mismo.
+Esta relación fue estudiada por Clade Shannon en 1948 en un artículo pionero de la teoría de la información \cite{shannon48} y es conocida actualmente como teorema de Shannon-Hartley o Teorema de codificación de canales con ruido (Noisy-channel coding theorem).
+
 La capacidad C de un canal discreto sin memoria es :
 
 \begin{equation}
 C = \max_{{\cal{P}}_x} I(X;Y) 
 \end{equation}
 
-O sea, la máxima información mutua entre los alfabetos X de entrada e Y de salida.
+O sea, C es la máxima información mutua entre los alfabetos X de entrada e Y de salida.
 Para hallar el máximo podemos derivar $I(X;Y)$ con respecto a la probabilidad $P_x$.
-De \cite{MacKay:2002}, para un canal binario asimétrico sin memoria con probabilidad de error $p$, la capacidad máxima $C$ es:
+De \cite{MacKay:2002}, para un canal binario simétrico sin memoria con probabilidad de error $p$, la capacidad máxima $C$ es:
 
 \begin{equation}\label{Cap}
 C \approx 1 - H(p) 
@@ -231,6 +237,8 @@ Si expandimos H(p) en \ref{Cap}:
 $$ c = 1-\left(p \times \log_2\left(\frac{1}{p}\right) + (1-p) \cdot \log_2\left(\frac{1}{1-p}\right)\right) $$
 Simplificada:
 $$ c = 1 + p * \log_2(p) + (1 - p) * \log_2(1-p) $$
+
+En la figura \ref{fig:CompBZ} puede verse la evolución de la capacidad del canal binario simétrico, que como se intuye, es máxima para $p=0$ y $p=1.0$, mientras que es cero para $p=0.5$. ya que con 0\% de probabilidad de error la capacidad es la máxima (no hay interferencia) y con 50\% de error la capacidad es cero y es imposible transmitir dato alguno. Quizas contra-intuitivamente, con 100\% de capacidad de error la capacidad también es máxima, ya que equivale a invertir cada símbolo transmitido, operación que no introduce error alguno en los datos.
 
 %Sin embargo esta capacidad es menor que la que realmente tenemos en nuestro canal, ya que un Z-channel se adecua mayormente a los medios de transmisión ópticos. Describiremos en detalle este caso especial en la siguiente sección. ??
 
@@ -267,12 +275,23 @@ La diferencia entre las capacidades de ambos tipos de canal puede apreciarse fac
 \end{figure}
 
 
-\subsection{Filtros de bloom}
-Como se discutió en la seccion [TODO], la colisiones de símbolos son inherentes a la modulación seleccionada.
+\subsection{Filtros de Bloom}
+\label{bloomf}
+Como se discutió en la seccion \ref{Seguridad} , la colisiones de símbolos son inherentes a la modulación seleccionada.
 En la modulacion OOK utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s. Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s, por que la interferencia solamente puede ser aditiva. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el slot de tiempo leido.
 Una buena estructura para representar este tipo de datos es el filtro de Bloom \cite{Bloom70space/timetrade-offs}, que se utiliza generalmente en técnicas de hashing, utilizándolo para tests muy rápidos (O=1) de pertenencia de un miembro en un set.
-La manera en que se implementó este algoritmo en el sistema propuesto se basa es copiar cada bit en K slots del frame transmitido, siendo el frame la representación física del filtro de Bloom. 
+La manera en que se implementó este algoritmo en el sistema propuesto se basa es copiar cada bit en K slots del frame transmitido, siendo el frame la representación física del filtro de Bloom.
 En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K copias del bit, para correctamente inferir que el bit original era originalmente un ‘0’, mientras que si el bit original era un ‘1’, las colisiones no tienen efecto debido a la naturaleza del canal-Z.
+
+En la figura \ref{fig:bloomf} puede apreciarse gráficamente como se utiliza un filtro de bloom para la transmisión de 12 clientes con una repetición $K=2$. Podria verse al algoritmo de filtro de Bloom como una técnica de CDMA, ya que tambien utiliza redundacia para lograr resistencia a interferencias.
+
+\begin{figure}[th]
+  \begin{center}
+    \includegraphics[scale=0.5]{frame-sp}
+  \end{center}
+  \caption{Filtro de Bloom}
+  \label{fig:bloomf}
+\end{figure}
 
 %As discussed in section 2, this leads to collisions. Since the modulation format is OOK, only transmitted ‘1’s can interfere with ‘0’s.
 %This behaviour can be modelled as a Z-channel because the superposition of individual light pulses representing ‘1’s
@@ -283,7 +302,13 @@ En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K co
 %end it is sufficient to receive a single ‘0’ out of K copies in order to correctly retrieve the original transmitted ‘0’,
 %whereas collisions have no effect on ‘1’s.
 
-\section{Time-hopping con filtros de bloom}
+\section{Filtros de bloom encriptado: Time-hopping}
+
+Es en esta etapa donde se logra la encriptación de los datos, reemplazando el algoritmo de hash que selecciona las posiciones de los datos dentro del filtro de bloom por una funcion pseudo-aleatoria criptográficamente segura, de manera que los bits de datos de los diferentes clientes se ubican aleatoriamente en el frame y no es posible decodificarlos si no se posee la semilla del algoritmo PRNG, que equivale a la clave. Desde el punto de vista de modulación, como el algoritmo PRNG selecciona la posición dentro del frame, que es temporal, esto es equivalente a una transmisión Time-hopping, con la única salvedad que el algoritmo de filtro de Bloom requiere K repeticiones de los datos para poder recuperarse de colisiones en la recepción.
+
+Para poder decodificar los datos en el filtro de bloom receptor es necesario que todos los participantes posean la clave o semilla generadora del mismo PRNG utilizado para codificar los datos, y estar sincronizado a nivel de frame con el originante, para poder regenerar exactamente todas las posiciones en donde se transmitieron los datos. Los demas clientes solo causan interferencias que son corregidas primeramente por el filtro de bloom, y luego por el codigo de corrección de errores externo (Reed-Solomon por ejemplo), por lo tanto no es necesario que todos los clientes en la red esten sincronizados a nivel de frame, sino que solo es necesario para los clientes que deseen participar en el canal encriptado.
+
+Es deseable pero no necesario que todos los clientes mantengan una sincronización a nivel de bit, de lo contrario un bit generalmente colisionará con dos bits en lugar de solo uno, y se necesitará aumentar la capacidad de corrección de errores del sistema.
 
 \section{Minimización de peso de Hamming}
 %% extraido de dline-pub.text
@@ -326,9 +351,69 @@ La minimización del peso de hamming conlleva una necesaria conversión del sím
 Esta operación puede realizarse de muchas maneras, pero un algoritmo muy eficiente es utilizar una tabla de lookup (ver tabla~\ref{hwtable}), donde un símbolo de largo L es utilizado como el índice en la tabla, y el resultado es el símbolo expandido, que tiene un largo N\textgreater L.
 Por motivos prácticos y de optimización, es deseable que L sea 8 u 16 bits, por lo que la tabla contendrá 256 o 65536 entradas respectivamente.
 Al aplicar la minimización de peso de hamming a símbolos de 8 o 16 bits de longitud, son necesarios 256 o 65536 símbolos de salida con un HW=2. En el caso de símbolos de entrada de 8 bits, la longitud del símbolo de salida sera de 363 bits, mientras que para 8 bits de entrada, el simbolo expandido con HW=2 tendra 24 bits de longitud.
-Puede observarse que el número de símbolos únicos con HW=2 y N=363 no es exáctamente 65536 sino 65703, esto significa que existen muchas tablas de expansión.
-La tabla seleccionada y el orden de la misma no son importantes para el resultado final, observando la condición que dos nodos comunicandose deberan utilizar idénticas tablas.
+Puede observarse que el número de símbolos únicos con HW=2 y N=363 no es exáctamente 65536 sino 65703, esto significa que la tabla de expansión no es única, sino que existen muchas tablas funcionalmente equivalentes que pueden seleccionarse para realizar la expansión.
+La tabla seleccionada y el orden de la misma no son importantes para el resultado final, observando la condición que todos los nodos participantes de un canal deberan utilizar idénticas tablas.
 %In general more bits transmitted per frame the more efficient the protocol will be. \textbf{PORQUE IN GENERAL? CUANDO FALLA?} 
+
+
+\section{Probabilidad de colisión de filtro de bloom con expansión de símbolo}
+
+%newJIS_140512
+En esta sección, presentaremos una estimación analítica de la probabilidad de error de bit, tomando en cuento solo las interferencias de otros usuarios en la red.
+Adicionalmente, no se considera ninguna corrección de etapas o algoritmos adicionales como Reed-Solomon, o interferencias producidas en el medio físico.
+Como se explicó en \ref{bloomf}, asumiremos que cada usuario agrupa sus bits de información en paquetes o Frames, cada una de largo n. Cada paquete es codificado utilizando exáctamente $m_{1}$ unos y $m_{0}$ ($m_{1}+m_{0}=m$. Cada uno de los $m$ dígitos binarios resultantes es repetido K veces en posiciones elegidas aleatoriamente en el frame de largo $M$. Repeticiones de un dígito binario puedes colisionar con otras repeticiones del mismo dígito, con repeticiónes de otro dígito o bien con dígitos pertenecientes a otro cliente.
+Llamaremos $N$ al número de usuarios activos. Para estimar la tasa de error o BER (Bit Error Rate) del sistema y simplificar los cálculos, haremos las siguientes asumpciones:
+
+\begin{enumerate}
+ \item Asumiremos que los frames de diferentes usuarios estan sincronizadas y cada frame contiene (incluyendo colisiones) $W_0 = N\cdot K\cdot m_0$ ceros y $W_1 = N\cdot K\cdot m_1$ unos.
+ \item No incluiremos en el análisis la posibilidad de corrección de errores debido al echo que, en general, 
+ \begin{equation}
+\nchoosek{m}{m_1} > 2^n.
+\end{equation}
+Específicamente, cada vez que una secuencia erronea de $m$ dígitos binarios es recibida con mas de $m_1$ unos, se mapea a una cadena de bits aleatoria de largo $n$.
+Por lo tanto, el número esperado de errores sera $n/2$.
+\end{enumerate}
+
+Bajo esas asumpciones, el BER esta dado por
+\begin{equation}
+\text{BER} = \frac{n}{2}\prob{\text{sobre-escribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros}}.
+\label{eq:ber_01}
+\end{equation}
+Por la cota de la unión (union bound), 
+\begin{multline}
+\prob{\text{sobreescribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros}}\leq \\
+\leq m_0\prob{\text{sobreescribir con unos las $K$ repeticiones de uno de los $m_0$ ceros}}.
+\label{eq:union_bound}
+\end{multline}
+Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ slots y las $K$ repeticiones del 0 dado usa $r ( \leq K)$ slots, entonces una condición necesaria para el error es que $s \geq r$. Por lo tanto asumamos que existen $s$ unos en un frame de $M$ bits. Dado $r$ lugares en el frame, la probabilidad de que los unos ocupen esas $r$ posiciones esta dada por 
+\begin{equation}
+z_{r,s} = \frac{\nchoosek{M-r}{s-r}}{\nchoosek{M}{s}}= \frac{\frac{(M-r)!}{(M-s)! (s-r)!}}{\frac{M!}{(M-s)!s!}} = \frac{(M-r)!}{M!}\frac{s!}{(s-r)!}\approx (\frac{s}{M})^r,
+\end{equation}
+Donde hemos asumido que $N,s\gg r$. Si $M \gg K$, no es dificil ver que las $K$ repeticiones de un cero dado ocupan $\mu_{R} \approx K$ slots en promedio. Tambien puede demostrarse que el número promedio de slots ocupados por los $W_{1}$ unos transmitidos por todos los usuarios es
+
+\begin{equation}
+\mu_{S} \approx M (1-e^{-W_1/M})
+\end{equation}
+ 
+Si $M$ y $W_{1}$ son grandes (ver apéndice TODO).
+De esas ecuaciones, una estimación de la cota superior del BER para un determinado usuario es
+\begin{equation}
+\text{BER} \approx \frac{n}{2} m_0 z_{\bar{R},\bar{S}} \approx \frac{n}{2} m_0 \left(1-e^{-W_1/M}\right)^K.
+\end{equation}
+
+La figura \ref{BERvsK} muestra la estimación en función de $K$ para $M=2014$, $m_{0} = 22$, $m_{1} = 2$, $n = 8$ y $N=38$. Es interesante notar que existe un valor óptimo de la tasa de repetición $K$ que minimiza la tasa de error. Este resultado es relevante en el diseño de un sistema de comunicaciones. En particular, la última ecuación es muy simple y puede ayudar al diseño de red. Notar que los bajos valores de BER alcanzados permiten utilizar en la siguiente etapa algoritmos tales como Reed-Solomon, para reducir aun mas el BER total de sistema y asi llevarlo a tasas aceptables para las aplicaciones a las que este trabajo apunta.
+
+\begin{figure}[!t]
+  \centering
+    \includegraphics[width=5in]{Kcalc}
+    \caption{Estimación de BER vs tasa de repeticion de filtro de Bloom K.}
+    \label{BERvsK}
+\end{figure}
+
+
+
+
+
 
 
 \section{Sistema completo}
