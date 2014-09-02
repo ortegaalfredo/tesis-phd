@@ -1,10 +1,10 @@
 \chapter{Sistema propuesto: teoría y simulaciones}
 
-Se propone un sistema de comunicaciones punto a punto y punto a multipunto de medio compartido o tambien denominado de broadcast. En la figura \ref{fig_hub} se aprecia su estructura logica del sistema, que en la versión óptica equivale a una red de tipo estrella con un hub amplificador central.
-Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el medio por un intérvalo determinado de tiempo denominado slot. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un slot diferente. La diferencia del sistema propuesto con un sistema TDMA común en donde el slot es asignado a cada cliente de manera periódica, en el sistema propuesto el slot se asigna mediante un algoritmo pseudo aleatorio criptograficamente seguro. Esto tiene dos efectos fundamentales: 
+Se propone un sistema de comunicaciones punto a punto y punto a multipunto de medio compartido o tambien denominado de broadcast. En la figura \ref{fig_hub} se aprecia su estructura logica del sistema, que en la versión óptica equivale a una red de tipo estrella con un hub amplificador central, pero utilizando diferentes medios esta configuración puede cambiar (Por ejemplo, puede no ser necesaria la etapa de amplificación).
+Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el medio por un intérvalo determinado de tiempo denominado slot. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un slot diferente. La diferencia del sistema propuesto con un sistema TDMA regular en donde el slot es asignado a cada cliente de manera periódica, en el sistema propuesto el slot se asigna mediante un algoritmo CS-PRNG. Esto tiene dos efectos fundamentales: 
 
 \begin{itemize}
- \item Un atacante no puede predecir los datos que esta transmitiendo un cliente en particular\footnote{Algunos parametros adicionales son necesarios para obtener privacidad, tales como el tamaño del slot}
+ \item Un atacante no puede predecir la posición en donde un cliente en particular transmite los datos. En particular, si el slot se reduce al minimo de un solo bit por slot, el atacante no puede inferir ninguna información acerca de los datos transmitidos sin conocer los parámetros del algoritmo CS-PRNG.
  \item Existira una inevitable inteferencia entre los clientes, lo que requiere la utilización de algoritmos de corrección de errores.
 \end{itemize}
 
@@ -17,7 +17,7 @@ La pila de codificación se detalla en la figura \ref{fig_comstack} donde se apr
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9 \textwidth]{Soft-stack2.eps} 
+\includegraphics[width=4.5in]{graphs/Soft-stack3}
 \caption{Etapas del sistema de comunicaciones}
 \label{fig_comstack}
 \end{figure}
@@ -49,7 +49,7 @@ El código (255,223) es particularmente eficiente de implementar digitalmente ya
 
 %En ciertas ona ventaja muy importante es que el codigo de correccion exterior puede facilmente detectar la presencia de un error aunque no pueda corregirlo. Esta informacion es una lista con las posiciones en las cuales se tiene la certeza que los símbolos fueron interferidos denominada lista de síndromes, y puede suministrarse al algoritmo de correccion de errores para que la capacidad de corrección del mismo puede aumentar hasta un 100\%~\cite{Moon:05}.
 
-\subsubsection{Características fisicas}
+\subsubsection{Características de implementación}
 Un parámetro importante en la selección del algoritmo es la facilidad de implementación sobre hardware digital. Ciertas caracteristicas se vuelven importantes al pasar de implementaciones de software a hardware, tales como tamaño, memoria utilizada y velocidad máxima alcanzada con el hardware disponible, apuntando a que el sistema debe funcionar a tasas de gigabit.
 
 A continuación se nombraran las características de la implementación en hardware (FPGA) de Reed-Solomon utilizada.
@@ -411,35 +411,31 @@ La figura \ref{BERvsK} muestra la estimación en función de $K$ para $M=2014$, 
 \end{figure}
 
 
-
-
-
-
-
-\section{Sistema completo}
+\section{Resumen del sistema completo}
 %% De orte.tex
-El sistema propuesto esta compuesto primeramente de una capa de acceso, donde es implementada la codificación CDMA y corrección de errores, y una capa física basada o bien en una red óptica con similaridades a redes PON, o una red sónica de broadcast.
-La capa de acceso es implementada utilizando CDMA del tipo time-hopping, donde cada uno de los $128$ ONUs posibles codifica su información en bits y los envia en un slot seleccionado de manera aleatoria en un frame de $356$ slots\footnote{ Estos valores pueden por supuesto variar de acuerdo a los parametros como error aceptable y cantidad de clientes máxima.}. De esta manera, ocurriran multiples colisiones entre diferentes ONUs pero seran subsanadas por la capa de corrección de errores que garantiza una transmisión de datos virtualmente\footnote{aunque es implosible eliminar totalmente los errores, un BER de 10E-12 se considera libre de errores} libre de errores.
+El sistema propuesto, cuya estructura se aprecia en la figura \ref{fig_comstack}, esta compuesto primeramente de una capa de acceso, donde es implementada la codificación CDMA y corrección de errores, y una capa física basada o bien en una red óptica con similaridades a redes PON, o una red acústica de tipo broadcast.
+La capa de acceso es implementada utilizando CDMA del tipo time-hopping, donde cada uno de los ONUs posibles codifica su información en bits y los envia en un slot seleccionado de manera aleatoria en un frame de $M$ slots\footnote{ Estos parámetros varian de acuerdo al nivel de error aceptable y cantidad de clientes máxima.}. De esta manera, ocurriran multiples colisiones entre diferentes ONUs pero seran subsanadas por la capa de corrección de errores que garantiza una transmisión de datos virtualmente\footnote{aunque es implosible eliminar totalmente los errores, un BER de 10E-12 se considera libre de errores} libre de errores.
 
-Nota rque la sincronizacion es realizada solo a nivel de bit-slot, en contraste con técnicas como TDMA que deben sincronizar a nivel de frame. También se elimina el requerimiento de una transmisión ordenada en el tiempo; en el esquema propuesto ambos clientes comunicantes pueden empezar su comunicación en cualquier momento, de manera similar al comportamiento del protocolo ethernet.
-Un cierto ONU $X$ puede recibir mensajes de otro ONU $Y$ si y solo si $X$ posee la {\em clave} de $Y$, y vice versa. De esta manera, si un cierto grupo de ONUs desean comunicarse sobre VLAN, es requerido que cada una en el grupo conozca todas las otras {\em claves}.
+Notar que la sincronizacion es realizada solo a nivel de bit-slot, en contraste con técnicas como TDMA que deben sincronizar a nivel de frame. También se elimina el requerimiento de una transmisión ordenada en el tiempo; en el esquema propuesto ambos clientes comunicantes pueden empezar su comunicación en cualquier momento, de manera similar al comportamiento del protocolo ethernet.
+Un cierto ONU $X$ puede recibir mensajes de otro ONU $Y$ si y solo si $X$ posee la {\em clave} de $Y$, y vice versa. De esta manera, si un cierto grupo de ONUs desean comunicarse sobre una VLAN encriptada, es requerido que cada uno en el grupo conozca la {\em clave}.
 
-Los flujos de datos de las ONU's se codifican con las siguientes técnicas de corrección de errores (Fig. \ref{arch:chain}):
+Los flujos de datos de las ONU's se codifican con las siguientes técnicas de corrección de errores:
 
-Reed-Solomon ($223/255$) y algoritmos LDPC ($1024\times512$ matrix) (ver \cite{Moon:05} y sus referencias), ademas de un filtro de Bloom con $K=4$~\cite{Bloom70space/timetrade-offs}.
+Reed-Solomon ($223/255$) (ver \cite{Moon:05} y sus referencias), y un filtro de Bloom\cite{Bloom70space/timetrade-offs}. En principio un algoritmo LDPC ($1024\times512$ matrix) fue utilizado pero fue descartado en posteriores iteraciones del sistema, ya que al agregar la optimización de la expansión de símbolo al filtro de bloom, se gano una capacidad de corrección adicional y pudo eliminarse el algoritmo LDPC de la pila de comunicaciones, con el consiguiente aumento de la capacidad total del sistema.
 
-La seleccion de estos algoritmos de corrección de errores fue influenciada al considerar al canal de comunicaciones como el denominado canal Z, que posee un limite de Shannon de $ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right),$ donde $p$ es la posibilidad de recibir un error al transmitir un bit.
-Este limite de capacidad es mayor que el límite en una canal simétrico sin memoria \cite{Tallini:02}.
+La selección de estos algoritmos de corrección de errores fue siempre considerando el canal de comunicaciones como el denominado canal Z. %que posee un limite de Shannon de $ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right),$ donde $p$ es la posibilidad de recibir un error al transmitir un bit. Este limite de capacidad es menor que el límite en una canal simétrico sin memoria \cite{Tallini:02}.
 
 \section{Aplicación en distintos medios físicos}
+La arquitectura del sistema lo hace muy confiable frente a interferencias de la capa física, al poseer una fuerte capacidad de recuperación de errores, por lo que modificando la etapa de modulación, pueden utilizarse diferentes medios físicos, siempre que tengan un modelo de ruido que se aproxime al canal Z.
 \subsection{Redes ópticas}
 % de orte.text
-\begin{figure}[!t]
-  \centering
-    \includegraphics[width=3in]{orte01.pdf}
-    \caption{Proposed network design: Access Layer}
-    \label{arch:chain}
-\end{figure}
+
+%\begin{figure}[!t]
+%  \centering
+%    \includegraphics[width=5in]{graphs/Soft-stack3}
+%    \caption{Diseño de red propuesto: Pila de comunicaciones}
+%    \label{arch:chain}
+%\end{figure}
 % Fiber		Es grave el efecto de la dispersion?  Sugerimos dispersion shifted G.653? O son muy caras?
 % splitter	No 1x128 commercially available (attenuation $\leq 27\,dB$)
 % DFB		http://cess-dk.com/gfx/upload/PX2-1541SF.pdf ( min $\simeq-1\,dB$)
@@ -448,11 +444,11 @@ Este limite de capacidad es mayor que el límite en una canal simétrico sin mem
 
 Al adaptar el sistema propuesto a una red óptica, la topología de misma debe ser de tipo estrella (ver Fig.\ref{arch:fig1}) donde splitters ópticos redistribuyen el tráfico proveniente de cada ONY a todo el resto permitiendo comunicaciones punto-a-punto asi como punto-a-multipunto entre hasta $128$ ONUs.
 %Traffic redistribution is made by optical splitters at the redistribution hub that introduces high attenuation to optical streams.
-Un amplificador óptico de fibra de Erbio (Erbium-Doped Fiber Amplifier, EDFA) localizado entre los splitters en el repetidor óptico incrementa la potencia óptica para contrarrestar las perdidas en la red. 
+Un amplificador óptico de fibra de Erbio (Erbium-Doped Fiber Amplifier, EDFA) localizado entre los splitters en el repetidor óptico incrementa la potencia óptica para contrarrestar las perdidas en la red, aunque esto es solamente necesario si el número de clientes es muy elevado o las pérdidas por dispersión son elevadas debido a las distancias entre ellos.
 
 La modulación utilizada para las señales ópticas es RZ \footnote{La modulacíon RZ o ``Return to Zero'' es la mas común utilizada en fibras ópticas, aunque por razones técnicas en ralidad el laser nunca retorna a cero. Esto tiene consecuencias para el sistema propuesto como se vera mas adelante.} con velocidades previstas de hasta $10$~Gbps por un laser DBF de $2$~dBm de potencia y $1550$~nm de color/frecuencia. Estos parametros permiten una transmisión de hasta $10$~km entre los nodos si se utiliza fibra óptica mono-modo estandard (ITU-T G.652) hacia el repetidor óptico.
 
-En este hub, un spliter de $128\times 1$ maneja el tráfico de todos los ONUs y es luego redistribuido por el correspondiente splitter de $1\times 128$, canalizando el trafico mezclado de cada ONU a travéz de la fibra de bajada, paralela a la fibra de subida.
+En este hub, un spliter de $128\times 1$ maneja el tráfico de todos los ONUs y es luego redistribuido por el correspondiente splitter de $1\times 128$, canalizando el trafico mezclado de cada ONU a travéz de la fibra de bajada, paralela a la fibra de subida. Este splitter permite tener hasta 128 clientes o ONUs en el sistema. Si se requiere una menor cantidad, el splitter puede reducirse.
 La atenuacion de los splitters centrales ($\simeq25$~dB cada uno) sumado a la atenuación propia de la fibra óptica y perdidas por inserción ($\simeq2$~dB y $\simeq1$~dB por tramo) contribuyen a las altas pérdidas que este sistema debe compensar ($\simeq28$~dB en ambos canales de subida y bajada).
 
 De utilizarse sin ningun tipo de amplificación, la atenuación que una señal sufriria entre dos ONUs es la suma de la atenuación de ambos tramos, o sea $\simeq56$~dB, que es un valor extremadamente alto fuera del alcance de la tecnología de detección disponible al momento de la escritura de esta tesis.
