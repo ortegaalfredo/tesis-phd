@@ -35,10 +35,11 @@ Un parámetro importante en estos algoritmos es el delay, o sea la cantidad de t
 Como código interior se seleccionó el algoritmo Reed-Solomon, un código de bloque con alta efectividad en SNR bajos. Los parametros seleccionados para dicho código son (255,223) o sea, 223 bytes de datos y 32 bytes de paridad. Estos parámetros lograran que el código pueda detectar hasta 32 errores de byte y corregir hasta 16 errores de byte en los 223 bytes del bloque. La selección de estos parametros responde a que el algoritmo de reed-solomon posee implementaciones muy eficientes si se utiliza un tamaño de bloque de 255 bytes. 
 Al ser un estandard muy utilizado, existen implementaciones muy eficientes de reed-solomon con estos parametros especificos, tanto en software como en hardware.
 Existen dos problemas con este algoritmo:
-
-1) Elevado delay: Si bien el delay de codificación es mínimo, el delay de decodificacion es muy elevado, pudiendo sobrepasar facilmente los 1200 clocks.
-2) Si bien el delay de decodificacion es elevado y requiere mucho procesamiento, el solo echo de tener que acumular un bloque de 256 bytes de datos solo para comenzar con la decodificacion, introduce un retraso muy importante especialmente si el sistema se utiliza con bajo ancho de banda, tal como es el caso en la implementacion acustica del sistema.
-
+\begin{enumerate}
+ \item Elevado delay: Si bien el delay de codificación es mínimo (menos de 10 clocks), el delay de decodificacion es muy elevado, pudiendo sobrepasar facilmente los 1200 clocks.
+ \item Si bien el delay de decodificacion es elevado y requiere mucho procesamiento, el solo echo de tener que acumular un bloque de 256 bytes de datos solo para comenzar con la decodificacion, introduce un retraso muy importante especialmente si el sistema se utiliza con bajo ancho de banda, tal como es el caso en la implementacion acustica del sistema.
+\end{enumerate}
+ 
 Ambos problemas se solucionan seleccionando parametros de Reed-Solomon con un menor tamaño de bloque, o un algoritmo similar con menor tamaño de bloque tal como BCH. El problema en este caso es encontrar implementaciones eficientes de los decodificadores ya que no son algoritmos muy utilizados, por lo que la seleccion final fue el estandard Reed-Solomon (255, 223).
 
 Para la simulación numérica por software se utilizó la biblioteca libfec de Phil Karn~\cite{libfec}. Para la implementacion en FPGA se utilizo la implementacion del algoritmo provista de manera gratuita en la biblioteca de nucleos de IP de Xilinx.
@@ -319,12 +320,12 @@ En lugar de esto, se adopto una estrategia que aprovecha el echo que un sistema 
 %This channel presents a Shannon limit of $ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right),$ where $p$ is the probability of error~\cite{Tallini:02}.
 
 Esta propuesta, y aqui esta el nucleo de la invencion propuesta en esta tesis, es la de aprovechar la naturaleza asimetrica del este tipo de canal, en donde solamente el símbolo ``1'' causa interferencia, ya que los ``0'' no se interfieren. \footnote{Aunque en un sistema óptico real, existe efectivamente una pequeña diferencia ya que un ``0'' nunca es representado con una potencia de laser de cero watts.}
-En otras palabras, la interferencia de un canal-Z es proporcional al peso de hamming del símbolo transmitido.
+En otras palabras, la interferencia de un canal-Z es proporcional al peso de Hamming del símbolo transmitido.
 El peso de Hamming de un símbolo es simplemente la cantidad de bits en ``1'' del mismo. El algoritmo de Minimización de peso de Hamming consiste en una codificación en donde cada símbolo binario es convertido en un equivalente de mayor longitud, tieniendo solamente una mínima cantidad de dígitos en ``1''. Aplicando esta codificación que minimiza el peso de Hamming y transmitiendo el símbolo resultante, se obtiene una menor interferencia en un canal Z.
 Intuitivamente, expandir el símbolo original a uno de mayor longitud decrementaria el ancho de banda del canal; pero como las simulaciones numéricas muestran (ver sección \ref{simulations}) a medida que la interferencia inter-símbolo se reduce, el ancho de banda adicional utilizado por los algoritmos de FEC tambien se reducen, compensando por el incremento del largo del símbolo y logrando un mayor ancho de banda neto del sistema.
 Podemos decir que un número binario normal de largo L posee un peso variable de Hamming, con L/2 siendo el promedio, cero siendo el mínimo y L siendo el máximo peso de Hamming.
 La técnica de reduccion de peso de Hamming (HW) da buenos resultados reduciendo a HW=2, logrando un buen balance entre la reducción de interferencia y el largo de símbolo.
-Adicionalmente, es deseable en un sistema de seguridad que no se revele ninguna información acerca de los símbolos transmitidos. Por ejemplo si transmitieramos el número cero, representado por todos sus dígitos en cero, seria trivial identificarlo sin importar si se aplica cualquier tipo de time-hopping. Para evitar estos ataques que utilizan estadísticas acerca del peso de hamming, la codificación exige que el peso de hamming sea fijo en todos los símbolos. Esto causa una ligera perdida en el ancho de banda pero hace imposible inferir cualquier tipo de información acerca del símbolo transmitido analizando estadisticas de tráfico de los datos transmitidos.
+Adicionalmente, es deseable en un sistema de seguridad que no se revele ninguna información acerca de los símbolos transmitidos. Por ejemplo si transmitieramos el número cero, representado por todos sus dígitos en cero, seria trivial identificarlo sin importar si se aplica cualquier tipo de time-hopping. Para evitar estos ataques que utilizan estadísticas acerca del peso de Hamming, la codificación exige que el peso de Hamming sea fijo en todos los símbolos. Esto causa una ligera perdida en el ancho de banda pero hace imposible inferir cualquier tipo de información acerca del símbolo transmitido analizando estadisticas de tráfico de los datos transmitidos.
 
 \begin{table}[t]
 \begin{center}
@@ -346,10 +347,10 @@ Datos & entrada HW= 0 to 3 & Expandida HW=2\\
  \end{table}
  
 \section{Expansión de símbolo}
-La minimización del peso de hamming conlleva una necesaria conversión del símbolo original a otro que necesariamente tendra mayor longitud, o sea, una expansión del símbolo.
+La minimización del peso de Hamming conlleva una necesaria conversión del símbolo original a otro que necesariamente tendra mayor longitud, o sea, una expansión del símbolo.
 Esta operación puede realizarse de muchas maneras, pero un algoritmo muy eficiente es utilizar una tabla de lookup (ver tabla~\ref{hwtable}), donde un símbolo de largo L es utilizado como el índice en la tabla, y el resultado es el símbolo expandido, que tiene un largo N\textgreater L.
 Por motivos prácticos y de optimización, es deseable que L sea 8 u 16 bits, por lo que la tabla contendrá 256 o 65536 entradas respectivamente.
-Al aplicar la minimización de peso de hamming a símbolos de 8 o 16 bits de longitud, son necesarios 256 o 65536 símbolos de salida con un HW=2. En el caso de símbolos de entrada de 8 bits, la longitud del símbolo de salida sera de 363 bits, mientras que para 8 bits de entrada, el simbolo expandido con HW=2 tendra 24 bits de longitud.
+Al aplicar la minimización de peso de Hamming a símbolos de 8 o 16 bits de longitud, son necesarios 256 o 65536 símbolos de salida con un HW=2. En el caso de símbolos de entrada de 8 bits, la longitud del símbolo de salida sera de 363 bits, mientras que para 8 bits de entrada, el simbolo expandido con HW=2 tendra 24 bits de longitud.
 Puede observarse que el número de símbolos únicos con HW=2 y N=363 no es exáctamente 65536 sino 65703, esto significa que la tabla de expansión no es única, sino que existen muchas tablas funcionalmente equivalentes que pueden seleccionarse para realizar la expansión.
 La tabla seleccionada y el orden de la misma no son importantes para el resultado final, observando la condición que todos los nodos participantes de un canal deberan utilizar idénticas tablas.
 %In general more bits transmitted per frame the more efficient the protocol will be. \textbf{PORQUE IN GENERAL? CUANDO FALLA?} 
@@ -456,7 +457,7 @@ Suponemos:
 
 Dadas estas suposiciones (Equivalen a un ataque con plain-text desconocido en jerga criptográfica) para inferir el conjunto de posiciones $n$ de un cliente, el atacante debera probar exaustivamente todo el conjunto de $ _{M}P_{r}$ sobre una trama capturada, o bien probar todas las combinaciones posibles de la clave del generador pseudoaleatorio. De esto se desprende que con tener $clave>128\ bits$ y $M>128$ se puede asumir que el algoritmo cuenta con una seguridad denominada ``fuerte'', ya que una complejidad temporal de $2 ^{128}$ es considerada segura al momento de la escritura de esta tesis.
 
-La segunda condición puede eliminarse con una cuidadosa selección de la tabla de expansión de hamming, ya que al convertir los datos en símbolos uniformes con el mismo largo y el mismo peso de Hamming, no es necesario que los datos de entrada esten randomizados ya que aún si los datos de entrada son controlados por el atacante a la salida del bloom-filter con expansión de simbolo siempre se observará también el mismo peso de Hamming\footnote{Mas correctamente, si el peso de hamming es P, el atacante podra observar un peso de Hamming de 1 hasta P, debido a las colisiones de un cliente con sí mismo.} y el atacante no podrá inferir ninguna información de los datos de entrada.
+La segunda condición puede eliminarse con una cuidadosa selección de la tabla de expansión de Hamming, ya que al convertir los datos en símbolos uniformes con el mismo largo y el mismo peso de Hamming, no es necesario que los datos de entrada esten randomizados ya que aún si los datos de entrada son controlados por el atacante a la salida del bloom-filter con expansión de simbolo siempre se observará también el mismo peso de Hamming\footnote{Mas correctamente, si el peso de Hamming es P, el atacante podra observar un peso de Hamming de 1 hasta P, debido a las colisiones de un cliente con sí mismo.} y el atacante no podrá inferir ninguna información de los datos de entrada.
 
 \section{Resumen del sistema completo}
 %% De orte.tex
