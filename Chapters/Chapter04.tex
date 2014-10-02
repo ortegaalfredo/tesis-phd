@@ -1,7 +1,44 @@
 \chapter{Experiencias realizadas (mediciones)}
+En este capítulo se detallan las distintas mediciones del sistema completo asi como mediciones de modulos aislados. 
+En la primera parte se detallan mediciones en el simulador numérico, para despues detallar mediciónes en las implementaciones completas realizadas, utilizando un medio óptico y luego un medio acústico.
 \section{Implementación en software}
-\subsection{Reed-Solomon}
+Como paso previo a realizar las implementaciones completas sobre FPGA y software, simuladores numérico de todas las etapas fueron implementados y combinados para corroborar los resultados teóricos. Esta implementación es de código abierto y realizada utilizando el lenguaje de C/C++ ya que para medir tasas de error muy pequeñas, (del orden de $10E-8$) se necesitan transmitir grandes cantidades de datos, por ejemplo para el simulador sobre medio óptico se simuló la transmisión de mas de 1 Gigabit de datos por cliente, por lo que se requiere de la mayor performance posible por parte del simulador.
+\subsection{Estructura general}
+Los diferentes módulos se implementaron en lenguaje C/C++ de una manera mayormente independiente del sistema operativo y se encadenan entre si mediante la entrada/salida estandard (STDIN/STDOUT). La simulación comienza con un bloque de datos aleatorio de datos binarios alimentadas a la primer etapa, o sea el modulo de corrección de errores. La salida codificada es almentada a la siguiente etapa, el scrambler. De esta manera los datos originales son transmormados en cada etapa y sucesivamente atraviesan todos los módulos, pasanto por el simulador de medio físico y entrando a la etapa decodificadora hasta llegar a la última estapa, el decodificador del corrector de errores. Esta salida final es comparada con la entrada original, y finalmente se calcula y reporta el BER.
+Utilizando esta modularidad se puede configurar el simulador como un sistema secuencial de esta manera:
+
+\small
+\begin{verbatim}
+ ./rsenc <${FILE} | ./scrambler ${SCRAMBLEBLOCK} >rs.out
+ ./bfenc ${CLIENTES} < rs.out | ./noisesim -c ${CLIENTES} -r 16.6 >bfenc.out
+ ./bfdec ${CLIENTES} <bfenc.out >bf.out
+ ./descramble ${SCRAMBLEBLOCK} <bf.out | ./rsdec >rsdec.out
+\end{verbatim}
+\normalsize
+O bien encadenar cada modulo utilizando un solo comando de esta manera:
+\small
+\begin{verbatim}
+./rsenc <${FILE} | ./scrambler ${SCRAMBLEBLOCK} | ./bfenc ${CLIENTES} | \
+                 ./noisesim -c ${CLIENTES} -r 16.6 | ./bfdec ${CLIENTES} | \ 
+                 ./descramble ${SCRAMBLEBLOCK} | ./rsdec > file.out
+\end{verbatim}
+\normalsize
+
+Las ventajas de la primera configuración de simulación son las de poder acceder a los archivos intermedios, utiles para depuración y mediciones por etapa, mientras que la segunda configuración tiene la ventaja de ser mas compacta y aprovechar todos los CPUs disponibles en el sistema, ya que el sistema operativo asigna un proceso a cada etapa y estas se ejecutan en paralelo.
+
+La implementación sobre medio acústico no presenta mayor inconveniente ya que las tasas de transmisión son bajas, acotadas naturalmente por el medio y ancho de banda disponible, por lo 
+que no se necesitan de mayores recursos computacionales para la simulación. Otro caso es la simulación del medio óptico, donde normalmente se necesita simular una transmisión de $1*10E9$ bits o mas para obtener una medición confiable del BER del sistema, ya que este medio tiene naturalmente una tasa elevada y un BER muy reducido. Adicionalmente, sobre este medio el sistema soporta un máximo de 128 clientes que deben ser simulados en cada corrida, por lo que los recursos computacionales requeridos son considerables. A raiz de este problema, y aprovechando que la simulación es altamente paralelizable, se implemento un modelo de cliente-servidor donde los cálculos son repartidos entre un cluster de múltiples nodos.
+
+\subsection{Etapa de corrección de errores/Scrambler}
+Estas estapas son muy sencillas de simular, ya que existen implementaciones de codigo abierto disponibles muy eficientes para reed-solomon, y el scrambler/descrambler es un algoritmo trivial muy sencillo y rápido de implementar. Se utilizó la popular libreria libFEC del autor Phil Karn [CITA], con el único agregado de hacer disponible la entrada y salida de símbolos mediante la entrada y salida estandard del sistema operativo.
+
 \subsection{Bloom-filter}
+La implementación por software del algoritmo de filtro de Bloom no tiene mayor dificultad ya que es un algoritmo muy sencillo. Todos los parametros, tanto el tamaño del filtro M como la cantidad de clientes a simular son configurables. Una característica que merece mencionarse es el sistema de minimización de peso de Hamming que esta implementado en esta etapa. La implementación se realiza mediante una tabla, lo que permite consultas en O(n)=1, aunque la tabla en si misma puede ser bastante grande escalando en memoria aproximadamente a $O(n)=2^{N}$ (TODO:Notacion de complejidad en memoria) por lo que es autogenerada en cada ejecución en función de los parámetros de simulación.
+
+\subsection{Simulador de medio acústico}
+El simulador de medio acústico es un completo modulador/demodulador de SPK que tranforma los bits de entrada en señales analógicas, a las cuales se aplican filtros pasa-bandas para simular las limitaciónes de los transductores, por ejemplo los parlantes y micrófonos de un dispositivo movil. Este módulo respeta el diseño de todos los demas, emitiendo la señal analógica como un flujo digital codificado PCM via la salida estandard del sistema. El filtro pasabanda se implementó como un filtro digital de respuesta finita o FIR, implementado en C.
+La etapa de modulación fue luego reutilizada en el sistema de transmisión acústico real sin modificaciónes.
+
 \subsection{Simulador de ruido óptico}
 %% de orte.text
 
@@ -11,7 +48,6 @@ El tráfico RZ upstream proveniente de todas las ONUs se asume que alcanza al sp
 Los slots correspondientes al bit `0' contienen una pequeña intensidad óptica de CW dada por el razón de extinción de Tx.
 Cada ONU on-line en el sistema agrega su propia intensidad de bit `0', incrementando la potencia base total.
 Se asume que cada bit `1' agrega un pulso super-Gaussiano ($m=4$) al nivel de potencia base, con un ciclo de trabajo (duty cycle) de $1/3$.
-
 
 %The physical optical channel simulation block provides an estimate of
 %the BER performance of the optical channel. Simulation steps are as
@@ -124,7 +160,6 @@ Este BER es lo suficientemente bajo para permitir rutinas de corrección de erro
 \begin{figure}[!t]
     \centering
       \includegraphics[angle=270 ,width=3.5 in]{orte04.pdf}
-%    \caption{Simulation results: Logical channel}
     \caption{Resultados de la simulación: canal lógico}
       \label{sim:access}
 \end{figure}
