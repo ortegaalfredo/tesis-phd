@@ -36,7 +36,7 @@ Estas estapas son muy sencillas de simular, ya que existen implementaciones de c
 La implementación por software del algoritmo de filtro de Bloom no tiene mayor dificultad ya que es un algoritmo muy sencillo. Todos los parametros, tanto el tamaño del filtro M como la cantidad de clientes a simular son configurables. Una característica que merece mencionarse es el sistema de minimización de peso de Hamming que esta implementado en esta etapa. La implementación se realiza mediante una tabla, lo que permite consultas en O(n)=1, aunque la tabla en si misma puede ser bastante grande escalando en memoria aproximadamente a $O(n)=2^{N}$ (TODO:Notacion de complejidad en memoria) por lo que es autogenerada en cada ejecución en función de los parámetros de simulación.
 
 \subsection{Simulador de medio acústico}
-El simulador de medio acústico es un completo modulador/demodulador de SPK que tranforma los bits de entrada en señales analógicas, a las cuales se aplican filtros pasa-bandas para simular las limitaciónes de los transductores, por ejemplo los parlantes y micrófonos de un dispositivo movil. Este módulo respeta el diseño de todos los demas, emitiendo la señal analógica como un flujo digital codificado PCM via la salida estandard del sistema. El filtro pasabanda se implementó como un filtro digital de respuesta finita o FIR, implementado en C.
+El simulador de medio acústico es un completo modulador/demodulador que tranforma los bits de entrada en señales analógicas, a las cuales se aplican filtros pasa-bandas para simular las limitaciónes de los transductores, por ejemplo los parlantes y micrófonos de un dispositivo movil. Este módulo respeta el diseño de todos los demas, emitiendo la señal analógica como un flujo digital codificado PCM via la salida estandard del sistema. El filtro pasabanda se implementó como un filtro digital de respuesta finita o FIR, implementado en C.
 La etapa de modulación fue luego reutilizada en el sistema de transmisión acústico real sin modificaciónes.
 
 \subsection{Simulador de ruido óptico}
@@ -114,12 +114,13 @@ Posteriormente, ruido blanco gaussiano es agregado, para representar el ruido t�
 optical channel simulation output. 
 
 
-%\section{Simulation results}
+\section{Redes ópticas}
+\subsection{Simulaciónes numéricas}
 
 Las fluctuaciones a niveles de potencia cercanos al límite de sensibilidad del dispositivo PD tienen un importante efecto en la detección de la señal.
 El ruido de shot es particularmente preocupante ya que es proporcional al la fotocorriente media. En nuestra propuesta, este ruido es mas alto que en PONs comunes ya que la intensidad del bit `0' de todas las ONUs presentes contribuyen al mismo.
 La intensidad resultante de la potencia de base óptica es por lo tanto altamente dependiente del razón de extinción de Tx.
-En la Fig.~\ref{sim:optical} se muestra el nivel de razín de extinción mínimo requerido para lograr un BER arbitrario en la capa física como una función del número de ONUs presentes on-line.
+En la Fig.~\ref{sim:optical} se muestra el nivel de razón de extinción mínimo requerido para lograr un BER arbitrario en la capa física como una función del número de ONUs presentes on-line.
 %Noise fluctuations at power levels near the PD sensitivity limit have an important effect on signal detection. 
 %Detection being made at power levels near PD sensitivity is highly sensitive to changes in noise.
 %Shot noise is of particular concern as it is proportional to the mean photocurrent.
@@ -157,17 +158,21 @@ Este BER es lo suficientemente bajo para permitir rutinas de corrección de erro
 % would be $\simeq -15$~dBm, well bellow standard commercial Rx overload
 % of $\sim0.5$~dBm (maximum acceptable mean input power for a
 % BER$<10^{-12}$).
-\begin{figure}[!t]
-    \centering
-      \includegraphics[angle=270 ,width=3.5 in]{orte04.pdf}
-    \caption{Resultados de la simulación: canal lógico}
-      \label{sim:access}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{graphs/BER-tesis.pdf} 
+  \caption{BER del canal de 10 Gbps vs la cantidad de ONUs activos.}
+  \label{sim:access}
 \end{figure}
 
-La Fig.~\ref{sim:access} muestra los resultados de la simulación del canal, comparando el porcentaje logrado con respecto a la capacidad total del canal y el BER medido en un solo canal, con respecto la número de ONUs on-line. Se observan dos mediciones, la primera (círculos) sin incluir el efecto de ruido producido en la capa física, y la segunda (cuadrados) incluyéndolo.
-Los resultados fueron obtenidos enviando un gigabit de datos por cada ONU simultáneamente. Esta figura muestra una utilización de canal de $15.7\%$ cuando todos los $128$ ONUs estan transmitiendo simultáneamente, con un BER de $<10^{-8}$. 
-De la figura \ref{arch:fig1} podemos observar una penalización de $8$ ONUs cuando el ruido de la capa óptica es tomado en cuenta (Mayormente la razón de extinción y el ruido producido por el EDFA y los PDs).
+
+La Fig.~\ref{sim:access} muestra los resultados de la simulación del canal, comparando el BER medido en un solo canal, con respecto la número total de ONUs on-line. Se observan tres mediciones, las dos primeras comparando la diferencia en performance al utiliza símbolos de 8 bits contra símbolos de 16 bits, y la tercera para apreciar la diferencia en el resultado al agregar el ruido óptico dentro de la simulación.
+Los resultados fueron obtenidos enviando un gigabit de datos por cada ONU simultáneamente. El mismo método se utilizó para realizar las simulaciónes reflejadas en la Fig.~\ref{BERvsExpansion}, pero en ese caso modificando los parámetros para apreciar la mejora al utilizar el algoritmo de reducción de peso de Hamming.
+Puede apreciarse que cuando la cantidad de ONUs supera los 128, el BER se eleva marcádamente.
+De la misma figura podemos observar una penalización de $8$ ONUs cuando el ruido de la capa óptica es tomado en cuenta (Mayormente la razón de extinción y el ruido producido por el EDFA y los PDs).
 Considerando que el sistema fue diseñado para soportar comunicaciones asincrónicas (Ej. Ethernet), no es probable que en el uso normal todas las ONUs transmitan simultáneamente; por lo tanto este sistema tiene un BER de $<10^{-8}$ para cada canal cuando 119 ONUs estan transmitiendo al mismo tiempo lo que supone una carga máxima del $90\%$ ($119/128>0.9$). 
+
 
 %Fig.~\ref{sim:access} shows simulation results for the fraction of the total
 %capacity and the BER of one channel at the coding level (circles) and 
@@ -216,7 +221,7 @@ bajo costo basada en la generación y trasmisión de señales en FPGAs.
 
 \subsection{Arquitectura alto-nivel de la FPGA Xilinx ML507}
 El equipamiento consta de un kit de desarrollo ML-507 de Xilinx y un
-transceptor SFP+ con láser de 1330 nm, con capacidad de hasta 10 Gbps
+transceptor SFP+ con varios emisores Láser XFP de 1330 nm y 1550 nm, con capacidad de hasta 10 Gbps
 en modulación NRZ y alcance de 10km en fibra monomodo. Para realizar
 las mediciones presentadas en este trabajo se utilizaron dos dispositivos:
 \begin{itemize}
@@ -235,7 +240,14 @@ tiempo real los bits individuales o realizar un diagrama de ojo.
 \end{itemize}
 \subsection{Transmisión a multi-gigabit}
 \subsection{Diseño del sistema propuesto}
-\section{Redes ópticas}
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=6in]{graphs/fpgadesign.pdf}
+\caption {Diseño de alto nivel sobre FPGA}
+\label{fig:fpgadesign}
+\end{figure}
+
 % de confEUA.tex
 
 \subsection{Transmisión a 9 Gbps con SFP+}
@@ -287,83 +299,72 @@ fuera del rango de operación especificado por el fabricante.
 \begin{figure}[t]
   \centering
     %\includegraphics[scale=0.70]{plot.png}
-    \includegraphics[width=6cm,angle=270]{medicionesPaper/BER_sp.pdf}
+    \includegraphics[width=3.5in,angle=270]{medicionesPaper/BER_sp_gray.pdf}
 \caption {BER vs. punto de muestreo.}
-\label{fig:BER}
+\label{fig:BERvsSamplingPoint}
 \end{figure}
 
-\section{Mediciones}
-\begin{figure}[!t]
-  \centering
-%  \subfigure[$4.5$ Gbps]{\includegraphics[scale=0.52]{medicionesPaper/screen3.png}
-  \includegraphics[scale=0.52]{medicionesPaper/screen3.png}
-  \caption {Señal óptica a $4.5$ Gbps}
-  \label{fig:Img1}
-%  \\[1cm]
-\end{figure}
-
-\begin{figure}[!t]
-  \centering
-%  \subfigure[$6$ Gbps]{\includegraphics[scale=0.52]{medicionesPaper/screen4.png}
- \includegraphics[scale=0.52]{medicionesPaper/screen4.png}
-  \caption {Señal óptica a $6$ Gbps}
-  \label{fig:Img2}
-%  \\[1cm]
-\end{figure}
-
-\begin{figure}[!t]
-  \centering
-%  \subfigure[$7.5$ Gbps]{\includegraphics[scale=0.52]{medicionesPaper/screen5.png}
- \includegraphics[scale=0.52]{medicionesPaper/screen5.png}
-  \caption {Señal óptica a $7.5$ Gbps}
-  \label{fig:Img3}
-%  }
-\end{figure}
+\subsection{características del tranceptor de gigabit a altas velocidades}
 
 
 \begin{figure}[!t]
-  \centering
-%  \subfigure[$9.33$ Gbps]{\includegraphics[scale=0.52]{medicionesPaper/screen6.png}
- \includegraphics[scale=0.52]{medicionesPaper/screen6.png}
-  \caption {Señal óptica a $9.33$ Gbps}
-  \label{fig:Img4}
-%  }\\[1cm]
-\end{figure}
-
-
-\begin{figure}[!t]
-  \centering
-%  \subfigure[$12.44$ Gbps]{\includegraphics[scale=0.52]{medicionesPaper/screen7.png}
- \includegraphics[scale=0.52]{medicionesPaper/screen7.png}
-  \caption {Señal óptica a $12.44$ Gbps}
-  \label{fig:Img5}
-%  }
-\end{figure}
-
-
-
-\begin{figure}[!t]
-  \centering
-  \includegraphics[scale=0.52]{medicionesPaper/screen12.png}
-  \caption {Señal óptica a $12.44$ Gbps, transmisión 10110101010}
-  \label{fig:Img6}
+   \centering
+   \subfloat[Señal óptica a $4.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen3.png} }}%
+   \qquad
+   \subfloat[Señal óptica a $6$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen4.png} }}%
+   \qquad
+   \subfloat[Señal óptica a $7.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen5.png} }}%
+   \qquad
+   \subfloat[Señal óptica a $9.33$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen6.png} }}%
+   \qquad
+   \subfloat[Señal óptica a $12.44$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen7.png} }}%
+   \qquad
+   \subfloat[Señal óptica a $12.44$ Gbps, transmisión 10110101010]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen12.png} }}%
+  \caption {Capturas de pantalla de la medición de la señal óptica a la salida del XFP variando la tasa de transmisión de $4.5$ a $12.44$ Gbps}
+  \label{fig:ImgTasa}
 \end{figure}
 
 
 
-Las figuras \ref{fig:Img1} a \ref{fig:Img5} muestran la señal óptica producida a diferentes
+
+
+Las Fig.~\ref{fig:ImgTasa} muestran la evolución de la señal óptica producida a diferentes
 tasas. Nótese que aunque el equipo puede generar señales estables de
 hasta $12.44$ Gbps pero no puede recibirlas a esa frecuencia, por lo que las
 mediciones de BER se realizaron solo hasta $9.33$ Gbps. Todas las señales
-corresponden a la secuencia 10101010, excepto la figura \ref{fig:Img6},
+corresponden a la secuencia 10101010, excepto la última figura,
 que fue generada con una secuencia distinta para demostrar el total
 control sobre la señal generada. El transceptor posee la capacidad de
 realizar una codificación 8B/10B adicional, pero para estas mediciones
 ese módulo fue desactivado.
+El punto de muestreo de la señal es importante, ya que si se elige correctamente se minimizará el BER, tal como lo muestra la Fig.~\ref{fig:BERvsSamplingPoint}, donde se aprecia como el BER es minimizado si el punto de muestreo cae exactamente en la mitad del bit. Tambien en la misma figura puede compararse distintas tasas de transmisión y ver que las curvas de BER causadas por el punto de muestreo son difierentes para cada tasa. Esto es porque como puede verse en las Figs.~\ref{fig:ImgTasa}, a tasas elevadas el pulso del bit se deforma y el punto de sampleo óptimo se modifica, acompañando esta deformación del bit transmitido.
 
 
+\subsection{Problema de linea desbalanceada y codificación 8B/10B}
+La conexión eléctrica de la FPGA al Láser XFP debe soportar señales de 4 Gigahertz o mas, y puede verse como un canal con características de un filtro pasa-altas. Esto requiere que la señal este balanceada eléctricamente, por lo que deben codificaciónes de balanceo para una correcta transmisión. Dichos algoritmos pueden ser el conocido 8B/10B u otras codificaciones, aunque 8B/10B tiene soporte de codificación/decodificación por hardware en el tranceptor de gigabit de Xilinx.
 
-\subsection{Implementación del sistema sobre 8B/10B}
+El hardware de prototipado no permite implementar el algoritmo diseñado sin modificaciones. En la Fig.~\ref{fig:expansionbit} se aprecia una expansión progresiva a medida que el desbalanceo de la señal se hace mas pronunciado. Los efectos de la expansión del tamaño de bit son evidentes en la fig.~\ref{fig:ImgExpansion} donde las gráficas de potencia óptica ponen en evidencia la expansión e interferencia causada por una señal desbalanceada.
+Efectivamente el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido de manera desbalanceada, generando una interferencia que impide el funcionamiento del sistema.
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=4in]{graphs/expansionbit.pdf}
+\caption {Se detalla la expansión del tiempo de bit en una señal desbalanceada a medida que la cantidad de unos por frame va disminuyendo. El tamaño de frame es de 512 bits, por lo que el mínimo de tamaño de bit esta con 256 unos por frame con una señal perfectamente balanceada. La tasa nominal es de 2.5Gbps}
+\label{fig:expansionbit}
+\end{figure}
+
+\begin{figure}[!t]
+   \centering
+   \subfloat[Señal con 256 unos por frame (8B/10B), 400ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion1.jpg} }}%
+   \qquad
+   \subfloat[Señal con 48 unos por frame, 1100ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion2.jpg} }}%
+   \qquad
+  \caption {Señal de potencia óptica de un Láser XFP Sumitomo de 1330nm. Se observa una expansión de bit cuando se reduce la cantidad de unos por frame, desbalanceando la señal. La tasa nominal utilizada es de 2.5 Gbps}
+  \label{fig:ImgExpansion}
+\end{figure}
+
+Este desbalanceo se soluciona simplemente aplicando las codificaciónes de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva es utilizar un hardware donde la señal no necesite balancearse, pero mientras tanto se opto por la siguiente solución para poder utilizar la placa ML507 y poder realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal pseudoaleatoria super-impuesta con una señal 8b/10b, por lo que la señal esta balanceada y es transmitida y recibida correctamente. Son los demas clientes los que transmiten una señal desbalanceada con muy pocos unos, causando solamente interferencias. La señal de estos clientes no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente que esta balanceado, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps) mientras que solo uno de los clientes pueda comunicarse y los demas actuen efectivamente solo como ruido.
+
 \section{Redes acústicas}
 
 \subsection{Modulación}

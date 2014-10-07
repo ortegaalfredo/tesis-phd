@@ -479,19 +479,22 @@ La arquitectura del sistema lo hace muy confiable frente a interferencias de la 
 \subsection{Redes ópticas}
 % de orte.text
 
+
 \begin{figure}[t]
   \centering
-    \includegraphics[width=0.48 \textwidth]{graphs/StarCoupler}
+      \subfloat[Distribución via acoplador tipo estrella 1]{{\includegraphics[width=0.45 \textwidth]{graphs/StarCoupler} }}%
+    \qquad
+    \subfloat[Distribución via EDFA]{{\includegraphics[width=0.45 \textwidth]{graphs/EDFA} }}%
     \caption{Diseño de red propuesto para la capa óptica: Un acoplador de tipo estrella es la base para la arquitectura de red en distancias inferiores a $10~\mathrm{km}$.}
     \label{arch:fig1}
 \end{figure}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.48 \textwidth]{graphs/EDFA}
-  \caption{Para distancias superiores a $10~\mathrm{km}$ la red requiere amplificación provista por un EDFA.}
-  \label{arch:hub_edfa}
-\end{figure}
+%\begin{figure}[t]
+%  \centering
+%  \includegraphics[width=0.48 \textwidth]{graphs/EDFA}
+%  \caption{Para distancias superiores a $10~\mathrm{km}$ la red requiere amplificación provista por un EDFA.}
+%  \label{arch:hub_edfa}
+%\end{figure}
 
 
 %\begin{figure}[!t]
@@ -561,7 +564,7 @@ Es necesario ajustar algunos parámetros con respecto a la implementación ópti
 \begin{figure}[t]
   \centering
     \includegraphics[width=4in]{graphs/audio-fig6}
-    \caption{Simulaciones con M=256 y K=9}
+    \caption{Sn M=256 y K=9}
     \label{arch:AudioSimul}
 \end{figure}
 
