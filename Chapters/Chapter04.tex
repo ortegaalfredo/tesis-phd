@@ -382,7 +382,19 @@ Efectivamente el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido d
 \end{figure}
 
 Este desbalanceo se soluciona simplemente aplicando las codificaciónes de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva es utilizar un hardware donde la señal no necesite balancearse, pero mientras tanto se opto por la siguiente solución para poder utilizar la placa ML507 y poder realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal pseudoaleatoria super-impuesta con una señal 8b/10b, por lo que la señal esta balanceada y es transmitida y recibida correctamente. Son los demas clientes los que transmiten una señal desbalanceada con muy pocos unos, causando solamente interferencias. La señal de estos clientes no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente que esta balanceado, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps) mientras que solo uno de los clientes pueda comunicarse y los demas actuen efectivamente solo como ruido.
+
 \subsection{Sincronización a nivel de bit, word y frame}
+La sincronización no se trató detenidamente en la sección teórica de esta tesis ya que desde un principio se consideró como un tema ajeno a la misma. Sin embargo, para la implementación real es imprescindible obtener la sincronización entre los nodos que deseen utilizar un canal. Esto no es una tarea sencila considerando que debe hacerse sobre un canal que contiene elevadas tasas de ruido.
+
+La estrategia utilizada para la transmisión por medio óptico es utilizar el hardware de sincronización que posee el tranceptor de multi-gigabit ya incluido en la FPGA. Este módulo [TODO: Cita] es bastante flexible y se basa en la utilización de un prefijo o ``comma'', que es una serie de bits determinada que se transmite antes de iniciar la comunicación. Esta serie de bits es configurable pero es deseable que posea ciertas características como una alta autocorrelación, para optimizar su detección en el stream de datos recibidos.
+La sincronización se realiza en dos fases:
+\begin{enumerate}
+ \item El iniciante envía el prefijo de sincronización y este es detectado por el módulo de alineación del receptor. Este módulo alinea a nivel de bit y byte, o sea que garantiza que en el buffer de salida de 32 bits, el prefijo aparece en el bit 0, 8, 16 o 24.
+ \item Una vez alineado el prefijo en el buffer de salida, solo resta detectar en qué posicion ha quedado y comenzar a leer el frame desde la posición siguiente. Esto se realiza en el código verilog sintetizando cuatro detectores que simultaneamente testearan por cada posición y deciden en un solo reloj cual es la alineación correcto. Al ser solo 4 posiciónes posibles, es una solución eficiente.
+\end{enumerate}
+
+En teoría, solo debería realizarse la sincronización al principio de las comunicaciónes. En la práctica los relojes no son perfectos y es necesario sincronizar periódicamente. En la implementación óptica se envía el prefijo de sincronización al comienzo de cada frame.
+Para evitar colisiones, el hardware de alineamiento se desactiva al detectarse una buena sincronización y se reactiva al finalizar la recepción del frame. Esta es una operación extremadamente rápida, recordemos que a una velocidad de 5Gbps, cada frame de 1024 bits tiene una duración temporal de 200 nanosegundos.
 
 \section{Redes acústicas}
 
