@@ -384,13 +384,22 @@ Efectivamente el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido d
 Este desbalanceo se soluciona simplemente aplicando las codificaciónes de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva es utilizar un hardware donde la señal no necesite balancearse, pero mientras tanto se opto por la siguiente solución para poder utilizar la placa ML507 y poder realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal pseudoaleatoria super-impuesta con una señal 8b/10b, por lo que la señal esta balanceada y es transmitida y recibida correctamente. Son los demas clientes los que transmiten una señal desbalanceada con muy pocos unos, causando solamente interferencias. La señal de estos clientes no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente que esta balanceado, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps) mientras que solo uno de los clientes pueda comunicarse y los demas actuen efectivamente solo como ruido.
 
 \subsection{Sincronización a nivel de bit, word y frame}
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=6in]{graphs/optsync.pdf}
+\caption {Flujo de datos en la sincronización óptica. El primer bloque, sincronización de bit alinea a un límite de byte, lo que resulta en cuatro posibles alineaciones distintas. El frame es luego es alineado a 32 bytes mediante desplazamientos o shifts.}
+\label{fig:optsync}
+\end{figure}
+
+
 La sincronización no se trató detenidamente en la sección teórica de esta tesis ya que desde un principio se consideró como un tema ajeno a la misma. Sin embargo, para la implementación real es imprescindible obtener la sincronización entre los nodos que deseen utilizar un canal. Esto no es una tarea sencila considerando que debe hacerse sobre un canal que contiene elevadas tasas de ruido.
 
 La estrategia utilizada para la transmisión por medio óptico es utilizar el hardware de sincronización que posee el tranceptor de multi-gigabit ya incluido en la FPGA. Este módulo [TODO: Cita] es bastante flexible y se basa en la utilización de un prefijo o ``comma'', que es una serie de bits determinada que se transmite antes de iniciar la comunicación. Esta serie de bits es configurable pero es deseable que posea ciertas características como una alta autocorrelación, para optimizar su detección en el stream de datos recibidos.
 La sincronización se realiza en dos fases:
 \begin{enumerate}
- \item El iniciante envía el prefijo de sincronización y este es detectado por el módulo de alineación del receptor. Este módulo alinea a nivel de bit y byte, o sea que garantiza que en el buffer de salida de 32 bits, el prefijo aparece en el bit 0, 8, 16 o 24.
- \item Una vez alineado el prefijo en el buffer de salida, solo resta detectar en qué posicion ha quedado y comenzar a leer el frame desde la posición siguiente. Esto se realiza en el código verilog sintetizando cuatro detectores que simultaneamente testearan por cada posición y deciden en un solo reloj cual es la alineación correcto. Al ser solo 4 posiciónes posibles, es una solución eficiente.
+ \item El iniciante envía el prefijo de sincronización y este es detectado por el módulo de alineación del receptor. Este módulo alinea a nivel de bit y byte, o sea que garantiza que en el buffer de salida de 32 bits, el prefijo aparece en el bit 0, 8, 16 o 24 (Ver fig.\ref{fig:optsync}).
+ \item Una vez alineado el prefijo en el buffer de salida, solo resta detectar en qué posicion ha quedado y comenzar a leer el frame desde la posición siguiente. Esto se realiza en el código verilog sintetizando cuatro detectores que simultaneamente testearan por cada posición y deciden en un solo reloj cual es la alineación correcta. Al ser solo 4 posiciónes posibles, es una solución eficiente.
 \end{enumerate}
 
 En teoría, solo debería realizarse la sincronización al principio de las comunicaciónes. En la práctica los relojes no son perfectos y es necesario sincronizar periódicamente. En la implementación óptica se envía el prefijo de sincronización al comienzo de cada frame.
@@ -411,10 +420,18 @@ Adicionalmente un duty-cycle de 50\% demostró ser el óptimo para la modulació
 %Simple pulse shaping is realized using a pass-band filter at the output of the modulation and also at the input of the demodulator. This filter also helps reject unwanted interference.
 \subsection{Sincronización}
 % de newJIS_140512
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=4in]{graphs/acusync.pdf}
+\caption {Sincronización acústica. En la figura a) se recorren serialmente todas las posibilidades hasta encontrar la mayor potencia de bit, que corresponde a la mejor sincronización. Luego, en la figura b) se calcula el umbral de decisión.}
+\label{fig:acusync}
+\end{figure}
+
 Como se desprende de la descripción del canal de comunicaciones, la sincronización entre el transmisor y el receptor es esencial para la correcta decodificación de la información. 
 En el caso del medio óptico la sincronización de bit y word debe realizarse a tasas tan elevadas que requiere necesariamente soporte de hardware por parte del transceptor.
 Sin embargo a las reducidas tasas (1000 bps) utilizadas en el canal acústico permiten realizar una sincronización por software sin ningún soporte de hardware adicional. 
-El método es muy similar al utilizado en el canal óptico: Un patrón inicial de sincronización es enviado, para que el receptor pueda realizar un ajuste de parámetros tales como fase y umbral de decisión (Ver Fig. [TODO]). La deriva y fluctuación del reloj del sistema (drift y jitter) no son significantes a esta baja velocidad de transmisión por lo que no se requiere corrección de ningun tipo, haciendo que la Implementación del modem por software sea muy sencilla.
+El método es muy similar al utilizado en el canal óptico: Un patrón inicial de sincronización es enviado, para que el receptor pueda realizar un ajuste de parámetros tales como fase y umbral de decisión (Ver Fig.~\ref{fig:acusync}). La deriva y fluctuación del reloj del sistema (drift y jitter) no son significantes a esta baja velocidad de transmisión por lo que no se requiere corrección de ningun tipo, haciendo que la Implementación del modem por software sea muy sencilla.
 Ciertos parámetros si bien son inicializados en la etapa de sincronización, son por naturaleza dinámicos y se ajustan periódicamente, como por ejemplo el umbral de decisión, que es recalculado a partir de un promedio de los datos de entrada. La fase es también corregida utilizando los datos de entrada como referencia. Notar que este método de sincronización simple permite detectar el comienzo de frame a su vez que se alinea a nivel de bit; ambas alineaciones son necesarias en cada comunicación (pero la alineación de frame solamente entre los ONUs comunicantes). Adicionalmente, una vez comenzada la transmisión, los datos seran indecifrables gracias al algoritmo de time-hopping guiado por un CS-PRNG.
 
 %As it follows from the description of the communication channel, synchronization between the transmitter and receiver is essential for the correct decoding of information. For this purpose, an initial synchronization pattern is sent, so the receiver can adjust parameters like phase and decision level (see Figure 3). For the data bits transmission a duty cycle of 50\% showed in our experiments an enhanced detection. Clock drift and jitter are not significant at this low transmission speed and so no correction is required, making the software modem implementation very simple. Decision level is dynamic, meaning it is constantly re-calculated from averaged input data. The receiver symbol phase is also corrected using the input data as reference. Notice that this simple synchronization method allows detecting the frame start as well as the bit slot; both are needed at every communication. Moreover, once the data began to be transmitted, the communication becomes indecipherable thanks to the CS-PRNG.
