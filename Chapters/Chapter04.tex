@@ -115,6 +115,8 @@ optical channel simulation output.
 
 
 \section{Redes ópticas}
+La implementación del sistema sobre redes ópticas fue el objetivo principal de la investigación, y solo luego de obtener resultados en este medio se pasó al medio acústico.
+La simulación tuvo un papel muy importante en el desarrollo y pruebas del algoritmo en este medio, ya que las elevadas velocidades de transmisión mínimas del tranceptor óptico hace practicamente imposible mediciones directas mas alla de la extracción de valores simples como el ancho de bit y el radio de extinción.
 \subsection{Simulaciónes numéricas}
 
 Las fluctuaciones a niveles de potencia cercanos al límite de sensibilidad del dispositivo PD tienen un importante efecto en la detección de la señal.
@@ -239,8 +241,10 @@ ancho de banda de 20 Ghz en potencia óptica, suficiente para capturar en
 tiempo real los bits individuales o realizar un diagrama de ojo.
 \end{itemize}
 \subsection{Transmisión a multi-gigabit}
-\subsection{Diseño del sistema propuesto}
+La plataforma de FPGA de Xilinx no fue seleccionada solamente porque la lógica programable es necesaria para la transmisión a altas velocidades, sino por la cuestión práctica de que los vendedores de FPGAs suelen incluir tranceptores de multi-gigabit en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos, asi como las interfaces para conectar las salidas directamente a las entradas de tranceptores ópticos como uno o mas XFPs [CITA].
+Es normal que los tranceptores de multi-gigabit puedan ser utilizados con otros medios, por ejemplo sobre cables trenzados de cobre o lineas de transmisión de alta velocidad sobre PCBs. Serial-ATA y PCI-Express son buses de transmisión de datos que suelen ser implementados utilizando los tranceptores de la FPGA. Estos medios de transmisión eléctricos no fueron considerados debido a las distancias muy limitadas entre los nodos, por lo que la implementación de alta velocidad con la FPGA fue puramente sobre fibras ópticas.
 
+\subsection{Diseño del sistema propuesto}
 En la Fig.~\ref{fig:fpgadesign} puede observarse el diseño propuesto en el cual se implementó y probó exitosamente el algoritmo transmitiendo a tasas de 5 Gigabits mediante una fibra óptica.
 El echo que el algoritmo pueda transmitir a altas velocidades se da gracias a ciertas características del diseño que seran descritas a continuación.
 
@@ -406,6 +410,8 @@ En teoría, solo debería realizarse la sincronización al principio de las comu
 Para evitar colisiones, el hardware de alineamiento se desactiva al detectarse una buena sincronización y se reactiva al finalizar la recepción del frame. Esta es una operación extremadamente rápida, recordemos que a una velocidad de 5Gbps, cada frame de 1024 bits tiene una duración temporal de 200 nanosegundos.
 
 \section{Redes acústicas}
+Debido en parte a la dificultad de implementación y debugging sobre la logica de la FPGA, y la imposibilidad de realizar mediciones a muy altas velocidades, se propuso la implementación sobre un medio acústico como solución intermedia. Las señales acústicas se interfieren típicamente de manera aditiva y un modem acústico debe representarse como un canal binario simétrico en lugar de un canal-Z. Pero si utilizamos ciertas modulaciones, tales como OOK (on-off Keying) de manera que la frecuencia portadora sea varias veces mayor al ancho de bit, la interferencia entre bits tendra siempre un efecto aditivo, mientras que los ceros no causan interferencia. Esto forma un canal-Z mediante el cual puede implementarse el sistema de comunicación segura descripto en esta tesis. Debido a las características de modulación necesarias, las velocidades de transmisión son muy bajas, ya que ancho de banda de un parlante o micrófono es relativamente reducido (de 2 a 15 khz) y la modulación OOK tiene una baja densidad espectral. 
+No obstante es un excelente medio para realizar pruebas ya que pueden ser implementadas totalmente via software, y puede ser utilizado en todas las aplicaciones que no requieren elevadas tasas de transmisión.
 
 \subsection{Modulación}
 % de newJIS_140512
@@ -438,6 +444,65 @@ Ciertos parámetros si bien son inicializados en la etapa de sincronización, so
 
 
 \subsection{Medición multi-usuario}
-\subsection{Medición distintas distancias}
+
+Todas las mediciones fueron realizadas a una tasa de 1000 bps, utilizando una señal portadora acústica de 16 kHz, que se encuentra en el límite auditivo de la mayoría de los adultos de mas de 30 años[CITA] aunque tambien es posible que ciertos parlantes tengan problemas a esta frecuencia, en cuyo caso puede reducirse y utilizar una portadora de 12 kHz.
+La cantidad total de datos transmitidos por canal fue de 4096 bits en cada medición. El volumen de la señal fue seteada al máximo para cada dispositivo, mientras que la amplificación de entrada de la señal obtenida por el micrófono fue optimizada en cada caso para obtener el menor BER.
+Con el modulador y sincronizador implementado, el sistema opera con tasas de error aceptables con una separación máxima entre nodos de 1 metro, una distacia que normalmente excede la existente entre un terminal móbil (Celular, etc.) y una computadora fija en el mismo escritorio (Ver Fig.~\ref{acudist}). Aún para un alto número de clientes simultaneos (>10) el sistema no presenta altas tasas de error o ancho de banda reducido, como puede verse en la Fig.~\ref{acumult}.
+En las pruebas con el software actual, el retraso del canal es de mas de 60 segundos, excesivo para muchas aplicaciones que no necesitan alto ancho de banda pero requieren un corto tiempo de respuesta (por ejemplo, aplicaciones bancarias). El retraso puede ser disminuido de dos maneras: 
+\begin{enumerate}
+ \item Decrementando la cantidad máxima de clientes simultaneos soportados por el sistema.
+ \item Utilizando algoritmos de ECC de bajo retraso, tales como BCH, ya que actualmente el retraso esta causado por el algoritmo de Reed-Solomon que requiere llenar un buffer de 256 bytes (2048 bits) antes de poder comenzar la decodificación.
+\end{enumerate}
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=4in]{graphs/medidas_clientes_JIS-fig6.pdf}
+\caption {Multi-usuario: BER del enlace entre dos laptops (Lenovo T420 y Lenovo X60), una de ellas simulando varios nodos}
+\label{fig:acumult}
+\end{figure}
+
+
+% De JIS2014MathType.pdf
+%All measurements were conducted at a rate of 1000 bps, with the carrier signal at 16 kHz. The total data trans-
+%mitted was 4096 bits. Output volume was set at the maximum possible for each device, while the input amplifi-
+%cation was optimized for each measurement.
+%We measured that the system operates with acceptable error rates for links of up to 1 meter, a distance usually
+%exceeding that between a mobile terminal (phone, etc.) and a fixed computer placed in the same desk (see Fig-
+%ure 7). Even for a high number of concurrent clients (>10) the system does not present high error rates or re-
+%duced bandwidth, as can be seen in Figure 6.
+%Although in the present test channel delay was longer than 60 seconds, excessive for some applications re-
+%quiring short response time (e.g. banking transactions), this parameter can be reduced by decreasing the maxi-
+%mum number of simultaneous users supported by the system and using a lower-delay interleaver and an outer
+%error correction algorithm like BCH
+%
+
+\subsection{Medición a distinta separación}
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=4in]{graphs/mediciones-distancia-fig7.pdf}
+\caption {Distancia: Enlace entre una Laptop (Lenovo T420) y un celular (HTC Status) presenta errores detectables solo cuando se supera 60 cm de separación.}
+\label{fig:acudist}
+\end{figure}
+
+Las comunicaciónes acústicas utilizando como portadora un tono de 12 kHz son muy suceptibles al ruido ambiente. Un enlace acústico con 50 cm de separación entre un Laptop Lenovo T420 y un celular HTC Status sufrió mas de un $15\%$ de BER con solo una ligera interferencia (como por ejemplo golpear una mesa cercana). Esta observación motivo el uso de la frecuencia mas alto posible. Una portadora de 16 kHz presentó el mayor rango de compatibilidad entre los dispositivos testeados, algunos de ellos demostraron no poder emitir audio a frecuencias mayores.
+Independientemente, algunas mediciones fueron realizadas a mayor frecuencia en dispositivos que lo soportaron. Por ejemplo, los parlantes de una Laptop T420 y otra Laptop Lenovo X60 fueron capaces de establecer un enlace utilizando como portadora un tono a 19.2 kHz, aunque solo en cortas distancias (20 cm). De todas formas, esta frecuencia de portadora permitió mayor ancho de banda en el enlace (2000 bps en lugar de 1000 bps) con la misma tasa de error.
+La señal acústica modulada puede causar molestias a personas o animales cercanos. Distintos tonos de portadora causan distintos efectos y niveles de molestia, aunque este último parámetro es subjetivo. La portadora de 19.2 kHz fue descrita como no audible, mientras que la portadora a 16 kHz y 12 kHz son claramente audibles. Se notó que el volumen del sonido modulado y las molestias asociadas al mismo aumentan con el numero de clientes simultaneos transmitiendo en el medio.
+
+% De JIS2014MathType.pdf
+%Communications using a 12 kHz tone carrier were extremely susceptible to ambient noise. Indeed, a 50 cm
+%link between a laptop Lenovo T420 and a HTC Status phone suffered an excess of 15% BER with slight noise
+%%interference (like bumping on a nearby table). This observation motivated the use of the highest attainable fre-
+%quency. A 16 kHz carrier provided the widest range of compatibility among tested devices, because some of
+%them could not emit at higher frequencies.
+%Tests were also done at higher frequencies for capable devices. For instance, laptop speakers in Lenovo T420
+%and Lenovo X60 laptops proved capable of establishing a link at 19.2 kHz, but only for very short distances
+%(20cm). Nevertheless, this carrier frequency allowed a faster link (2000 bps) with the same BER.
+%The modulated sound signal can represent a nuisance to nearby persons and animals. Several different carrier
+%frequencies were tested as a way to evaluate the level of discomfort. The 19.2 kHz carrier signal was perceived
+%as almost non-audible, with 16 kHz being clearly audible for most people and the link at 12 kHz being the most
+%uncomfortable. It should be noticed that loudness and hence discomfort increase with the number of simultane-
+%hous users.
+%
 
 \section{Conclusiones}
