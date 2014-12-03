@@ -1,45 +1,47 @@
 \chapter{Estado del arte}
 
 \subsection{Códigos correctores de errores}
-En toda comunicación es importante la confiabilidad de la misma, y como ningún sistema es perfecto es esperable que se produzcan errores en la transmisión que se presentan como bits erroneos detectados por el receptor. 
+Al codificar información sobre algun medio físico ya sea para transmisión o almacenamiento, invariablemente se sufre una degradación o ruido. Esta degradación puede ocurrir en cualquier módulo del sistema o las interfaces entre los mismos y generalmente es deseable que un sistema pueda reproducir los datos almacenados o transmitidos con la menor cantidad posible de errores o de ruido. El ruido se suele modelar como una señal con una determinada distribución de potencia superpuesta a la señal codificada. Algunos modelos de ruido son muy utilizados, tal como el ruido aditivo gaussiano[CITA], utilizado para modelar ruido producto de fuentes naturales como ruido térmico o para aproximar fuentes de ruido aleatorias.
 
-La idea de un código corrector de errores esta relacionada con la técnica de espectro expandido, siendo ambos métodos que ayudan a la transmisión de la información reduciendo la entropía de la información transmitida, o lo que es lo mismo, aumentando la redundancia de la información. 
 
-La manera mas simple de corregir estos errores es usar un algoritmo de detección de errores como puede ser un Checksum, CRC o hash[CITA], e iniciar un proceso de retransmisión de la porción o trama de datos afectada. Esto posee la desventaja de ser costoso tanto en ancho de banda perdido, como en delay de transmisión. En enlaces de muy alta velocidad las elevadas tasas de retransmisiones hacen a este algoritmo sumamente ineficiente. 
-Por lo que es deseable utilizar un algoritmo que pueda detectar y corregir errores basado solamente en los bits recibidos, sin utilizar retransmisiones. Esto se denomina Forward Error Correction Codes, o FEC Codes [CITA] de los cuales existen diferentes tipos de acuerdo con sus aplicación, performance y parámetros.
+Al transmitir datos digitales sobre canales con ruido, aun asumiendo que las etapas moduladoras y demoduladoras son capaces de reproducir los datos fielmente, el mensaje recibido $m_r$ sera distinto del mensaje original $m$, ya que la señal que recibe el demodulador sera una combinación de la señal original del demodulador con la señal de ruido. La diferencia de la señal recibida $m_r$ y $m$ se denomina error de transmisión. Para aumentar la confiabilidad y reducir el error de transmisión se idearon códigos correctores/detectores de errores, con los que el receptor puede detectar un error y pedir una retransmisión, o bien corregir el error utilizando datos adicionales presentes en la señal. Los métodos de corrección de errores generalmente funcionan reduciendo la entropía de la información transmitida, o lo que es lo mismo, aumentando la redundancia de la información.
+
+La manera mas simple de corregir estos errores es usar un algoritmo de detección de errores como puede ser un Checksum, CRC o función de hash[CITA], e iniciar un proceso de retransmisión de la porción o trama de datos afectada. Esto posee la desventaja de ser costoso tanto en ancho de banda utilizado, como en el retraso de la transmisión. En enlaces de muy alta velocidad las elevadas tasas de retransmisiones hacen a este algoritmo sumamente ineficiente. 
+
+Por lo tanto es deseable utilizar un algoritmo que pueda detectar y corregir errores basado solamente en información adicional transmitida, sin utilizar retransmisiones. Esto se denomina Forward Error Correction Codes, o códigos FEC \cite{Moon:05} de los cuales existen diferentes tipos de acuerdo con sus aplicación, performance y parámetros.
 
 \subsubsection{BCH/Reed Solomon}
-Los códigos BCH y Reed-Solomon son usados ampliamente en multitud de industria ya que son computacionalmente sencillos de implementar y muy eficientes desde el punto de vista de errores corregidos por bit agregado. Se basan en operaciones sobre grupos algebráicos cíclicos cuyas operaciones sobre sus símbolos dan como resultado otro símbolo válido dentro del grupo. 
-Este tipo de código si bien es relativamente antiguo, es todavía utilizado en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps [CITA: IEEE P802.3bj  o ``FORWARD ERROR CORRECTION FOR 400G: INITIAL THOUGHTS''] debido a su robustez, bajo over
+Los códigos BCH y Reed-Solomon son usados ampliamente en multitud de industria ya que son computacionalmente sencillos de implementar y muy eficientes desde el punto de vista de errores corregidos por bit agregado. Se basan en una representación de los datos basada en grupos algebráicos cíclicos cuyas operaciones sobre sus símbolos dan como resultado otro símbolo válido dentro del grupo. 
+Este tipo de código si bien es relativamente antiguo, es todavía utilizado en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps [CITA: IEEE P802.3bj  o ``FORWARD ERROR CORRECTION FOR 400G: INITIAL THOUGHTS''] debido a su robustez, bajo retraso y la existencia de algoritmos eficientes para la decodificación en un tiempo fijo.
 
 \subsubsection{LDPC}
-El esquema de corrección de errores LDPC (Low Density Parity Check) es muy utilizado actualmente debido a su gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
-Antes de ahondar en la descripción de este algoritmo cabe aclarar que a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una performance similar desde el punto de vista de corrección de errores.
-Básicamente es un código lineal que utiliza una matriz de paridad grande y dispersa.
-La matriz H es tal que cualquier codeword valido x cumple con $H*x=0$
+El esquema de corrección de errores LDPC~\cite{gallagerpress} (Low Density Parity Check) es muy utilizado actualmente debido a su gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
+Antes de ahondar en la descripción de este algoritmo cabe aclarar que a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una performance similar desde el punto de vista de corrección de errores, sin embargo cabe mencionarlo ya que actualmente es uno de los algoritmos mas utilizados en mecanismos de transmisión modernos debido a su eficiencia. 
+
+El algoritmo se basa en un código lineal que utiliza una matriz de paridad grande y dispersa. La matriz $H$ es tal que cualquier codeword válido x cumple con $H*x=0$. La alta complejidad computacional de operar con matrices de gran tamaño impedía que este algoritmo fuera adoptado con anterioridad a pesar de haber sido desarrollado en los años 60.
 
 \paragraph{LDPC: Generador de matriz}
-La matriz generadora puede crearse facilmente si H es de la forma $[D|I]$, simplemente formando la matriz:
+La matriz generadora puede crearse fácilmente si H es de la forma $[D|I]$, simplemente formando la matriz:
 $$G=[I|D']$$
 Donde D' es la transpuesta de la matriz D
-Para la generacion de la matriz se opto por utilizar un algoritmo random y luego aplicando algunos tests, para lograr una matriz sistemática de rate entero (1/2, 1/3, etc.)
+Para la generación de la matriz se opto por utilizar un algoritmo aleatorio y luego aplicando testeos de validación, para lograr una matriz sistemática de rate entero (1/2, 1/3, etc.)
 Para verificar se G genera vectores cuya matriz de paridad es H, puede verificarse que:
 $$ H*G'=0 $$
 
-Podemos definir la matriz de paridad H como una matriz de paridad que tenga mas de 3 unos por fila y una cantidad similar por columna. Buenos resultados se obtienen a partir de matrices de 200x100.
+Podemos definir la matriz de paridad $H$ como una matriz de paridad que tenga mas de 3 unos por fila y una cantidad similar por columna. Buenos resultados se obtienen a partir de matrices de 200x100.
 Se puede comenzar por una matriz vacía $H = 0$ del tamaño deseado, y ir agregándole unos al azar. Cierto análisis es necesario para garantizar que no se cumplan ciclos y que la cantidad de unos por columna y por fila es la deseada. De esto se encargan los algoritmos llamados evencol y evenrow.
 
 El generador puede generar matrices de cualquier tamaño, de esta manera:
 
 $$ ./genMatrix <width> <height> <ones per row>$$
 
-La matriz se genera en la salida estandard. El formato es el utilizado por la libreria boost:ublas.
+La matriz se genera en la salida estándar. El formato es el utilizado por la biblioteca boost:ublas [CITA].
 
-NOTA: La matriz siempre esta compuesta de simbolos en GF(2) (O sea, ceros y unos)
+NOTA: La matriz siempre esta compuesta de símbolos en GF(2) (O sea, ceros y unos)
 
 \paragraph{LDPC: encoder}
 
-El vector inicial se toma de la entrada estandard y el codeword se emite en la salida estandard. La sintaxis es muy sencilla:
+El vector inicial se toma de la entrada estándar (stdin) y el codeword se emite en la salida estándar (stdout). La sintaxis es muy sencilla:
 
 $$ ./ldpcen <matriz> < in >out $$
 \paragraph{LDPC: decoder}
@@ -49,22 +51,21 @@ La linea de comando es la siguiente:
 
 $$ ./ldpcdec <matriz> <in >out $$
 
-La conversion codeword->vector es sencilla, ya que al ser un codigo sistemático solo se necesita eliminar la parte del vector que representa la paridad añadida.
+La conversión codeword->vector es sencilla, ya que al ser un código sistemático solo se necesita eliminar la parte del vector que representa la paridad añadida.
 
-Se generaron muchas matrices, desde 256x128 hasta matrices muy grandes de 10000x5000, pero el tiempo de decodificacion crece enormemente para matrices grandes.
+Se generaron muchas matrices, desde 256x128 hasta matrices muy grandes de 10000x5000, pero el tiempo de decodificación crece enormemente para matrices grandes.
 
-\paragraph{LDPC: optimizacion}
+\paragraph{LDPC: optimización}
 
-Debido a la naturaleza iterativa del decodificador ldpc, pronto se convirtio en el cuello de botella de la simulacion. Para acelerar el sistema, se opto por realizar la siguiente optimizacion:
-LDPC consta basicamente de varios loops, dentro de los cuales se accede a la matriz de paridad, y a otras matrices que acumulan datos intermedios. Primeramente la implementacion fue realizada como mencionamos utilizando boost:ublas, pero luego se comprobo que una implementacion utilizando arrays de C era hasta 3 veces mas rapida.
-Luego se procedio a realizar un algoritmo de ``unrolling'' de estos loops, generando codigo especifico a una matriz dada, sin ningun tipo de loop. Obviamente este codigo es mucho mas grande, pero la aceleracion provista es aun mayor, del orden de 8 veces mas rapido que en implementaciones iniciales.
-La manera de invocar el generador de codigo es la siguiente:
+Debido a la naturaleza iterativa del decodificador LDPC, pronto se convirtió en el cuello de botella de la simulación. Para acelerar el sistema, se opto por realizar la siguiente optimización:
+Desde el punto de vista algorítmico, LDPC consta básicamente de varios loops, dentro de los cuales se accede a la matriz de paridad, y a otras matrices que acumulan datos intermedios. Primeramente la implementación fue realizada como mencionamos utilizando boost:ublas, pero luego se comprobó que una implementación utilizando arrays de C era hasta 3 veces mas rápida.
+Luego se procedió a realizar un algoritmo de ``unrolling'' de estos loops, generando código especifico a una matriz dada, sin ningún tipo de loop. Obviamente este código es mucho mas grande, pero la aceleración provista es aun mayor, del orden de 8 veces mas rápido que en implementaciones iniciales.
+La manera de invocar el generador de código es la siguiente:
 
 $$ ./genLdpcDecoder matriz  > decodeGen.h $$
 
-El archivo generado decodeGen.h es el decodificador especifico para la matriz dada. Este header de C es luego incluido desde el decodificador ldpcenc.cpp y compilado. Al ser generalmente un archivo de un megabyte para una matriz pequeña de 1024x512, el proceso de compilacion el largo y requiere de mucha memoria.
-Por otra parte, no se optimizo el proceso de codificacion ldpc, ya que consiste solo de una multiplicacion de un vector por una matriz, y es una de las tareas en la que boost:ublas es especialmente eficiente.
-
+El archivo generado decodeGen.h es el decodificador especifico para la matriz dada. Este encabezado de C es luego incluido desde el decodificador ldpcenc.cpp y compilado. Al ser generalmente un archivo de un megabyte para una matriz pequeña de 1024x512, el proceso de compilación el largo y requiere de mucha memoria.
+Por otra parte, no se optimizo el proceso de codificación LDPC, ya que consiste solo de una multiplicación de un vector por una matriz, y es una de las tareas en la que boost:ublas es especialmente eficiente.
 
 \subsubsection{Viterbi/Convolucional}
 
@@ -72,9 +73,9 @@ Por otra parte, no se optimizo el proceso de codificacion ldpc, ya que consiste 
 \label{espectroensanchado}
 El espectro ensanchado, Spread Spectrum o CDMA es una técnica donde se utiliza mucho mas espectro del medio de transmisión que el necesario para la transmisión correcta de los datos.
 Los origines datan del 1900, cuando Nicola Tesla patentó el concepto de \textit{"Frequency hopping"}.
-El spreading de la señal tiene varias ventajas:
+El ensanchamiento del espectro ocupado por la señal tiene varias ventajas:
 \begin{enumerate} 
-\item Resistencia al espionaje, ya que solamente las partes que conocen la señal de spreading pueden decodificar la señal original
+\item Resistencia al espionaje, ya que solamente las partes que conocen la señal de ensanchamiento pueden decodificar la señal original
 \item Resistencia contra interferencias de banda angosta (No a interferencias de banda ancha como el ruido térmico)
 \item Capacidad de acceso múltiple. Varios usuario pueden transmitir en la misma frecuencia mientras utilicen diferentes códigos.
 \end{enumerate} 
@@ -82,23 +83,23 @@ Adicionalmente, al guiarse la señal expandida con un generador pseudo-aleatorio
 
 A su vez, se puede expandir la señal en tres dominios:
 \begin{enumerate} 
-\item Direct Sequence (CDMA): Se expande la señal multiplicándola (XOR) con la señal de spreading, generalmente mucho más rápida. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares, etc.
-\item Frecuency Hopping: La señal de spreading es utilizada para variar la frecuencia portadora de la señal original. Este método es utilizado por ejemplo en BlueTooth. (Se utiliza Adaptive Frequency Hopping, un método para evitar frecuencias con mucha interferencia)
-\item Time Hopping: La señal de datos no transmite todo el tiempo, sino que sufre de un delay que depende de la señal de spreading. Este método no es muy utilizado aunque lo estudiaremos detenidamente en nuestro caso ya que es muy sencillo de implementar con los recursos de los que disponemos.
+\item Direct Sequence (CDMA): Se expande la señal multiplicándola (XOR) con la señal de ensanchamiento, generalmente mucho más rápida. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares, etc.
+\item Frecuency Hopping: La señal de ensanchamiento es utilizada para variar la frecuencia portadora de la señal original. Este método es utilizado por ejemplo en BlueTooth. (Se utiliza Adaptive Frequency Hopping, un método para evitar frecuencias con mucha interferencia)
+\item Time Hopping: La señal de datos no transmite todo el tiempo, sino que sufre de un retraso que depende de la señal de ensanchamiento. Este método no es muy utilizado aunque lo estudiaremos detenidamente en nuestro caso ya que es muy sencillo de implementar con los recursos de los que disponemos.
 \end{enumerate} 
 
 
-La desventaja de la técnica del espectro expandido, que es utilizar mucho espectro por bits transmitido, o lo que también se denomina baja densidad espectral, a veces no afecta demasiado al tener el canal una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI, en todas sus versiones, que utiliza un codigo DSS (Direct-sequence spread spectrum) para compartir una misma frecuencia entre varios nodos.
+La desventaja de la técnica del espectro expandido, que es utilizar mucho espectro por bits transmitido, o lo que también se denomina baja densidad espectral, a veces no afecta demasiado al tener el canal una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI, en todas sus versiones, que utiliza un código DSS (Direct-sequence spread spectrum) para compartir una misma frecuencia entre varios nodos.
 
 \subsection{Códigos de generación pseudo-aleatorio}
 \label{PRNGs} 
-Para que un código CDMA pueda utilizarse para obtener privacidad en la comunicación, es necesario que el parámetro a expandir, sea la frecuencia, el tiempo o el código utilizado, sea guiado o seleccionado por un generado pseudo-aleatorio o PRBS, que son algoritmos que basados en un parámetro de inicialización o semilla, son capaces de generar un stream de numeros aparentemente aleatorios, pero en realidad totalmente determinísticos. 
+Para que un código CDMA pueda utilizarse para obtener privacidad en la comunicación, es necesario que el parámetro a expandir, sea la frecuencia, el tiempo o el código utilizado, sea guiado o seleccionado por un generado pseudo-aleatorio o PRBS, que son algoritmos que basados en un parámetro de inicialización o semilla, son capaces de generar un stream de números aparentemente aleatorios, pero en realidad totalmente determinísticos. 
 Es necesario que los nodos que participen de la comunicación puedan generar exactamente la misma secuencia y compartan el parámetro de generación o semilla. Esto es equivalente a lo que en criptografía se denomina un algoritmo criptográfico simétrico.
 Existen muchas maneras y algoritmos de generar streams pseudo-aleatorios. Algunos algoritmos están optimizados para que su periodo (la cantidad de números en su salida antes que el patrón se repita) sea enorme, como por ejemplo el algoritmo Mersenne-twister.
 Otro parámetro deseable en un PRBS es su sencillez y rapidez. Un generadores PRBS muy popular se denomina Lineal Congruential Generator y solo precisa de dos operaciones, una multiplicación y una suma.
 
-Estos ejemplos carecen de una característica fundamental requerida en nuestro sistema: Que no se puedan predecir. Esta simple característica no es en realidad trivial ya que muchas técnicas existen para inferir datos acerca del generador PRBS, lo que supondría una falla en la seguridad de un sistema basado en dicho generador. Para evitar estos problemas existen los llamados generadores PRBS criptográficamente seguros. Como ejemplo podemos nombrar a los generadores shrinking o self-shrinking.
-Constantemente surgen nuevos ataque a generadores ampliamente utilizados, tales como RC4~\cite{vaudenay2007passive}, por lo que es imprescindible estar actualizado en los avances de investigación criptográfica para diseñar un sistema seguro.
+Estos ejemplos carecen de una característica fundamental requerida en nuestro sistema: Que no se puedan predecir. Esta simple característica no es en realidad trivial ya que muchas técnicas existen para inferir datos acerca del generador PRBS, lo que supondría la falla total en la seguridad de un sistema basado en dicho generador. Para evitar estos problemas existen los llamados generadores PRBS criptográficamente seguros. Como ejemplo podemos nombrar a los generadores shrinking o self-shrinking.
+Constantemente surgen nuevos ataque a generadores ampliamente utilizados, tales como el generador utilizado por el algoritmo RC4~\cite{vaudenay2007passive}, por lo que es imprescindible estar actualizado en los avances de investigación criptográfica para diseñar un sistema seguro. En el caso de RC4, el mismo creador (Ron Rivest) ha desarrollado recientemente un reemplazo corrigiendo varias vulnerabilidades y manteniendo las características deseables denominado Spritz \cite{RC14}. Los generadores pseudoaleatorios suelen ser costosos computacionalmente , una de las razones por la cueal las transmisiones de muy alta velocidad no suelen estar encriptadas.
 
 
 \subsection{Seguridad}
@@ -108,12 +109,12 @@ Se fijaron los siguientes parámetros de seguridad:
 
 . El sistema debe proveer confidencialidad, integridad y autenticidad de los datos.
 . El sistema debe ser seguro sin importar la cantidad de clientes existentes o los datos que transmiten
-. Un atacante no debe poder identificar los datos de un cliente, aunque controle todos los demas nodos de la red.
+. Un atacante no debe poder identificar los datos de un cliente, aunque controle todos los demás nodos de la red.
 
-Con estos parámetros se busco el algoritmo CDMA adecuado. Las características de un sistema óptico hacen muy complejo el hardware requerido para lograr CDMA o Frequency-Hopping, pero implementar Time-hopping no presenta costo ni dificultad adicional, asi que este fue el seleccionado para la implementación de seguridad.
-Varios algoritmos de asignación del time-slot fueron analizados. Se necesita que la salida de los mismos sean códigos ortogonales, o sea, deben poseer un generador capaz de crear streams pseudo-aleatorios que nunca coincidan para no generar colisiones entre los clientes. Esto no es trivial sin compartir algún tipo de información entre todos los clientes, lo que debilita la seguridad del sistema. Por ejemplo, códigos existentes llamados gold-codes permiten la generación de múltiples secuencias con baja cross-correlacion, muy util para coordinar dispositivos que comparten el medio. Pero desde el punto de vista de la seguridad, este código es trivialmente derrotado. Por ejemplo en un esquema donde un atacante controla todos los canales menos uno, el atacante podría simplemente dejar de transmitir y revelar la secuencia utilizada por la víctima, que forzosamente estara utilizando el canal restante.
+Con estos parámetros se busco el algoritmo CDMA adecuado. Las características de un sistema óptico hacen muy complejo el hardware requerido para lograr CDMA o Frequency-Hopping, pero implementar Time-hopping no presenta costo ni dificultad adicional, por lo que fue el seleccionado para la implementación del aspecto de seguridad del sistema.
+Varios algoritmos de asignación del time-slot fueron analizados. Se necesita que la salida de los mismos sean códigos ortogonales, o sea, deben poseer un generador capaz de crear números pseudo-aleatorios que nunca coincidan para no generar colisiones entre los clientes. Esto no es trivial sin compartir algún tipo de información entre todos los clientes, lo que debilita la seguridad del sistema. Por ejemplo, códigos existentes llamados gold-codes permiten la generación de múltiples secuencias con baja correlación cruzada, muy útil para coordinar dispositivos que comparten el medio. Pero desde el punto de vista de la seguridad, este código es trivialmente derrotado. Por ejemplo en un esquema donde un atacante controla todos los canales menos uno, el atacante podría simplemente dejar de transmitir y revelar la secuencia utilizada por la víctima, que forzosamente estará utilizando el canal restante.
 
-Se decidió utilizar una codificación trivial: Seleccionar el time-slot de acuerdo a una secuencia criptográficamente segura estandard, totalmente independiente de los otros nodos. Es demostrable que esta decisión produce un sistema extremadamente simple y seguro. Como contrapartida, produce una cantidad muy elevada de colisiones que aumenta exponencialmente con el numero de clientes. Sin embargo, estas colisiones pueden ser corregidas mediante codificación adicional, y se logro una utilización de canal muy cercana al máximo teórico como se demostrara en la próxima sección. De echo, es en esta codificación adicional donde reside el principal aporte de esta tesis.
+Se decidió utilizar una codificación trivial: Seleccionar el time-slot de acuerdo a una secuencia criptográficamente segura estándar, totalmente independiente de los otros nodos. Es demostrable que esta decisión produce un sistema extremadamente simple y seguro. Como contrapartida, produce una cantidad muy elevada de colisiones que aumenta exponencialmente con el numero de clientes. Sin embargo, estas colisiones pueden ser corregidas mediante codificación adicional, y se logro una utilización de canal muy cercana al máximo teórico como se demostrara en la próxima sección. De echo, es en esta codificación adicional donde reside el principal aporte de esta tesis.
 
 \subsubsection{Consideraciones de seguridad y fuerza de cifrado}\label{Seguridad-fuerza}
 %% extraido de dline-pub.tex
