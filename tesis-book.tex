@@ -2,7 +2,7 @@
 
 \usepackage{hyperref}
 %\usepackage[spanish,english]{babel}
-%\usepackage[spanish]{babel}
+\usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 %-------------------------------------
 
@@ -11,8 +11,6 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-%\usepackage{subcaption}
-%\usepackage{caption}
 \usepackage{subfig}
 \newcommand{\blankpage}{
 \newpage
@@ -25,9 +23,25 @@
 \newcommand{\prob}[1]{\mathrm{P}\left[#1\right]}
 
 
-%\includeonly{FrontBackmatter/Contents,Chapters/Chapter03,Chapters/Chapter04,Chapters/Chapter05,Chapters/Chapter06,Chapters/Chapter0A,FrontBackmatter/Bibliography}
-
-%\includeonly{Chapters/Chapter01,Chapters/Chapter02}
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}}                      %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
 
 %-------------------------------------
 
@@ -134,16 +148,12 @@ Agradecimientos...
 
 %AQUI CHAPTERS
 
-% \chapter[Introduction]{Introduction}
-% ...
-% \chapter[Future Work]{Future Work}
 
 \include{Chapters/Chapter01}
 \include{Chapters/Chapter02}
-%\include{Chapters/Chapter06}
 \include{Chapters/Chapter03}
+%\include{Chapters/diff3}
 \include{Chapters/Chapter04}
-%\include{Chapters/Chapter05}
 
 % ********************************************************************
 % Backmatter

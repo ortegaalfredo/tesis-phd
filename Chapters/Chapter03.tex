@@ -1,97 +1,102 @@
 \chapter{Sistema propuesto: teoría y simulaciones}
 
-Se propone un sistema de comunicaciones punto a punto y punto a multipunto de medio compartido también denominado de broadcast. En la figura \ref{fig_hub} se aprecia su estructura lógica del sistema, que en la versión óptica equivale a una red de tipo estrella con un hub amplificador central, pero utilizando diferentes medios esta configuración puede cambiar (Por ejemplo, puede no ser necesaria la etapa de amplificación).
-Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el medio por un intervalo determinado de tiempo denominado slot. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un slot diferente. La diferencia del sistema propuesto con un sistema TDMA regular en donde el slot es asignado a cada cliente de manera periódica, en el sistema propuesto el slot se asigna mediante un algoritmo CS-PRNG. Esto tiene dos efectos fundamentales: 
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.5in]{graphs/hub}
+\caption{Estructura de alto nivel del sistema propuesto}
+\label{fig_hub}
+\end{figure}
+
+Se propone un sistema de comunicaciones punto a punto y punto a multipunto sobre medios compartidos, o también llamados medios de difusión. En la figura \ref{fig_hub} se detalla la estructura de alto nivel del sistema, que en la versión óptica (ver Fig. \ref{arch:fig1}) equivale a una red de tipo estrella con un concentrador/amplificador central, pero utilizando diferentes medios esta configuración puede cambiar (por ejemplo, puede no ser necesaria la etapa de amplificación).
+Al ser un sistema de tipo TDMA o time-hopping, cada cliente puede utilizar el medio por un intervalo determinado de tiempo denominado slot. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un slot diferente. La diferencia del sistema propuesto con un sistema TDMA regular en donde el slot es asignado a cada cliente de manera periódica, en el sistema propuesto el slot se asigna mediante un algoritmo CS-PRNG\footnote{Siglas en inglés de ``generador de numeros pseudoaleatorio criptográficamente seguro'')}. Esto tiene dos efectos fundamentales: 
 
 \begin{itemize}
- \item Un atacante no puede predecir la posición en donde un cliente en particular transmite los datos. En particular, si el slot se reduce al mínimo de un solo bit por slot, el atacante no puede inferir ninguna información acerca de los datos transmitidos sin conocer los parámetros del algoritmo CS-PRNG.
+ \item Un atacante no puede predecir la posición (??) en donde un cliente en particular transmite los datos. En particular, si el slot se reduce al mínimo de un solo bit por slot, el atacante no puede inferir ninguna información acerca de los datos transmitidos sin conocer los parámetros del algoritmo CS-PRNG.
  \item Existirá una inevitable interferencia entre los clientes, lo que requiere la utilización de algoritmos de corrección de errores.
 \end{itemize}
 
-Como se describe en el capítulo \ref{PRNGs}, existen varios algoritmos de generación de números pseudo aleatorios criptográficamente seguros estandarizados, cuya mayor dificultad es la implementación sobre silicio de manera eficiente. Esta tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera mientras sea un algoritmo estandarizado por la industria y no posea ninguna vulnerabilidad conocida. Otra virtud que debe poseer el algoritmo seleccionado es una alta relación de bits generados por unidad de tiempo o clock, ya que al ser utilizados para seleccionar la posición de cada bit en el frame, se necesitan $\log_2(M)$ bits aleatorios por cada bit de datos, por lo que en general la velocidad del PRNG afectara directamente la velocidad total de codificación y decodificación del sistema.
+Como se describe en la sección \ref{PRNGs}, existen varios algoritmos de generación de números pseudo aleatorios (??) criptográficamente seguros estandarizados \cite{gallagherfips}. Esta tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera algoritmo CS-PRNG estandarizado y utilizado por la industria y no posea ninguna vulnerabilidad conocida. Otra virtud que debe poseer el algoritmo seleccionado es una alta cantidad de bits pseudo aleatorios generados por unidad de tiempo o reloj, ya que al ser utilizados para seleccionar la posición de cada bit en un frame de largo $M$, se necesitarán generar como mínimo $\log_2(M)$ bits aleatorios por cada bit de datos\footnote{Esta cantidad es tal debido a para codificar una posición dentro de $M$ posibles valores, se necesitan $\log_2(M)$ bits}, por lo que en general la velocidad del PRNG afectará directamente la velocidad total de codificación y decodificación del sistema.
 
-El aporte mas importante de esta tesis es en la etapa de corrección de errores, ya que se necesitó desarrollar algoritmos adaptados al medio de transmisión y a la gran cantidad de interferencia producida por el método aleatorio de selección de slot de transmisión.
+Un aporte importante de esta tesis es el desarrollo de un método de corrección de errores adaptados al medio de transmisión, aprovechando las características del canal para recuperar información con gran cantidad de interferencia, producida por el método aleatorio de selección de slot de transmisión.
 
 %Utilizando este Diseño físico con una etapa adicional de codificación y correccion de errores. El hub central es una etapa totalmente óptica que puede o no estar amplificada. Con la amplificacion optica se incrementa notablemente el rango, de 5 km a mas de 20 km.
-La pila de codificación se detalla en la figura \ref{fig_comstack} donde se aprecia un diseño convencional, excepto que en la ultima etapa de corrección de errores se aplica el algoritmo de filtros de Bloom, que aprovecha la característica de error asimétrico del canal Z para una corrección de errores adicional.
+La pila (??) de codificación se detalla en la figura \ref{fig_comstack} donde se aprecia un diseño convencional, excepto que en la ultima etapa de corrección de errores se aplica el algoritmo de filtros de Bloom, que aprovecha la característica de error asimétrico del canal Z para una corrección de errores adicional.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=4.5in]{graphs/Soft-stack3}
-\caption{Etapas del sistema de comunicaciones}
+\caption{Diagrama esquemático del sistema de comunicaciones}
 \label{fig_comstack}
 \end{figure}
 
 \section{Códigos correctores de errores}
 
-La selección del código corrector de errores debe ser guiada por los parámetros del sistema, sin olvidarse de las posibles limitaciones de calculo del sistema, que es una limitación importante al operar con enlaces con tasas de transmisión elevadas.
+La selección del código corrector de errores debe ser guiada por los parámetros del sistema, teniendo en cuenta que al operar en enlaces con tasas de transmisión elevadas, una de las limitaciones mas importantes es la velocidad de procesamiento de datos del sistema.
 
-En nuestro caso se utilizó un típico arreglo de dos códigos de corrección, uno denominado exterior, encadenado con el segundo denominado interior.
-La idea de utilizar dos códigos distintos es la de aprovechar las virtudes de dos tipos de corrección. El código exterior suele ser un código iterativo o convolucional, con una elevada cantidad de paridad y alto poder de detección y corrección. Ciertos tipos de códigos tales como LDPC o códigos Turbo se caracterizan por poseer un piso de error elevado, que es un fenómeno en donde el código pierde efectividad con SNR altos. Esto se soluciona utilizando un segundo código corrector denominado interior, que si bien no es tan efectivo a SNR altos como el código exterior, es efectivo con SNR bajos, haciendo que el sistema sea efectivo en cualquier condición.
+En nuestro caso se (??) utilizó una típica estructura de dos códigos de corrección, uno denominado exterior, y el segundo denominado interior.
+La idea de utilizar dos códigos distintos es la de encadenar ambos algoritmos en serie para aprovechar las virtudes de dos tipos de corrección. Esta estructura se denomina códigos concatenados \cite{forney1966concatenated}. El motivo de utilizar códigos concatenados es que ciertos tipos de códigos tales como LDPC o códigos Turbo se caracterizan por poseer un piso de error elevado, que es un fenómeno en donde el código pierde efectividad con relaciones señal/ruido altas \cite{Moon:05}. Es para evitar esta pérdida de efectividad que se utiliza un segundo código corrector concatenado al primero denominado código interior, que si bien no es tan efectivo con relaciones de señal/ruido altas como el código exterior, es efectivo con bajo ruido, haciendo que el sistema sea eficiente en cualquier condición. El código exterior suele ser un código iterativo o convolucional, con una elevada cantidad de paridad y alto poder de detección y corrección, mientras que el código interior suele ser un código cíclico tal como Reed-Solomon o BCH.
 
-Un parámetro importante en estos algoritmos es el delay, o sea la cantidad de tiempos (medida usualmente en clocks del procesador) que tarda un bit que entra a la etapa de corrección en salir de la misma, luego de la aplicación de la corrección. Este delay es variable según el algoritmo, algunos algoritmos con un delay importante no pueden ser utilizados en aplicaciones de bajo ancho de banda, ya que retrasan enormemente las comunicaciones. A continuación se detalla el algoritmo de corrección seleccionado.
+Un parámetro importante en estos algoritmos es el retardo de codificación o latencia, o sea la cantidad de tiempo (medida usualmente en ciclos de reloj del procesador) que demora un bit entrante a la etapa de corrección en ser procesado y salir de la misma, luego de la aplicación de la corrección de errores. Esta latencia es variable según el algoritmo. Algunos algoritmos con una latencia importante no son óptimos para utilizar en aplicaciones de bajo ancho de banda que precisan de retransmisiones o confirmaciones de los datos, ya que a cada confirmación debe sumarse también este retraso, y esto suele resultar en una disminución apreciable de la velocidad de las comunicaciones. A continuación se detalla el algoritmo de corrección seleccionado.
 
-\subsection{Reed-Solomon}
-Como código interior se seleccionó el algoritmo Reed-Solomon, un código de bloque con alta efectividad en SNR bajos. Los parámetros seleccionados para dicho código son (255,223) o sea, 223 bytes de datos y 32 bytes de paridad. Estos parámetros lograran que el código pueda detectar hasta 32 errores de byte y corregir hasta 16 errores de byte en los 223 bytes del bloque. La selección de estos parámetros responde a que el algoritmo de Reed-Solomon posee implementaciones muy eficientes si se utiliza un tamaño de bloque de 255 bytes. 
-Al ser un estándard muy utilizado, existen implementaciones muy eficientes de Reed-Solomon con estos parámetros específicos, tanto en software como en hardware.
-Existen dos problemas con este algoritmo:
+\subsection{Codigos de corrección Reed-Solomon}
+Como código interior se seleccionó el algoritmo Reed-Solomon, un código de bloque con alta efectividad en relaciones de señal/ruido bajas. La cantidad de paridad agregada por el algoritmo y por lo tanto, la potencia de corrección, puede ajustarse a la aplicación, sin embargo en computadoras digitales binarias es eficiente utilizar 8-bits como tamaño de símbolo en Reed-Solomon, lo que conlleva utilizar un tamaño de bloque de 255 bytes y 223 bytes de datos, con 32 bytes de paridad. Estos parámetros lograran que el código pueda detectar hasta 32 errores de byte y corregir hasta 16 errores dentro de los 223 bytes de datos del bloque \cite{reed1960polynomial}. Al ser un estándar ampliamente utilizado, existen implementaciones eficientes de Reed-Solomon con estos parámetros específicos, tanto en software como en hardware.
+Podemos citar algunas desventajas de este algoritmo:
 \begin{enumerate}
- \item Elevado delay: Si bien el delay de codificación es mínimo (menos de 10 clocks), el delay de decodificación es muy elevado, pudiendo sobrepasar fácilmente los 1200 clocks.
- \item Si bien el delay de decodificación es elevado y requiere mucho procesamiento, el solo echo de tener que acumular un bloque de 256 bytes de datos solo para comenzar con la decodificación, introduce un retraso muy importante especialmente si el sistema se utiliza con bajo ancho de banda, tal como es el caso en la implementación acústica del sistema.
+ \item Elevado retraso de decodificación: si bien el retraso de codificación es mínimo (menos de 10 ciclos de reloj), el retraso de decodificación es elevado, pudiendo sobrepasar fácilmente los 1200 ciclos de reloj.
+ \item Retraso inducido por buffer: Si bien el retraso de decodificación es elevado y requiere un procesamiento no despreciable, el tiempo necesario para acumular un bloque de 256 bytes de datos en memoria para comenzar con la decodificación introduce un retraso importante, especialmente si el sistema se utiliza con bajo ancho de banda tal como es el caso en la implementación acústica del sistema.
 \end{enumerate}
  
-Ambos problemas se solucionan seleccionando parametros de Reed-Solomon con un menor tamaño de bloque, o un algoritmo similar con menor tamaño de bloque tal como BCH. El problema en este caso es encontrar implementaciones eficientes de los decodificadores ya que no son algoritmos muy utilizados, por lo que la selección final fue el estandard Reed-Solomon (255, 223).
+Ambas desventajas se solucionan seleccionando parámetros de Reed-Solomon con un menor tamaño de bloque, o un algoritmo similar con menor tamaño de bloque tal como BCH \cite{bose1960class}. Sin embargo, una implementación eficiente
+ y disponible de este algoritmo no pudo ser encontrada, por lo que la selección final fue el estandard Reed-Solomon (255, 223).
 
-Para la simulación numérica por software se utilizó la biblioteca libfec de Phil Karn~\cite{libfec}. Para la implementación en FPGA se utilizo la versión del algoritmo provista de manera gratuita en la biblioteca de núcleos de IP de Xilinx.
+Para la simulación numérica por software se utilizó la biblioteca libfec de Phil Karn~\cite{libfec}. Para la implementación en FPGA se utilizo la versión del algoritmo provista de manera gratuita en la biblioteca de núcleos de IP de Xilinx \cite{Xilinx:DS251}.
 
 %Con posibilidad de error de simbolo P, la posibilidad de error de un codigo reed-solomon R(n/k) es:
 %$$P_{rs}= \sum_{k=(\frac{n-k}{2}+1)}^{n} \binom{L}{i} * P^{i} * (1-P)^{L-i} $$
-El código (255,223) es particularmente eficiente de implementar digitalmente ya que cada símbolo puede representarse con un byte (existen 255 símbolos). El código posee 32 bytes de paridad y 223 bytes de datos, lo que representa una adición de 14\% a la cantidad total de datos a transmitir. Este código permite corregir hasta 16 bytes errados, que pueden estar consecutivos, por lo que RS suele utilizarse en canales con errores de tipo ``Erasure'' o errores tipo ráfaga, donde los errores no están uniformemente distribuidos sino que están agrupados temporal o espacialmente.
+El código posee 32 bytes de paridad y 223 bytes de datos, lo que representa una adición de 14\% a la cantidad total de datos a transmitir. Este código permite corregir hasta 16 bytes errados, que pueden estar consecutivos, por lo que Reed-Solomon suele utilizarse en canales con errores de tipo ``Erasure'' o errores tipo ráfaga, donde los errores no están uniformemente distribuidos sino que están agrupados temporal o espacialmente.
 
 %En ciertas ona ventaja muy importante es que el codigo de correccion exterior puede facilmente detectar la presencia de un error aunque no pueda corregirlo. Esta informacion es una lista con las posiciones en las cuales se tiene la certeza que los símbolos fueron interferidos denominada lista de síndromes, y puede suministrarse al algoritmo de correccion de errores para que la capacidad de corrección del mismo puede aumentar hasta un 100\%~\cite{Moon:05}.
 
 \subsection{Características de implementación}
-Un parámetro importante en la selección del algoritmo es la facilidad de implementación sobre hardware digital. Ciertas características se vuelven importantes al pasar de implementaciones de software a hardware, tales como tamaño, memoria utilizada y velocidad máxima alcanzada con el hardware disponible, apuntando a que el sistema debe funcionar a tasas de gigabit.
+Un parámetro importante en la selección del algoritmo es la facilidad de implementación sobre hardware digital. Ciertas características se vuelven importantes al pasar de implementaciones de software a hardware, tales como tamaño, memoria utilizada y velocidad máxima alcanzada con el hardware disponible, apuntando a que el sistema debe funcionar a tasas de transferencia en el orden de gigabits.
 
-A continuación se nombraran las características de la implementación en hardware (FPGA) de Reed-Solomon utilizada.
-El bloque de IP se denomina Reed-Solomon Encoder/Decoder 7.1 de LogiCORE IP. La complejidad espacio-temporal y ciclomática de los algoritmos de codificación de Reed-Solomon son muy distintas a las de su correspondiente algoritmo de decodificación. En general, la decodificación es mucho mas costosa en términos de recursos de hardware y de latencia agregada al sistema.
+A continuación se listan las características de la implementación en hardware (FPGA) de Reed-Solomon utilizada:
 
-Según la especificación de esta implementación~\cite{Xilinx:DS252} el decodificador Reed-Solomon con configuración CCSDS (que implementa el estandard (255,223)) posee un tamaño de 1364 LUTS (Look-up tables) y 3 bloques de RAM. Como comparación, el diseño completa posee un tamaño de aprox. 20000 LUTS, y la FPGA utilizada posee una capacidad de 50000 LUTS y unos 200 bloques de RAM. La velocidad máxima de este algoritmo en la FPGA utilizada es de unos 350 Mhz.
-Mucho menor es la cantidad de recursos utilizados por el codificador: Son necesarios solo unos 300 LUTS y solo 1 bloque de memoria aunque la velocidad máxima es similar~\cite{Xilinx:DS251}.
+El bloque de IP se denomina Reed-Solomon Encoder/Decoder 7.1 de LogiCORE IP. Con respecto al retraso, Reed-Solomon es un algoritmo asimétrico, o dicho de otro modo, la complejidad espacio-temporal y ciclomática de los algoritmos de codificación de Reed-Solomon son distintas a las de su correspondiente algoritmo de decodificación. En general, la decodificación mas costosa en términos de recursos de hardware y de latencia agregada al sistema. Según la especificación de esta implementación~\cite{Xilinx:DS252} el decodificador Reed-Solomon con configuración CCSDS \cite{coding1999consultative} (que implementa el estandard (255,223)) posee un tamaño de 1364 LUTS (Look-up tables) y 3 bloques de RAM. Como comparación, el diseño completo posee un tamaño de aproximadamente 20000 LUTS, mientras que la FPGA utilizada posee una capacidad de 50000 LUTS. La velocidad máxima de este algoritmo en la FPGA utilizada es de unos 350 Mhz, que esta muy por encima de la velocidad requerida por el sistema completo a máxima velocidad, que es de aproximadamente 70 Mhz.
+La cantidad de recursos utilizados por el codificador es menor: Son necesarios solo unos 300 LUTS y solo 1 bloque de memoria aunque la velocidad máxima es similar~\cite{Xilinx:DS251}.
 
-\subsection{Cálculo de latencia}
-La latencia en un sistema esta dada por el tiempo en que un bit tarda en atravesarlo en su totalidad. Específicamente la latencia de esta etapa es importante ya que la latencia agregada por este algoritmo representa un porcentaje importante de la latencia total de la pila de comunicación del sistema. Es importante notar que los cálculos son específicos de una implementación en particular. 
+\subsection{Cálculo de latencia de la etapa de corrección de errores}
+La latencia en un sistema está dada por el tiempo en que demora un bit en atravesarlo en su totalidad. Específicamente, el retraso en la etapa de correccion de errores representa un porcentaje importante de la latencia total en la pila de comunicación del sistema. Es importante notar que el cálculo de latencia es específico a una implementación en particular del algoritmo de corrección.
 
-La latencia total estará dada por la introducida por la codificación adicionada a la de la decodificación ya que los datos deben atravesar ambas etapas. Pero los tiempos de latencia para la codificación son despreciables, en el orden de 5 clocks. 
+La latencia total estará dada por el retraso introducido por la codificación sumado al retraso introducido por la decodificación, ya que los datos deben atravesar ambas etapas. Sin embargo, el tiempos de latencia en la etapa de codificación es despreciable (del orden de 5 ciclos~\cite{Xilinx:DS251}), por lo que se utilizarán sólo los valores de latencia de la etapa de decodificación. 
 
-La latencia de la etapa de decodificación es muy superior y puede ser calculada de manera exacta mediante ecuaciones provistas por la hoja de datos. Una manera simplificada es utilizar la figura \ref{fig_rslat} para obtener el delay de procesamiento. El parámetro $t$ se calcula como $t=(n-k)/2$ donde $n$ es la cantidad de símbolos totales en el bloque (en nuestro caso 255) y $k$ es la cantidad de símbolos de datos en el bloque (223 en nuestro caso) por lo que la variable $t=16$.  El retraso total introducida por la decodificación estará dada por la latencia (en nuestro caso aprox. 650 clocks) mas el retraso producto de cargar un bloque entero de datos en el decodificador, que no es despreciable ya que deben ingresarse los datos al bloque IP por medio de un bus serial de un byte de capacidad, por lo que se necesitan de 255 clocks adicionales por cada bloque. 
+La latencia de la etapa de decodificación puede ser calculada de manera exacta mediante ecuaciones provistas por la hoja de datos \cite{Xilinx:DS252}. Se puede utilizar la figura \ref{fig_rslat} para obtener rápidamente el retraso de procesamiento. El parámetro $t$ se calcula como $t=(n-k)/2$ donde $n$ es la cantidad de símbolos totales en el bloque (en nuestro caso 255) y $k$ es la cantidad de símbolos de datos en el bloque (223 en nuestro caso) por lo que la variable $t=16$.  El retraso total introducido por la decodificación estará dado por la latencia (en nuestro caso es aproximadamente 650 ciclos) sumado al retraso producto de cargar un bloque entero de datos en el decodificador. Como los datos deben ingresarse a la memoria del decodificador por medio de un bus serial de un byte de capacidad, se necesitan 255 ciclos adicionales por cada bloque. 
 
-Sumando ambos valores e ignorando la mínima latencia de codificación, podemos afirmar que la latencia introducida por el algoritmo Reed-Solomon en el sistema es de 900 clocks.
+Sumando ambos valores e ignorando la mínima latencia de codificación, podemos afirmar que la latencia introducida por el algoritmo Reed-Solomon en el sistema es de 900 ciclos.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6 \textwidth]{graphs/rsDelay.pdf} 
-  \caption{Delay de proceso de la implementación de Reed-Solomon utilizada.}
+  \caption{Retraso de proceso de la implementación de Reed-Solomon utilizada~\cite{Xilinx:DS252}.}
   \label{fig_rslat}
 \end{figure}
 
 
-\subsection{Optimizaciones propuestas}
- 
-Existen ciertas optimizaciones que podrían haberse realizado si se hubiera optado por implementar el algoritmo desde cero, pero que al utilizar una implementación pre-existente no se realizaron. Estas optimizaciones están relacionadas con la características del canal asimétrico, que presenta las ventajas de tener la certeza de que ciertos símbolos fueron transmitidos correctamente. Una posible optimización de Reed-Solomon para su utilización sobre canales Z se plantea para una trabajo futuro.
+%\subsection{Optimizaciones propuestas}
+% 
+%Existen ciertas optimizaciones que podrían haberse realizado si se hubiera optado por implementar el algoritmo desde cero, pero que al utilizar una implementación pre-existente no se realizaron. Estas optimizaciones están relacionadas con la características del canal asimétrico, que presenta las ventajas de tener la certeza de que ciertos símbolos fueron transmitidos correctamente. Una posible optimización de Reed-Solomon para su utilización sobre canales Z se plantea para una trabajo futuro.
 
-\section{Canal Z con filtros de bloom}
+\section{Canal Z con filtros de Bloom}
 
-En esta sección vamos a modelar el canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. 
-Un canal de comunicaciones puede clasificarse primeramente según el tipo de información transmitida, sea binaria o analógica, por lo cual tendremos canales binarios o analógicos \cite{MacKay:2002}.
-Una sub-clasificación del canal de comunicación puede realizarse según el comportamiento del ruido del mismo.
-Por ejemplo las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN (Additive White Gaussian Noise). 
+En esta sección se describe un modelo del canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. 
+Un canal de comunicaciones puede clasificarse primeramente según el tipo de información transmitida, sea binaria o analógica \cite{MacKay:2002}.
+Una subclasificación del canal de comunicaciónes puede realizarse según el comportamiento del ruido del mismo.
+Por ejemplo las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN\footnote{Additive White Gaussian Noise}. 
 
-Específicamente, un canal digital suele clasificarse como canal discreto sin memoria (Discrete memoryless channel), ya que posee un alfabeto de símbolos de entrada $A_{x}$, que son los datos que se desea transmitir, y un alfabeto de símbolos de salida $A_{y}$ , que son los símbolos actualmente detectados por el receptor. El canal es discreto ya que la cantidad de símbolos posible es finita. Los datos a transmitir deberán codificarse en el alfabeto de símbolos de entrada.
+Específicamente, las comunicaciones digitales suelen modelarse como un canal discreto sin memoria \footnote{Discrete memoryless channel}, ya que posee un alfabeto de símbolos de entrada $A_{x}$, que son los datos que se desea transmitir, y un alfabeto de símbolos de salida $A_{y}$ , que son los símbolos actualmente detectados por el receptor. El canal es discreto ya que la cantidad de símbolos posible es finita. Los datos a transmitir deberán codificarse en el alfabeto de símbolos de entrada.
 Otro parámetro importante que define a un canal discreto es la distribución de probabilidades condicionales $P(y|x)$ entre ambos alfabetos, o sea la posibilidad de que al recibir el símbolo $x$ se haya transmitido el símbolo $y$. Esta distribución puede representarse como un diagrama (ver figura \ref{fig:canbin} para la representación de distribución de probabilidades de un canal binario simétrico) o una matriz.
 
-De acuerdo con la distribución de probabilidades de error que mejor represente al canal físico de transmisión, 
-El tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (Z-Channel), un canal digital en el que el ruido afecta solo uno de los símbolos a transmitir.
+De acuerdo con la distribución de probabilidades de error que mejor represente al canal físico de transmisión, el tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (Z Channel), un canal digital en el que el ruido afecta sólo uno de los símbolos binarios a transmitir.
 
 Es este modelo de ruido lo que nos permite innovar en el diseño de algoritmos adaptándolos y optimizándolos para aprovechar la naturaleza del error, ya que la mayoría de los algoritmos de corrección de errores están pensados para un canal de ruido simétrico y generalmente analógico.
 Empezaremos primeramente estudiando un modelo simplificado del canal por el cual vamos a trasmitir, el mencionado canal simétrico binario, para después ahondar en un caso especial de este mismo, denominado Canal Z.
@@ -100,23 +105,23 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 
 \begin{figure}[t]
   \begin{center}
-    \includegraphics[scale=0.43]{capacidad/canalBinario.png}
+    \includegraphics[scale=0.60]{capacidad/canalBinario.png}
   \end{center}
 \caption {Canal binario: esquema de probabilidad}
 \label{fig:canbin}
 \end{figure}
 
-Para calcular el ruido en un canal simétrico binario, calculamos la probabilidad de no-colisión que tendrá un usuario determinado, ya que las colisiones serán el ruido del canal (En esta etapa no consideramos otros tipos de ruido que pueda tener el canal físico).
+Para simplificar los cálculos, consideraremos como ruido solamente las colisiones con otros usuarios, ignorando otros tipos de ruido que pueda tener el canal físico. Por lo tanto, procederemos a calcular la posibilidad de no-colisión de un cliente.
 
 Sea $M$ la cantidad de slots por frame y $n$ la cantidad de clientes o usuarios.
 
-Entonces la probabilidad de no colisión para un usuario en un canal simétrico esta dada por:
+Entonces la probabilidad de no colisión para un usuario en un canal simétrico esta dada por
 \begin{equation}
 P_{nc}=\left(\frac{M-1}{M}\right)^{n-1}
 \end{equation}
 
 
-\noindent Probabilidad de no colisión para un usuario en un canal Z:
+\noindent Mientras que la probabilidad de no colisión para un usuario en un canal Z
 \begin{eqnarray}
 P_{nc} & = & P(1) \cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) \\
 P_{nc} & = & \frac{1}{2} \cdot 1 +  \frac{1}{2} \cdot \sum_{i=0}^{n-1} 
@@ -126,11 +131,10 @@ C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{M}\right)^{n-1-i}  \lef
 \noindent Donde $\left(\frac{M-1}{M}\right)^i$ es la probabilidad de no colisión de $i$ canales (se suma para todo posible número de canales no
 colisionando: $1\leq i\leq n$, que están en otro slot), $
 \left(\frac{1}{M}\right)^{n-1-i}$ es la probabilidad de colisión de los restantes
-$n-1-i$ (estos están en el mismo slot que el canal actual, el `$-1$' es para no
-contar el canal actual), y la colisión se produce cuando los otros canales
-transmiten $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$. El
-factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales no
-colisionando, que son hechos independientes.
+$n-1-i$, y la colisión se produce cuando los otros canales
+transmiten el símbolo $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$. El
+factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales que no
+hayan colisionado, que son hechos independientes.
 
 \noindent Teniendo en cuenta que $ \sum_{i=0}^{n-1}
 C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{2M}\right)^{n-1-i}$ es la potencia $n-1$ de un binomio, reemplazando tenemos
@@ -140,13 +144,13 @@ P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2M} \right)^{n-1
 P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{-1/2} REVISAR ESTO
 \end{eqnarray}
 
-\noindent Donde la última aproximación vale para $n=M$ y $n$ grande.
+\noindent Donde la última aproximación vale para $n=M$ y $n$ mayor que dos.
 
 \iffalse
 
 \vspace{5mm}
 
-\noindent Para el caso de {\em bloom} filters con $k$ filtros\footnote{Se envían $k$ repeticiones del bit en canales distintos, entonces basta que sólo uno de ellos sea 0 para que recibamos un 0 en un canal óptico.} la probabilidad de no colisión es:
+\noindent Para el caso de {\em Bloom} filters con $k$ filtros\footnote{Se envían $k$ repeticiones del bit en canales distintos, entonces basta que sólo uno de ellos sea 0 para que recibamos un 0 en un canal óptico.} la probabilidad de no colisión es:
 \begin{eqnarray} 
 P_{nc}^{k} & = &  P(1) \cdot P_{nc}^{k}(1) + P(0) \cdot P_{nc}^{k}(0)\\ \label{Pnc_k}
 \end{eqnarray}
@@ -158,7 +162,7 @@ Pero la probabilidad de colisión para el 0 cuando se transmiten $k$ copias es:
 \begin{eqnarray}
 P_{c^k}(0) & = & 1 - \big(P_{nc^k}(0)\big)  \enspace,
 \end{eqnarray}
-y que además la probabilidad de no colisión para los $k$ slots del bloom
+y que además la probabilidad de no colisión para los $k$ slots del Bloom
 filter es
 \begin{eqnarray}
 P(\mbox{no col.} k) &=& P(\mbox{no col.}1)\cdot P(\mbox{no col.}2)\cdot P(\mbox{no col.}3)\cdots P(\mbox{no col.}k)\\
@@ -218,15 +222,14 @@ Mide el promedio de reduccion de la incertidumbre acerca de x que resulta de sab
 \subsection{Capacidad de canal}
 
 Existe una relación entre la probabilidad de error $Pb$ de un canal y la máxima velocidad de transmisión de datos posible en el mismo.
-Esta relación fue estudiada por Clade Shannon en 1948 en un artículo pionero de la teoría de la información \cite{shannon48} y es conocida actualmente como teorema de Shannon-Hartley o Teorema de codificación de canales con ruido (Noisy-channel coding theorem).
+Esta relación fue estudiada por Claude Shannon en 1948 en un artículo pionero de la teoría de la información \cite{shannon48} y es conocida actualmente como teorema de Shannon-Hartley o Teorema de codificación de canales con ruido (Noisy-channel coding theorem).
 
-La capacidad C de un canal discreto sin memoria es :
+La capacidad C de un canal discreto sin memoria es la máxima información mutua entre los alfabetos X de entrada e Y de salida
 
 \begin{equation}
 C = \max_{{\cal{P}}_x} I(X;Y) 
 \end{equation}
 
-O sea, C es la máxima información mutua entre los alfabetos X de entrada e Y de salida.
 Para hallar el máximo podemos derivar $I(X;Y)$ con respecto a la probabilidad $P_x$.
 De \cite{MacKay:2002}, para un canal binario simétrico sin memoria con probabilidad de error $p$, la capacidad máxima $C$ es:
 
@@ -234,20 +237,26 @@ De \cite{MacKay:2002}, para un canal binario simétrico sin memoria con probabil
 C \approx 1 - H(p) 
 \end{equation}
 
+Donde $H(p)$ es la función de entropía binaria
+
+\begin{equation}\label{Hp}
+ H(p) = [p \cdot log_2(p) + (1-p)\cdot log_2 (1-p)]
+\end{equation}
+
 Si expandimos H(p) en \ref{Cap}:
 
-$$ c = 1-\left(p \times \log_2\left(\frac{1}{p}\right) + (1-p) \cdot \log_2\left(\frac{1}{1-p}\right)\right) $$
+$$ c = 1-\left(p \cdot \log_2\left(\frac{1}{p}\right) + (1-p) \cdot \log_2\left(\frac{1}{1-p}\right)\right) $$
 Simplificada:
-$$ c = 1 + p * \log_2(p) + (1 - p) * \log_2(1-p) $$
+$$ c = 1 + p \cdot \log_2(p) + (1 - p) \cdot \log_2(1-p) $$
 
-En la figura \ref{fig:CompBZ} puede verse la evolución de la capacidad del canal binario simétrico, que como se intuye, es máxima para $p=0$ y $p=1.0$, mientras que es cero para $p=0.5$. ya que con 0\% de probabilidad de error la capacidad es la máxima (no hay interferencia) y con 50\% de error la capacidad es cero y es imposible transmitir dato alguno. Quizás contra-intuitivamente, con 100\% de capacidad de error la capacidad también es máxima, ya que equivale a invertir cada símbolo transmitido, operación que no introduce error alguno en los datos.
+En la figura \ref{fig:CompBZ} puede verse la evolución de la capacidad del canal binario simétrico, que es máxima para $p=0$ y $p=1.0$, mientras que es cero para $p=0.5$. ya que con 0\% de probabilidad de error la capacidad es la máxima (no hay interferencia) y con 50\% de error la capacidad es cero y es imposible transmitir dato alguno. Quizás contra-intuitivamente, con 100\% de capacidad de error la capacidad también es máxima, ya que equivale a invertir cada símbolo transmitido, operación que no introduce error alguno en los datos.
 
 %Sin embargo esta capacidad es menor que la que realmente tenemos en nuestro canal, ya que un Z-channel se adecua mayormente a los medios de transmisión ópticos. Describiremos en detalle este caso especial en la siguiente sección. ??
 
 \subsection{Canal Z}
 \label{canalZ}
-Un canal Z (Z-channel) difiere de un canal binario, ya que las probabilidades de bit-flip son asimétricas.
-Los Z-channel se usan generalmente para modelar sistemas de transmisión ópticos.
+Un canal Z (Z channel) difiere de un canal binario, ya que las probabilidades de error de bit son asimétricas.
+Los canales Z se usan generalmente para modelar sistemas de transmisión ópticos.
 
 \begin{figure}[th]
   \begin{center}
@@ -257,42 +266,43 @@ Los Z-channel se usan generalmente para modelar sistemas de transmisión óptico
   \label{fig:Gal}
 \end{figure}
 
-Para un Z-channel, la distribución de probabilidades de I(X;Y) es diferente \cite{Tallini:02}, por lo que obtenemos un máximo diferente:
+Para un canal Z, la distribución de probabilidades de la información mutua $I(X;Y)$ es diferente a la de un canal binario simétrico \cite{Tallini:02}, por lo que obtenemos un máximo diferente:
 
 \begin{equation}\label{CapA}
 C_{Z} \approx 1 - \left(\frac{1}{2}*H(p)\right)
 \end{equation}
 
-Por lo tanto, expandiendo H(p) en \ref{CapA}:
+Por lo tanto, expandiendo $H(p)$ (definida en \ref{Hp}) en \ref{CapA}:
 
 $$ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right) $$
 
-La diferencia entre las capacidades de ambos tipos de canal puede apreciarse fácilmente en la figura \ref{fig:CompBZ}, donde no tiene sentido hablar de una probabilidad de error mayor a 0.5 en un canal binario simétrico, es totalmente válido en un canal-Z y el mínimo de capacidad en este caso no es cuando $p=0.5$ sino cuando $p=1.0$.
+La diferencia entre las capacidades de ambos tipos de canal puede apreciarse en la figura \ref{fig:CompBZ}. Nótese que el mínimo de capacidad en el canal simétrico se da cuando $p=0.5$, mientras que en el canal asimétrico es cuando $p=1.0$.
 
 \begin{figure}[th]
   \begin{center}
     \includegraphics[scale=0.9]{graphs/grafico_comparacion_capacidad_binaria_z}
   \end{center}
+  \caption{Capacidad de un canal binario simétrico con respecto a uno asimétrico o canal Z}
   \label{fig:CompBZ}
 \end{figure}
 
 
 \section{Filtros de Bloom}
-\label{bloomf}
+\label{Bloomf}
 Como se discutió en la sección \ref{Seguridad} , la colisiones de símbolos son inherentes a la modulación seleccionada.
 En la modulación OOK utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s. Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s, por que la interferencia solamente puede ser aditiva. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el slot de tiempo leído.
-Una buena estructura para representar este tipo de datos es el filtro de Bloom \cite{Bloom70space/timetrade-offs}, que se utiliza generalmente en técnicas de hashing, utilizándolo para tests muy rápidos (O=1) de pertenencia de un miembro en un set.
+Una buena estructura para representar este tipo de datos es el filtro de Bloom \cite{Bloom70space/timetrade-offs}, que se utiliza generalmente en técnicas de hashing, utilizándolo para tests eficientes ($O=1$) de pertenencia de un miembro en un set.
 La manera en que se implementó este algoritmo en el sistema propuesto se basa es copiar cada bit en K slots del frame transmitido, siendo el frame la representación física del filtro de Bloom.
 En el extremo receptor es suficiente para recibir un solo ‘0’ entre las K copias del bit, para correctamente inferir que el bit original era originalmente un ‘0’, mientras que si el bit original era un ‘1’, las colisiones no tienen efecto debido a la naturaleza del canal-Z.
 
-En la figura \ref{fig:bloomf} puede apreciarse gráficamente como se utiliza un filtro de Bloom para la transmisión de 12 clientes con una repetición $K=2$. Podría verse al algoritmo de filtro de Bloom como una técnica de CDMA, ya que también utiliza redundancia para lograr resistencia a interferencias.
+En la figura \ref{fig:Bloomf} puede apreciarse gráficamente como se utiliza un filtro de Bloom para la transmisión de 12 clientes con una repetición $K=2$. Podría verse al algoritmo de filtro de Bloom como una técnica de CDMA, ya que también utiliza redundancia para lograr resistencia a interferencias.
 
 \begin{figure}[th]
   \begin{center}
     \includegraphics[scale=0.5]{frame-sp}
   \end{center}
   \caption{Filtro de Bloom}
-  \label{fig:bloomf}
+  \label{fig:Bloomf}
 \end{figure}
 
 %As discussed in section 2, this leads to collisions. Since the modulation format is OOK, only transmitted ‘1’s can interfere with ‘0’s.
@@ -304,11 +314,11 @@ En la figura \ref{fig:bloomf} puede apreciarse gráficamente como se utiliza un 
 %end it is sufficient to receive a single ‘0’ out of K copies in order to correctly retrieve the original transmitted ‘0’,
 %whereas collisions have no effect on ‘1’s.
 
-\subsection{Filtros de bloom encriptado: Time-hopping}
+\subsection{Filtros de Bloom encriptado: time hopping}
 
-Es en esta etapa donde se logra la encriptación de los datos, reemplazando el algoritmo de hash que selecciona las posiciones de los datos dentro del filtro de Bloom por una función pseudo-aleatoria criptográficamente segura, de manera que los bits de datos de los diferentes clientes se ubican aleatoriamente en el frame y no es posible decodificarlos si no se posee la semilla del algoritmo PRNG, que equivale a la clave. Desde el punto de vista de modulación, como el algoritmo PRNG selecciona la posición dentro del frame, que es temporal, esto es equivalente a una transmisión Time-hopping, con la única salvedad que el algoritmo de filtro de Bloom requiere K repeticiones de los datos para poder recuperarse de colisiones en la recepción.
+Es en esta etapa donde se logra la encriptación de los datos, reemplazando el algoritmo de hash que selecciona las posiciones de los datos dentro del filtro de Bloom por una función pseudo-aleatoria criptográficamente segura, de manera que los bits de datos de los diferentes clientes se ubican aleatoriamente en el frame y no es posible decodificarlos si no se posee la semilla del algoritmo PRNG, que equivale a la clave. Desde el punto de vista de modulación, como el algoritmo PRNG selecciona la posición dentro del frame, que es temporal, esto es equivalente a una transmisión time hopping, con la única salvedad que el algoritmo de filtro de Bloom requiere K repeticiones de los datos para poder recuperarse de colisiones en la recepción.
 
-Para poder decodificar los datos en el filtro de Bloom receptor es necesario que todos los participantes posean la clave o semilla generadora del mismo PRNG utilizado para codificar los datos, y estar sincronizado a nivel de frame con el originante, para poder regenerar exactamente todas las posiciones en donde se transmitieron los datos. Los demás clientes solo causan interferencias que son corregidas primeramente por el filtro de bloom, y luego por el código de corrección de errores externo (Reed-Solomon por ejemplo), por lo tanto no es necesario que todos los clientes en la red estén sincronizados a nivel de frame, sino que solo es necesario para los clientes que deseen participar en el canal encriptado.
+Para poder decodificar los datos en el filtro de Bloom receptor es necesario que todos los participantes posean la clave o semilla generadora del mismo PRNG utilizado para codificar los datos, y estar sincronizado a nivel de frame con el originante, para poder regenerar exactamente todas las posiciones en donde se transmitieron los datos. Los demás clientes solo causan interferencias que son corregidas en primera instancia por el filtro de Bloom, y luego por el código de corrección de errores externo (Reed-Solomon por ejemplo), por lo tanto no es necesario que todos los clientes en la red estén sincronizados a nivel de frame, sino que solo es necesario para los clientes que deseen participar en el canal encriptado.
 
 Es deseable pero no necesario que todos los clientes mantengan una sincronización a nivel de bit, de lo contrario un bit generalmente colisionará con dos bits en lugar de solo uno, y se necesitará aumentar la capacidad de corrección de errores del sistema.
 
@@ -350,7 +360,7 @@ Datos & entrada HW= 0 to 3 & Expandida HW=2\\
  
 \section{Expansión de símbolo}
 La minimización del peso de Hamming conlleva una necesaria conversión del símbolo original a otro que necesariamente tendrá mayor longitud, o sea, una expansión del símbolo.
-Esta operación puede realizarse de muchas maneras, pero un algoritmo muy eficiente es utilizar una tabla de lookup (ver tabla~\ref{hwtable}), donde un símbolo de largo L es utilizado como el índice en la tabla, y el resultado es el símbolo expandido, que tiene un largo N\textgreater L.
+Esta operación puede realizarse de muchas maneras, pero un algoritmo eficiente es utilizar una tabla de lookup (ver tabla~\ref{hwtable}), donde un símbolo de largo L es utilizado como el índice en la tabla, y el resultado es el símbolo expandido, que tiene un largo N\textgreater L.
 Por motivos prácticos y de optimización, es deseable que L sea 8 u 16 bits, por lo que la tabla contendrá 256 o 65536 entradas respectivamente.
 Al aplicar la minimización de peso de Hamming a símbolos de 8 o 16 bits de longitud, son necesarios 256 o 65536 símbolos de salida con un HW=2. En el caso de símbolos de entrada de 8 bits, la longitud del símbolo de salida sera de 363 bits, mientras que para 8 bits de entrada, el símbolo expandido con HW=2 tendrá 24 bits de longitud.
 Puede observarse que el número de símbolos únicos con HW=2 y N=363 no es exactamente 65536 sino 65703, esto significa que la tabla de expansión no es única, sino que existen muchas tablas funcionalmente equivalentes que pueden seleccionarse para realizar la expansión.
@@ -364,12 +374,12 @@ La tabla seleccionada y el orden de la misma no son importantes para el resultad
 \end{figure}
 
 
-\section{Probabilidad de colisión de filtro de bloom con expansión de símbolo}
+\section{Probabilidad de colisión de filtro de Bloom con expansión de símbolo}
 
 %newJIS_140512
 En esta sección, presentaremos una estimación analítica de la probabilidad de error de bit, tomando en cuento solo las interferencias de otros usuarios en la red.
 Adicionalmente, no se considera ninguna corrección de etapas o algoritmos adicionales como Reed-Solomon, o interferencias producidas en el medio físico.
-Como se explicó en \ref{bloomf}, asumiremos que cada usuario agrupa sus bits de información en paquetes o Frames, cada una de largo n. Cada paquete es codificado utilizando exactamente $m_{1}$ unos y $m_{0}$ ($m_{1}+m_{0}=m$. Cada uno de los $m$ dígitos binarios resultantes es repetido K veces en posiciones elegidas aleatoriamente en el frame de largo $M$. Repeticiones de un dígito binario puedes colisionar con otras repeticiones del mismo dígito, con repeticiones de otro dígito o bien con dígitos pertenecientes a otro cliente.
+Como se explicó en \ref{Bloomf}, asumiremos que cada usuario agrupa sus bits de información en paquetes o Frames, cada una de largo n. Cada paquete es codificado utilizando exactamente $m_{1}$ unos y $m_{0}$ ($m_{1}+m_{0}=m$. Cada uno de los $m$ dígitos binarios resultantes es repetido K veces en posiciones elegidas aleatoriamente en el frame de largo $M$. Repeticiones de un dígito binario puedes colisionar con otras repeticiones del mismo dígito, con repeticiones de otro dígito o bien con dígitos pertenecientes a otro cliente.
 Llamaremos $N$ al número de usuarios activos. Para estimar la tasa de error o BER (Bit Error Rate) del sistema y simplificar los cálculos, haremos las siguientes asunciones:
 
 \begin{enumerate}
@@ -409,7 +419,7 @@ De esas ecuaciones, una estimación de la cota superior del BER para un determin
 \text{BER} \approx \frac{n}{2} m_0 z_{\bar{R},\bar{S}} \approx \frac{n}{2} m_0 \left(1-e^{-W_1/M}\right)^K.
 \end{equation}
 
-La figura \ref{BERvsK} muestra la estimación en función de $K$ para $M=2014$, $m_{0} = 22$, $m_{1} = 2$, $n = 8$ y $N=38$. Es interesante notar que existe un valor óptimo de la tasa de repetición $K$ que minimiza la tasa de error. Este resultado es relevante en el diseño de un sistema de comunicaciones. En particular, la última ecuación es muy simple y puede ayudar al diseño de red. Notar que los bajos valores de BER alcanzados permiten utilizar en la siguiente etapa algoritmos tales como Reed-Solomon, para reducir aun mas el BER total de sistema y asi llevarlo a tasas aceptables para las aplicaciones a las que este trabajo apunta.
+La figura \ref{BERvsK} muestra la estimación en función de $K$ para $M=2014$, $m_{0} = 22$, $m_{1} = 2$, $n = 8$ y $N=38$. Es interesante notar que existe un valor óptimo de la tasa de repetición $K$ que minimiza la tasa de error. Este resultado es relevante en el diseño de un sistema de comunicaciones. En particular, la última ecuación puede ayudar al diseño de red. Notar que los bajos valores de BER alcanzados permiten utilizar en la siguiente etapa algoritmos tales como Reed-Solomon, para reducir aun mas el BER total de sistema y asi llevarlo a tasas aceptables para las aplicaciones a las que este trabajo apunta.
 
 \begin{figure}[!t]
   \centering
@@ -442,7 +452,7 @@ De todas maneras, el estado actual de la teoría de complejidad no permite justi
 Por lo tanto, la investigación se concentra usualmente en buscar las condiciones suficientes mas débiles (o necesarios y suficientes) para la existencia de un esquema seguro.
 Las asumciones son usualmente generales (Basadas en la teoría de complejidad) o basadas en intratabilidad de problemas en la teoría de números, etc.
 
-\subsection{Aplicación al algoritmo de bloom-filter encriptado}
+\subsection{Aplicación al algoritmo de Bloom-filter encriptado}
 
 Este algoritmo puede verse como uno que a $r$ clientes le asigna $M$ posiciones de slot.
 La cantidad posible de combinaciones de $M$ posiciones entre todos los clientes es de $ _{M}P_{r} = \frac{M!}{(n-r)!} $.
@@ -476,7 +486,7 @@ Reed-Solomon ($223/255$) (ver \cite{Moon:05} y sus referencias), y un filtro de 
 La selección de estos algoritmos de corrección de errores fue siempre considerando el canal de comunicaciones como el denominado canal Z. %que posee un limite de Shannon de $ C_{Z} = \log_2\left(1+(1-p) p^{p/(1-p)}\right),$ donde $p$ es la posibilidad de recibir un error al transmitir un bit. Este limite de capacidad es menor que el límite en una canal simétrico sin memoria \cite{Tallini:02}.
 
 \section{Aplicación en distintos medios físicos}
-La arquitectura del sistema lo hace muy confiable frente a interferencias de la capa física, al poseer una fuerte capacidad de recuperación de errores, por lo que modificando la etapa de modulación, pueden utilizarse diferentes medios físicos, siempre que tengan un modelo de ruido que se aproxime al canal Z.
+La arquitectura del sistema lo hace confiable frente a interferencias de la capa física, al poseer una fuerte capacidad de recuperación de errores, por lo que modificando la etapa de modulación, pueden utilizarse diferentes medios físicos, siempre que tengan un modelo de ruido que se aproxime al canal Z.
 \subsection{Redes ópticas}
 % de orte.text
 
@@ -512,7 +522,7 @@ La arquitectura del sistema lo hace muy confiable frente a interferencias de la 
 
 Al adaptar el sistema propuesto a una red óptica, la topología de misma debe ser de tipo estrella (ver Fig.\ref{arch:fig1}) donde splitters ópticos redistribuyen el tráfico proveniente de cada ONY a todo el resto permitiendo comunicaciones punto-a-punto asi como punto-a-multipunto entre hasta $128$ ONUs.
 %Traffic redistribution is made by optical splitters at the redistribution hub that introduces high attenuation to optical streams.
-Un amplificador óptico de fibra de Erbio (Erbium-Doped Fiber Amplifier, EDFA) localizado entre los splitters en el repetidor óptico incrementa la potencia óptica para contrarrestar las perdidas en la red, aunque esto es solamente necesario si el número de clientes es muy elevado o las pérdidas por dispersión son elevadas debido a las distancias entre ellos.
+Un amplificador óptico de fibra de Erbio (Erbium-Doped Fiber Amplifier, EDFA) localizado entre los splitters en el repetidor óptico incrementa la potencia óptica para contrarrestar las perdidas en la red, aunque esto es solamente necesario si el número de clientes es elevado o las pérdidas por dispersión son elevadas debido a las distancias entre ellos.
 
 La modulación utilizada para las señales ópticas es RZ \footnote{La modulacíon RZ o ``Return to Zero'' es la mas común utilizada en fibras ópticas, aunque por razones técnicas en ralidad el laser nunca retorna a cero. Esto tiene consecuencias para el sistema propuesto como se vera mas adelante.} con velocidades previstas de hasta $10$~Gbps por un laser DBF de $2$~dBm de potencia y $1550$~nm de color/frecuencia. Estos parámetros permiten una transmisión de hasta $10$~km entre los nodos si se utiliza fibra óptica mono-modo estandard (ITU-T G.652) hacia el repetidor óptico.
 
@@ -552,11 +562,11 @@ El radio de extinción (`1'$/$`0' radio de potencia pico) mínimo requerido por 
 
 Un canal óptico es un claro ejemplo de canal Z, pero también es posible realizar un canal Z con redes acústicas si se utilizan ciertas modulaciones y parámetros.
 
-Los enlaces ópticos presentan como mayor desventaja la necesidad de, o bien una fibra óptica entre los nodos comunicantes, o que exista visibilidad directa entre ambos nodos, una condición que no puede ser garantizada en muchos ambientes de trabajo. Además, los sensores ópticos requeridos generalmente no están presentes en los clientes y deben ser instalados separadamente.
+Los enlaces ópticos presentan como mayor desventaja la necesidad de, o bien una fibra óptica entre los nodos comunicantes, o que exista visibilidad directa entre ambos nodos, una condición que no puede ser garantizada en todos los ambientes de trabajo. Además, los sensores ópticos requeridos generalmente no están presentes en los clientes y deben ser instalados separadamente.
 
-Sin embargo utilizar un canal acústico tiene como ventaja poder utilizar hardware pre-existente en la mayoría de los potenciales clientes, como parlantes o micrófonos estandard, elementos muy comunes en dispositivos de información actuales \cite{citeulike:12800468}. Además, no es necesaria la visibilidad directa mientras ambos nodos estén localizados a pocos cm o metros de distancia, con bajo nivel de volumen.
+Sin embargo utilizar un canal acústico tiene como ventaja poder utilizar hardware pre-existente en la mayoría de los potenciales clientes, como parlantes o micrófonos estandard, elementos comunes en dispositivos de información actuales \cite{citeulike:12800468}. Además, no es necesaria la visibilidad directa mientras ambos nodos estén localizados a pocos cm o metros de distancia, con bajo nivel de volumen.
 
-Pero en contraste con otras tecnologías como RF o enlaces ópticos, la naturaleza del canal de sonido y la facilidad para interceptar o registrar comunicaciones utilizando este medio hace necesaria que la privacidad sea un requerimiento esencial. Muchos sistemas de comunicación de audio han sido propuestos \cite{august2002apparatus}, pero hasta donde fue posible investigar, el problema de la privacidad en este tipo de comunicaciones ha sido solucionada solamente en la capa de aplicación, o sea en alto nivel. Este trabajo presenta una aproximación a la seguridad y privacidad desde la capa física, basada también en time-hopping CDMA, similar a aquella presentada en \cite{6476559}. En este trabajo se presenta una red segura acústica punto-a-punto y punto-a-multipunto de corto rango y bajo consumo, que no requiere de ningún hardware adicional en clientes móviles.
+Pero en contraste con otras tecnologías como RF o enlaces ópticos, la naturaleza del canal de sonido y la facilidad para interceptar o registrar comunicaciones utilizando este medio hace necesaria que la privacidad sea un requerimiento esencial. Algunos sistemas de comunicación de audio han sido propuestos \cite{august2002apparatus}, pero hasta donde fue posible investigar, el problema de la privacidad en este tipo de comunicaciones ha sido solucionada solamente en la capa de aplicación, o sea en alto nivel. Este trabajo presenta una aproximación a la seguridad y privacidad desde la capa física, basada también en time-hopping CDMA, similar a aquella presentada en \cite{6476559}. En este trabajo se presenta una red segura acústica punto-a-punto y punto-a-multipunto de corto rango y bajo consumo, que no requiere de ningún hardware adicional en clientes móviles.
 Establecer un enlace privado entre dispositivos móviles previamente desconectados requiere cierto nivel de interacción por parte del usuario que es usualmente ignorado \cite{4912753}. Sin embargo, cuando la privacidad se brinda desde la capa física, la intervención del usuario es minimizada. Este es el caso de esta propuesta.
 
 Un escenario válido para la aplicación de esta tecnología podría ser la validación de transacciones financieras pequeñas tales como terminales PoS (Point of Sale) o cajeros automáticos (ATM) utilizando un dispositivo móvil (Ej. un smartphone) sin modificaciones de hardware. Una tecnología similar que se utiliza en estos casos es la denominada Near Field Communications (NFC) [10], un protocolo inalámbrico que requiere hardware especializado que al momento de escritura de esta tesis no se encuentra disponible en la mayoría de los dispositivos móviles.
@@ -573,7 +583,7 @@ Es necesario ajustar algunos parámetros con respecto a la implementación ópti
 
 \subsection{Redes acústicas: Arquitectura}
 
-Una ventaja muy importante del sistema acústico propuesto es su simplicidad, requiriendo solamente un emisor de sonido (parlante), un receptor (micrófono) y un canal de transmisión de sonido que puede ser aire (y en casos mas especializados, agua). Ambos requerimientos están generalmente disponibles en computadoras, notebooks, tablets y teléfonos celulares modernos. 
+Una ventaja importante del sistema acústico propuesto es su simplicidad, requiriendo solamente un emisor de sonido (parlante), un receptor (micrófono) y un canal de transmisión de sonido que puede ser aire (y en casos mas especializados, agua). Ambos requerimientos están generalmente disponibles en computadoras, notebooks, tablets y teléfonos celulares modernos. 
 El esquema lógico es el mismo que el descrito anteriormente: Time-hopping CDMA seguro, códigos correctores de errores y un método de sincronización a nivel de bit.
 Como resultado, el sistema provee canales unidireccionales a los usuarios que sirven tanto para comunicaciones punto-a-punto como punto-a-multipunto. Comunicaciones bi-direccionales pueden establecerse utilizando dos canales separados (Ej. utilizando dos códigos CDMA diferentes), o empleando el mismo canal de manera half-duplex, aunque este último modo de funcionamiento necesita de desarrollo adicional y no es el objetivo de esta tesis.
 En las próximas secciones se describe el sistema en mayor detalle.
