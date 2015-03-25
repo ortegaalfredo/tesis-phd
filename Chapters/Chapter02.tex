@@ -1,28 +1,33 @@
 \chapter{Fundamentos y Estado del arte}
 
 %En este capítulo se intentara dar una breve reseña de las investigaciones mas recientes en el campo de las comunicaciones ópticas. 
-En este capítulo se presentaran las bases y fundamentos de las técnicas desarrolladas y utilizadas en esta tesis. 
-Se procederá a dar una breve explicación de los conceptos de códigos correctores de errores, siguiendo con la presentación los algoritmos utilizados en la implementación. Luego se explicará el concepto de espectro ensanchado, una técnica muy utilizada en comunicaciones la cual se utiliza en un modo poco convencional, y se finalizara con una explicación de los aspectos de seguridad a tener en cuenta al utilizar los algoritmos previamente mencionados, y de cual es el objetivo a alcanzar con respecto a este último tema.
-Para finalizar, se repasarán el estado de las tecnologías y sistemas en uso actualmente, a modo de comparación con el descrito en esta tesis.
+En este capítulo se presentan las bases y fundamentos de las técnicas desarrolladas y utilizadas en esta tésis. 
+Primeramente se da una breve explicación de los conceptos de códigos correctores de errores, continuando con los distintos algoritmos utilizados en la implementación. Luego, se explicará el concepto de espectro ensanchado, una técnica utilizada en comunicaciones pero implementada de un modo poco convencional en este trabajo. Posteriormente se repasarán los aspectos de seguridad a tener en cuenta al utilizar los algoritmos previamente mencionados, los conceptos de niveles de fuerza criptográficas y de cual es el objetivo a alcanzar con respecto a este último tema.
+
+Para finalizar, en la sección de estado del arte se repasarán el estado de las tecnologías y sistemas en uso actualmente, a modo de comparación con el descrito en esta tesis.
 
 \section{Códigos correctores de errores}
-Al codificar información sobre algún medio físico ya sea para transmisión o almacenamiento, invariablemente se sufre una degradación o ruido. Esta degradación puede ocurrir en cualquier módulo del sistema o las interfaces entre los mismos y generalmente es deseable que este sistema pueda reproducir los datos almacenados o transmitidos con la menor cantidad posible de errores o ruido. Este ruido se suele modelar como una señal con una determinada distribución de potencia superpuesta a la señal codificada. Algunos modelos de ruido son muy utilizados, tal como el ruido aditivo gaussiano, utilizado para modelar ruido producto de fuentes naturales como ruido térmico o para aproximar fuentes de ruido aleatorias.
 
-Al transmitir datos digitales sobre canales con ruido, aun asumiendo que las etapas moduladoras y demoduladoras son capaces de reproducir los datos fielmente, el mensaje recibido $m_r$ sera distinto del mensaje original $m$, ya que la señal que recibe el demodulador sera una combinación de la señal original del demodulador con la señal de ruido. La diferencia de la señal recibida $m_r$ y $m$ se denomina error de transmisión. Para aumentar la confiabilidad y reducir el error de transmisión se idearon códigos correctores/detectores de errores, con los que el receptor puede detectar un error y pedir una retransmisión, o bien corregir el error utilizando datos adicionales presentes en la señal. Los métodos de corrección de errores generalmente funcionan reduciendo la entropía de la información transmitida, o lo que es lo mismo, aumentando la redundancia de la información.
+Para trasmitir información digital a través de un medio analógico tal como una fibra óptica, deben convertirse las señales digitales original a señales analógicas.
+Toda señal analógica que se transmite o almacen en algún medio físico invariablemente se sufre una degradación, producto de las imperfecciones de los transductores, imperfecciones o limitaciones en la codificación o ruido de diferentes tipos. Esta degradación puede ocurrir en cualquier módulo del sistema, o las interfaces entre los mismos, y generalmente es deseable que el sistema pueda reproducir los datos almacenados o transmitidos con la menor cantidad posible de errores. La diferencia entre la señal transmitida y la recibida se suele modelar como una señal de ruido con una determinada distribución de potencia superpuesta a la señal codificada. Algunos modelos de ruido son muy utilizados, tal como el ruido aditivo gaussiano, utilizado para modelar la interferencia producto de fuentes naturales como ruido térmico o para aproximar fuentes de ruido no-lineales.
 
-La manera mas simple de corregir estos errores es usar un algoritmo de detección de errores como puede ser un Checksum, CRC o función de hash, e iniciar un proceso de retransmisión de la porción o trama de datos afectada. Esto posee la desventaja de ser costoso tanto en ancho de banda utilizado, como en el retraso de la transmisión. En enlaces de muy alta velocidad las elevadas tasas de retransmisiones hacen a este algoritmo sumamente ineficiente.
+Al transmitir datos digitales sobre canales con ruido, aún asumiendo que las etapas moduladoras y demoduladoras son capaces de reproducir los datos fielmente, el mensaje recibido $m_r$ sera distinto del mensaje original $m$, ya que la señal que recibe el demodulador sera una combinación de la señal original del demodulador con el ruido. La diferencia entre la señal recibida $m_r$ y $m$ se denomina error de transmisión. Para aumentar la confiabilidad y reducir el error de transmisión se idearon códigos correctores/detectores de errores, con los que el receptor puede detectar un error y pedir una retransmisión, o bien corregir el error utilizando datos adicionales presentes en la señal. Los métodos de corrección de errores generalmente funcionan reduciendo la entropía de la información transmitida, aumentando la redundancia de la información.
 
-Por lo tanto es deseable utilizar un algoritmo que pueda detectar y corregir errores basado solamente en información adicional transmitida, sin utilizar retransmisiones. Esto se denomina Forward Error Correction Codes, o códigos FEC \cite{Moon:05} de los cuales existen diferentes tipos de acuerdo con sus aplicación, performance y parámetros. A continuación se describen algunos códigos que fueron utilizados en el sistema propuesto o durante el desarrollo del mismo.
+Un método trivial de corrección de errores consiste en utilizar un código de detección de errores como puede ser una suma de verificación, el algoritmo CRC o función de hash \cite{Menezes:1996:HAC:548089}, e iniciar un proceso de retransmisión del segmento o trama de datos afectada. Esté simple método posee la desventaja de ser costoso tanto en ancho de banda utilizado, como en el retraso de la transmisión. En enlaces de muy alta velocidad, las elevadas tasas de retransmisiones hacen a este algoritmo sumamente ineficiente.
+
+Por lo tanto es deseable utilizar un algoritmo que pueda detectar y corregir errores basado solamente en información adicional transmitida, sin utilizar retransmisiones. Esta técnica se denomina \textsl{Forward Error Correction Codes}, o códigos FEC \cite{Moon:05} de los cuales existen diferentes tipos de acuerdo con sus aplicación, performance y parámetros. A continuación, se describen los algoritmos que fueron utilizados en el sistema propuesto en esta tesis.
 
 \subsection{BCH/Reed Solomon}
-Los códigos BCH y Reed-Solomon son usados ampliamente en multitud de industria ya que son computacionalmente sencillos de implementar y muy eficientes desde el punto de vista de errores corregidos por bit agregado. Se basan en una representación de los datos basada en grupos algebráicos cíclicos cuyas operaciones sobre sus símbolos dan como resultado otro símbolo válido dentro del grupo. 
-Este tipo de código si bien es relativamente antiguo, es todavía utilizado en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps~\cite{liforward} debido a su robustez, bajo retraso y la existencia de algoritmos eficientes para la decodificación en un tiempo fijo.
+Los códigos BCH y Reed-Solomon~\cite{reed1960polynomial} son usados ampliamente en la industria de comunicaciones y almacenamiento masivo ya que la implementación es eficientes desde el punto de vista del radio entre errores corregidos e información de paridad agregada. De echo, Reed-Solomon pertenece a una clase de códigos lineales denominados MDS (\textit{maximum distance separable}) que se consideran óptimos en esta relación. Estos códigos consisten en una representación de los datos basada en grupos algebraicos cíclicos. 
+Esta familia de códigos fue introducida en 1959, pero es todavía utilizada en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps~\cite{liforward} debido a su robustez, bajo retraso y la existencia de algoritmos eficientes para la decodificación en un tiempo fijo.
 
 \subsection{LDPC}
-El esquema de corrección de errores LDPC~\cite{gallagerpress} (Low Density Parity Check) es muy utilizado actualmente debido a su gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
-Antes de ahondar en la descripción de este algoritmo cabe aclarar que a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una desempeño similar desde el punto de vista de corrección de errores, sin embargo es necesario mencionarlo ya que actualmente es uno de los algoritmos más utilizados en sistemas de comunicación modernos debido a su eficiencia y simplicidad.
+El esquema de corrección de errores LDPC~\cite{gallagerpress} (\textit{Low Density Parity Check}, también conocidos como códigos de Gallager) es un caso notable. Introducido en los años 60, fue olvidado debido a la alta capacidad de procesamiento y memoria requerido por el mismo, ya que para su implementación es necesario utilizar matrices de paridad de un tamaño elevado. Sin embargo, con los modernos avances en hardware informático, éste algoritmo se volvió una opción viable y actualmente es utilizado en sistemas modernos~\cite{brack2007low} debido a su simplicidad y gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
+Antes de ahondar en la descripción de este algoritmo debemos aclarar que, a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una desempeño similar desde el punto de vista de corrección de errores.
 
-El algoritmo se basa en un código lineal que utiliza una matriz de paridad $H$ grande y dispersa. La matriz es tal que cualquier codeword válido $x$ cumple con $H*x=0$. La alta complejidad computacional de operar con matrices de gran tamaño impedía que este algoritmo fuera adoptado con anterioridad a pesar de haber sido desarrollado en los años 60.
+LDPC es un código que se denomina ``\textit{capacity-approaching}'' o sea, que para un canal discreto sin memoria, el ruido del mismo puede ser estar muy cerca del límite teórico de Shannon~\cite{shannon48}.
+El algoritmo se basa en un código lineal que utiliza una matriz de paridad $H$ grande y dispersa. Esta matriz tiene la propiedad de que todo codeword $x$ válido cumple con $H*x=0$. 
+Existen muchos métodos para construir la matriz de paridad; uno muy utilizado consiste simplemente en generarla aleatoriamente. Otras maneras de generar la matriz son posibles y es un campo de investigación activo actualmente.
 
 % Meter en apendice
 %\paragraph{LDPC: Generador de matriz}
@@ -74,31 +79,33 @@ El algoritmo se basa en un código lineal que utiliza una matriz de paridad $H$ 
 
 %\subsubsection{Viterbi/Convolucional}
 
-\section{Espectro ensanchado}
+\section{CDMA}
 \label{espectroensanchado}
-El espectro ensanchado, Spread Spectrum o CDMA es una técnica donde se utiliza mucho mas espectro en el medio de transmisión que el necesario para la transmisión correcta de los datos.
-Los origines datan del 1900, cuando Nicola Tesla patentó el concepto de \textit{"Frequency hopping"}.
-El ensanchamiento del espectro ocupado por la señal tiene varias ventajas:
-\begin{enumerate} 
-\item Resistencia al espionaje, ya que solamente las partes que conocen la señal de ensanchamiento pueden decodificar la señal original
-\item Resistencia contra interferencias de banda angosta (No a interferencias de banda ancha como el ruido térmico)
-\item Capacidad de acceso múltiple. Varios usuario pueden transmitir en la misma frecuencia mientras utilicen diferentes códigos.
-\end{enumerate} 
-Adicionalmente, al guiarse la señal expandida con un generador pseudo-aleatorio o PRBS, se puede agregar privacidad a la comunicación haciendo imposible decodificar los datos sin tener los parámetros del PRBS.
+La multiplexación por división de código, acceso múltiple por división de código o CDMA (del inglés \textit{Code Division Multiple Access}) es el nombre genérico de varias técnicas de comunicación basadas en el espectro expandido, con el fin de lograr multiplexación o control de acceso al medio. 
+Se denomina espectro expandido a la utilización de mayor ancho de banda que el necesario para la transmisión correcta de los datos. Generalmente se logra mediante la combinación de una señal señal de ensanchamiento o de pseudo-ruido, con la señal original, utilizando diferentes métodos.
 
-A su vez, se puede expandir la señal en tres dominios:
+Los orígenes datan del 1903, cuando Nicola Tesla patentó el concepto de \textit{Frequency hopping} o salto en frecuencia, uno de los métodos de CDMA utilizados actualmente.
+
+Estas técnicas apuntan a agregar las siguientes propiedades en el sistema de comunicaciones:
 \begin{enumerate} 
-\item Direct Sequence (CDMA): Se expande la señal multiplicándola (XOR) con la señal de ensanchamiento, generalmente mucho más rápida. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares, etc.
-\item Frecuency Hopping: La señal de ensanchamiento es utilizada para variar la frecuencia portadora de la señal original. Este método es utilizado por ejemplo en BlueTooth. (Se utiliza Adaptive Frequency Hopping, un método para evitar frecuencias con mucha interferencia)
-\item Time Hopping: La señal de datos no transmite todo el tiempo, sino que sufre de un retraso que depende de la señal de ensanchamiento. Este método no es muy utilizado aunque lo estudiaremos detenidamente en nuestro caso ya que es muy sencillo de implementar con los recursos de los que disponemos.
+\item Resistencia contra ruido e interferencias: ya que el ruido solo afecta una parte del espectro, ante la presencia de ruido, la mayoría de la señal no se verá afectada, pudiéndose recuperar el resto de la información mediante técnicas de corrección de errores.
+\item Resistencia a intercepción: si un atacante no conoce la secuencia que se utilizó para expandir el espectro de la señal original (secuencia generada, por ejemplo, por un generador de números pseudo-aleatorio o PRBS), es dificil diferenciar la señal expandida del ruido.
+\item Capacidad de acceso múltiple: varios usuarios pueden transmitir en la misma frecuencia mientras utilicen diferentes códigos.
 \end{enumerate} 
 
+Existen varios métodos de CDMA, entre ellos:
+\begin{enumerate} 
+\item \textit{Direct Sequence Spread Spectrum} (DSSS): Se expande la señal multiplicándola con un código de pseudo-ruido o señal de ensanchamiento, mediante la operación lógica XOR, o mediante desplazamientos de fase. Dicho código es en general modulado a mucha mayor velocidad que la información original. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares, el sistema GPS, etc.
+\item \textit{Frecuency Hopping Spread Spectrum} (FHSS}: La señal de ensanchamiento o pseudo-ruido en este caso,  utilizada para variar la frecuencia portadora o canal de la señal original. Este método es utilizado, por ejemplo, en el sistema BlueTooth de comunicación digital. En este caso se utiliza una variación llamada \textit{Adaptive Frequency Hopping}, un método para evitar frecuencias con mucha interferencia.
+\item \textit{Time Hopping Spread Spectrum}: En este método, también llamado modulación por posición de pulso, la señal de datos no se transmite todo el tiempo, sino que se divide en pulsos de transmisión, que sufren de un retraso que depende de la señal de ensanchamiento o pseudo-ruido. Actualmente este método no es tan utilizado como los anteriores, aunque se estudiará detenidamente en nuestro caso ya que su implementación sobre una plataforma FPGA con interface óptica es posible sin ningun componente adicional.
+\end{enumerate} 
 
-La desventaja obvia de la técnica del espectro expandido, es tiene una baja densidad espectral, o un bajo aprovechamiento del medio de transmisión. Esto puede no afectar al sistema si es posible acceder a una cantidad disponible de espectro mucho mayor a la utilizada. Un ejemplo de un protocolo de comunicaciones que utiliza CDMA es el protocolo WIFI en todas sus versiones, que utiliza un código DSS (Direct-sequence spread spectrum) para compartir una misma frecuencia entre varios nodos.
 
-\section{Códigos de generación pseudo-aleatorio}
+\section{Códigos de generación de pseudo-ruido}
 \label{PRNGs} 
-Para que un código CDMA pueda utilizarse de manera privada, es necesario que el parámetro a expandir, sea la frecuencia, el tiempo o el código utilizado, sea guiado o seleccionado por un algoritmo que solo sea conocido por los nodos que se estan comunicando. Esto puede lograrse mediante un generador pseudo-aleatorio o PRBS, que son algoritmos que basados en un parámetro de inicialización o semilla, son capaces de generar un stream de números aparentemente aleatorios, pero en realidad totalmente determinísticos. 
+El código CDMA requiere de una secuencia de pseudo-ruido para combinar con la señal original. Existen muchos algoritmos para generar este tipo de secuencias, dependiendo de las características deseadas.
+Los algoritmos 
+Para que un código CDMA pueda utilizarse de manera privada, es necesario que el parámetro a expandir, sea la frecuencia, el tiempo o el código utilizado, esté guiado o seleccionado por una secuencia solo conocida por los nodos que se estan comunicando. Esto puede lograrse mediante un generador pseudo-aleatorio o PRBS, que son algoritmos que basados en un parámetro de inicialización o semilla, son capaces de generar un stream de números aparentemente aleatorios, pero en realidad totalmente determinísticos. 
 Es necesario que los nodos que participen de la comunicación puedan generar exactamente la misma secuencia y compartan el parámetro de generación o semilla. Esto es equivalente a lo que en criptografía se denomina un algoritmo criptográfico simétrico.
 Existen muchas maneras y algoritmos de generar flujos de números pseudo-aleatorios. Algunos algoritmos están optimizados para que su periodo (la cantidad de números en su salida antes que el patrón se repita) sea enorme, como por ejemplo el algoritmo Mersenne-twister.
 Otro parámetro deseable en un PRBS es su sencillez y rapidez. Un generadores PRBS muy popular se denomina Lineal Congruential Generator y solo precisa de dos operaciones, una multiplicación y una suma.
