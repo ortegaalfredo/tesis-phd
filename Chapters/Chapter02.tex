@@ -179,18 +179,18 @@ Podria discutirse que el sistema es similar al esquema TDMA (\textit{Time Divisi
 
 \section{Estado del Arte}
 
-A continuación se hará un repaso de las tecnologías disponibles actualmente para realizar encriptación sobre fibra óptica a altas velocidades y otros tipos de redes con esquemas similares al propuesto:
+A continuación se repasarán las tecnologías disponibles actualmente para realizar encriptación sobre fibra óptica a altas velocidades y otros tipos de redes con esquemas similares al propuesto:
 
 \subsection{Criptografía clásica}
 Las comunicaciones ópticas pueden utilizar sin problemas algoritmos de criptografía clásicos tales como encriptación de clave simétrica y asimétrica. La única dificultad consiste en que el procesamiento de datos debe ser lo suficientemente rápido para poder aplicarse al enlace de alta velocidad, lo que conlleva altos costos y procesadores con un alto consumo de energía, aunque la velocidad máxima de procesamiento puede reducirse arbitrariamente utilizando procesamiento en paralelo \cite{liforward}.
 
 Actualmente, un dispositivo muy utilizado capaz de realizar criptografía a alta velocidad sobre fibra óptica es la FPGA, que con la correcta paralelización del procesamiento de datos, puede alcanzar la velocidad máxima permitida por sus tranceptores (por ejemplo, 400 Gbps~\cite{Algotronix}).
 
-\subsection{Encriptación púramente óptica}
+\subsection{Criptografía púramente óptica}
 \label{optocry}
-Otro método activamente investigado en la actualidad es la encriptación puramente óptica. La eliminación de la parte electrónica y la conversión a de los datos a señales eléctricas para procesamiento tiene muchas ventajas, principalmente en velocidad y potencia consumida por el sistema.
-La dificultad principal en este método es en lograr el procesamiento y la implementación de los algoritmos necesarios solamente utilizando componentes ópticos. Actualmente este es un activo campo de investigación, ejemplos notables son los avances en la creación de compuertas lógicas puramente ópticas \cite{jung2008demonstration}, o la utilización de señales caóticas para transmisión~\cite{liu2002synchronized}.
-La dificultad de implementación de estos métodos hace que actualmente estos sistemas estén en fase de desarrollo.
+Un campo de investigación activo en la actualidad es el de la criptografía puramente óptica. La eliminación de las etapas electrónicas y la conversión electro-óptica de los datos para su procesamiento tiene muchas ventajas, principalmente en velocidad y potencia consumida por el sistema.
+La dificultad principal en este método consiste en lograr una fuerza de cifrado adecuada, y la implementación de los algoritmos necesarios solamente utilizando componentes ópticos. Podemos citar algunos resultados publicados tales como los avances en la creación de compuertas lógicas puramente ópticas \cite{jung2008demonstration}, o la utilización de señales caóticas para transmisión~\cite{liu2002synchronized}.
+Debido a su novedad, no existen implementaciones prácticas de esta tecnología utilizada en la industria al momento de la escritura de esta Tesis.
 
 %High speed all-optical encryption and decryption using quantum dot semiconductor optical amplifiers 	http://www.tandfonline.com/doi/abs/10.1080/09500340.2013.856486#.VNHcKPtue00
 
@@ -199,18 +199,29 @@ La dificultad de implementación de estos métodos hace que actualmente estos si
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.7 \textwidth]{graphs/quantum} 
-  \caption{Típico uso de distribución cuántica de claves. Notar que el canal cuántico es generalmente de menor velocidad que el clásico, ya que no se requiere de un grán ancho de banda para transferir las claves.}
+  \caption{Esquema típico del método de distribución cuántica de claves. Al utilizar detectores de mayor complejidad, el canal cuántico posee generalmente menor ancho de banda que el clásico, pero es suficiente para la transmisión segura del material de clave.}
   \label{fig_quant}
 \end{figure}
 
 
 \label{quantcry}
-Una solución muy interesante a varios problemas criptográficos son las llamadas técnicas de encriptación cuántica, donde se aprovechan fenómenos físicos de mecánica cuántica para realizar varias tareas criptográficas.
-Uno de los problemas criptográficos mas fácilmente resueltos utilizando mecánica cuántica es el de la distribución de claves, por lo que la distribución cuántica de claves (Quantum key distribution~\cite{grosshans2003quantum}) actualmente ya cuenta con muchas implementaciones comerciales e instalaciones a nivel metropolitano~\cite{sasaki2011field}. Generalmente se utilizan varios canales sobre una fibra óptica, unos llamados ``canales cuánticos'' utilizados solamente para la distribución de claves, y otros ``canales clásicos'' donde se utiliza criptografía clásica (ver esquema en la figura~\ref{fig_quant}).
+Una solución muy interesante a varios problemas criptográficos son las llamadas técnicas de criptografía cuántica, donde se aprovechan fenómenos de mecánica cuántica para lograr seguridad en las comunicaciones digitales.
+En estos sistemas, se codifica la información en estados cuánticos o \textit{qubits}, en lugar de los bits comúnmente utilizados para codificar datos en comunicaciones clásicas, que utilizan efectos físicos clásicos. Generalmente, se utilizan fotones para generar y medir dichos estados cuánticos, por lo que el medio de transmisión suele ser la fibra óptica, aunque es también es posible utilizar el aire como medio \cite{alleaume2004experimental}.
+Uno de los problemas criptográficos resueltos utilizando mecánica cuántica es el de la distribución de claves. Algoritmos maduros de distribución cuántica de claves (Quantum key distribution~\cite{bb84}) actualmente son utilizados por la industria y cuentan con implementaciones comerciales e instalaciones a nivel metropolitano~\cite{sasaki2011field}. 
+
+Dependiendo de la propiedad física aprovechada, los sistemas cuánticos pueden dividirse en dos categorías:
+\begin{enumerate}
+ \item Sistemas basados en mediciones de variables físicas, en los que a diferencia de lo que ocurren en la física clásica, la medición de un parámetro físico afecta el estado cántico de alguna manera. Esto se conoce como indeterminación cúantica, y es utilizado para detectar cualquier interceptación de los datos, que necesariamente deberá realizar una medición sobre los mismos. Por ejemplo, un parámetro comúnmente seleccionado para codificar la información es la polarización del fotón \cite{muller1993experimental}.
+ \item Sistemas basados en el entrelazamiento cuántico (\textit{quantum entanglement}) \cite{jennewein2000quantum}, donde los estados cuánticos de dos o más elementos quedan unidos de forma que deben ser descritos mediante un estado cuántico combinado, y no como objetos individuales. Esto causa que la medición en uno de los objetos afectará a los otros, y de esta manera puede detectarse cualquier interceptación.
+\end{enumerate}
+
+La seguridad de ambos métodos consiste en detectar una posible interceptación, en lugar de prevenir el acceso a los datos.
+
+Generalmente se utilizan varios canales sobre una fibra óptica, unos llamados ``canales cuánticos'' utilizados solamente para la distribución de claves, y otros ``canales clásicos'' donde se utiliza criptografía clásica (ver esquema en la figura~\ref{fig_quant}).
 
 Vale mencionar que la distribución segura de claves también puede realizarse en un canal clásico por medio de algoritmos matemáticos tales como Diffie-Hellman~\cite{diffie1976new} o bien la utilización de esquemas de clave pública.
 
-Una posible ventaja de la criptografía cuántica es que al estar basado en fenómenos físicos comprobados, es imposible de atacar. Sin embargo, vulnerabilidades y fallas en la implementación afectan estos sistemas de la misma manera que afectan sistemas de criptografía clásicos~\cite{lydersen2010hacking}.
+Resumiendo, la seguridad de sistemas de criptografía cuántica se basa en las bases de la mecánica cuántica, en contraste con sistemas de criptografía tradicional que se basan en la complejidad computacional de ciertas funciones matemáticas \cite{kohnfelder1978towards}. Sin embargo, vulnerabilidades y fallas en la implementación afectan la seguridad de ambos tipos de sistemas de la misma manera~\cite{lydersen2010hacking}.
 
 
 \subsection{Corrección de errores de canales asimétricos}
