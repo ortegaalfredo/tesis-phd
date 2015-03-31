@@ -184,9 +184,9 @@ A continuación se repasarán las tecnologías disponibles actualmente para real
 \subsection{Criptografía clásica}
 Las comunicaciones ópticas pueden utilizar sin problemas algoritmos de criptografía clásicos tales como encriptación de clave simétrica y asimétrica. La única dificultad consiste en que el procesamiento de datos debe ser lo suficientemente rápido para poder aplicarse al enlace de alta velocidad, lo que conlleva altos costos y procesadores con un alto consumo de energía, aunque la velocidad máxima de procesamiento puede reducirse arbitrariamente utilizando procesamiento en paralelo \cite{liforward}.
 
-Actualmente, un dispositivo muy utilizado capaz de realizar criptografía a alta velocidad sobre fibra óptica es la FPGA, que con la correcta paralelización del procesamiento de datos, puede alcanzar la velocidad máxima permitida por sus tranceptores (por ejemplo, 400 Gbps~\cite{Algotronix}).
+Actualmente, un dispositivo muy utilizado capaz de realizar criptografía a alta velocidad sobre fibra óptica es la FPGA, que con la correcta paralelización del procesamiento de datos, puede alcanzar la velocidad máxima permitida por sus transceptores (por ejemplo, 400 Gbps~\cite{Algotronix}).
 
-\subsection{Criptografía púramente óptica}
+\subsection{Criptografía puramente óptica}
 \label{optocry}
 Un campo de investigación activo en la actualidad es el de la criptografía puramente óptica. La eliminación de las etapas electrónicas y la conversión electro-óptica de los datos para su procesamiento tiene muchas ventajas, principalmente en velocidad y potencia consumida por el sistema.
 La dificultad principal en este método consiste en lograr una fuerza de cifrado adecuada, y la implementación de los algoritmos necesarios solamente utilizando componentes ópticos. Podemos citar algunos resultados publicados tales como los avances en la creación de compuertas lógicas puramente ópticas \cite{jung2008demonstration}, o la utilización de señales caóticas para transmisión~\cite{liu2002synchronized}.
@@ -226,9 +226,20 @@ Resumiendo, la seguridad de sistemas de criptografía cuántica se basa en las b
 
 \subsection{Corrección de errores de canales asimétricos}
 
-Una seccion importante de esta Tesis es la descripción de una técnica de corrección de errores en canales asimétricos basada en el algoritmo de filtros de Bloom (ver~\ref{zbloom}). Recientemente surgió interés en campo de corrección de errores de canales asimétricos o unidireccionales, debido a la utilidad de estos algoritmos en sistemas de almacenamiento digitales\cite{tanakamaru201195}. Sin embargo, el número de artículos publicados acerca del tema sigue siendo muy reducido en comparación con las investigaciones de códigos de corrección para canales convencionales.
+Una sección importante de esta Tesis es la descripción de una técnica de corrección de errores de canales asimétricos basada en el algoritmo de filtros de Bloom (ver~\ref{zbloom}). 
+Se denominan códigos de corrección de errores asimétricos o unidireccionales, a todo código de corrección especializado en canales de comunicaciones cuya probabilidad de error no se aplica simétricamente a todos los símbolos. Un caso sencillo es por ejemplo el canal Z, un canal binario (símbolos uno y cero) pero cuyos errores solo pueden afectar un símbolo, por ejemplo esta descripción puede aplicarse a un sistema donde al transmitir el símbolo cero, es posible que un error suceda y sea recibido incorrectamente como un uno, pero lo contrario no es posible. En la figura \ref{fig:Gal} se observa el diagrama de probabilidades del canal binario asimétrico o canal Z. En la sección \ref{canalZ} se desarrolla el límite de capacidad del canal Z.
+
+ Al poder corregir errores sin discriminar el símbolo, puede decirse que todo código de corrección simétrico es también un código de corrección asimétrico.
+
+Recientemente surgió interés en campo de corrección de errores de canales asimétricos, debido a la utilidad de estos algoritmos en sistemas de almacenamiento digitales\cite{tanakamaru201195}. Sin embargo, el número de artículos publicados acerca del tema sigue siendo muy reducido en comparación con las investigaciones de códigos de corrección para canales convencionales. Como ejemplo de un códigos unidireccionales podemos citar los códigos de Berger \cite{berger1961note} y códigos de Gallager o LDPC unidireccionales \cite{neri2008gallager}.
 
 \subsection{Sistemas de comunicaciones ópticas}
 
-Existen muchos esquemas tales como EPON~\cite{kramer2002ethernet} y sus derivados APON/BPON, utilizados por millones de usuarios en la actualidad.
-Sin embargo, el sistema que mas se aproxima al descrito en esta Tesis es el SPON (Secure Passive Optical Network). Existen muchos sistemas comerciales que proveen SPONs actualmente. Sistemas académicos se basan en encriptación puramente óptica tal como la descrita en \ref{optocry} (Ver~\cite{cincotti2009secure}). Algunas implementaciones proveen la misma funcionalidad que el sistema descrito en esta Tesis, tale como~\cite{nadarajah2006implementation} aunque se diferencian en tipo de CDMA utilizado y la topología de la red óptica.
+Existen muchos esquemas tales como EPON~\cite{kramer2002ethernet} y sus derivados APON/BPON, utilizados por millones de usuarios en la actualidad \cite{chanclou2013france}.
+Sin embargo, el sistema que mas se aproxima al descrito en esta Tesis es el SPON (Secure Passive Optical Network). Existen muchos sistemas comerciales que proveen SPONs actualmente. En estos sistemas, se agrega una capa de seguridad clásica por sobre un protocolo de comunicaciones  pre-existente como G-PON (\textit{Gigabit Passive Optical Network}).
+
+Sistemas académicos se basan en encriptación puramente óptica tal como la descrita en \ref{optocry} (Ver~\cite{cincotti2009secure}). Algunas implementaciones proveen la misma funcionalidad que el sistema descrito en esta Tesis, tale como~\cite{nadarajah2006implementation} aunque se diferencian en tipo de CDMA utilizado y la topología de la red óptica.
+
+\subsection{Encriptación de comunicaciones acústicas}
+
+En general, los sistemas de seguridad aplicadas a comunicaciones acústicas han sido siempre en forma de capas adicionales de alto nivel funcionando por sobre las capas físicas. Debido al poco ancho de banda disponible en el espectro de audio (menos de 100 Khz), las comunicaciones acústicas tienen un ancho de banda reducido y es muy conveniente utilizar software para todo proceso criptográfico. Sin embargo existe ejemplos de modems acústicos comerciales capaces de encriptar su enlace \cite{arcelect}, y recientemente se han publicado esquemas en los que también se utiliza la propiedad caótica de la sensibilidad a condiciones iniciales para crear un sistema criptográfico, esta vez sobre canales acústicos \cite{gnanajeyaraman2009audio}.
