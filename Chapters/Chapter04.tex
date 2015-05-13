@@ -1,4 +1,5 @@
 \chapter{Experiencias y mediciones realizadas}
+\label{simulations}
 En este capítulo se detallan las distintas mediciones del sistema completo así como mediciones de módulos aislados. 
 En la primera parte se detallan mediciones en el simulador numérico, para después detallar mediciones en las implementaciones completas realizadas, utilizando un medio óptico y luego un medio acústico.
 \section{Implementación en software}
@@ -134,7 +135,7 @@ En la Fig.~\ref{sim:optical} se muestra el nivel de razón de extinción mínimo
 %number of on-line ONUs.
 \begin{figure}[!t]
     \centering
-      \includegraphics[angle= 270, width=3.5 in]{orte03.pdf}
+      \includegraphics[angle= 270, width=3.5 in]{graphs/orte03.pdf}
 %      \caption{Physical layer simulation result: Minimal extinction ratio required to assure a given BER}
       \caption{Resultado de simulaciones de la capa física: Nivel de razón de extinción mínimo requerido para asegurar un cierto BER}
       \label{sim:optical}
@@ -321,7 +322,7 @@ fuera del rango de operación especificado por el fabricante.
 \begin{figure}[t]
   \centering
     %\includegraphics[scale=0.70]{plot.png}
-    \includegraphics[width=3.5in,angle=270]{medicionesPaper/BER_sp_gray.pdf}
+    \includegraphics[width=3.5in,angle=270]{graphs/BER_sp_gray.pdf}
 \caption {BER vs. punto de muestreo: como es esperable, el BER aumenta al samplear los extremos del bit, donde el diagrama de ojo es mas cerrado}
 \label{fig:BERvsSamplingPoint}
 \end{figure}
@@ -331,17 +332,17 @@ fuera del rango de operación especificado por el fabricante.
 
 \begin{figure}[!t]
    \centering
-   \subfloat[Señal óptica a $4.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen3.png} }}%
+   \subfloat[Señal óptica a $4.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen3.png} }}%
    \qquad
-   \subfloat[Señal óptica a $6$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen4.png} }}%
+   \subfloat[Señal óptica a $6$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen4.png} }}%
    \qquad
-   \subfloat[Señal óptica a $7.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen5.png} }}%
+   \subfloat[Señal óptica a $7.5$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen5.png} }}%
    \qquad
-   \subfloat[Señal óptica a $9.33$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen6.png} }}%
+   \subfloat[Señal óptica a $9.33$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen6.png} }}%
    \qquad
-   \subfloat[Señal óptica a $12.44$ Gbps]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen7.png} }}%
+   \subfloat[Señal óptica a $12.44$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen7.png} }}%
    \qquad
-   \subfloat[Señal óptica a $12.44$ Gbps, transmisión 10110101010]{{\includegraphics[width=0.45 \textwidth]{medicionesPaper/screen12.png} }}%
+   \subfloat[Señal óptica a $12.44$ Gbps, transmisión 10110101010]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen12.png} }}%
   \caption {Capturas de pantalla de la medición de la señal óptica a la salida del XFP variando la tasa de transmisión de $4.5$ a $12.44$ Gbps}
   \label{fig:ImgTasa}
 \end{figure}
