@@ -22,6 +22,7 @@ Los códigos BCH y Reed-Solomon~\cite{reed1960polynomial} son usados ampliamente
 Esta familia de códigos fue introducida en 1959, pero es todavía utilizada en estándares de Ethernet de 10Gbps, 100Gbps y hasta 400Gbps~\cite{liforward} debido a su robustez, bajo retraso y la existencia de algoritmos eficientes para la decodificación en un tiempo fijo.
 
 \subsection{LDPC}
+\label{defLDPC}
 El esquema de corrección de errores LDPC~\cite{gallagerpress} (\textit{Low Density Parity Check}, también conocidos como códigos de Gallager) es un caso notable: Introducido en los años 60, fue olvidado debido a la alta capacidad de procesamiento y memoria requerido por el mismo, ya que para su implementación es necesario utilizar matrices de paridad de un tamaño elevado. Sin embargo, con los modernos avances en hardware informático, éste algoritmo se volvió una opción viable y actualmente es utilizado en sistemas modernos~\cite{brack2007low} debido a su simplicidad y gran capacidad de corrección de errores, en algunos casos muy cercana a la máxima capacidad teórica del canal.
 Antes de ahondar en la descripción de este algoritmo debemos aclarar que, a pesar de ser utilizado para ciertos modelos durante la primera fase de la investigación, fue descartado en la versión final por un modelo mas simple y con menos requerimientos de hardware que presenta una desempeño similar desde el punto de vista de corrección de errores.
 
@@ -151,6 +152,23 @@ Sin embargo para lograr esta característica es necesario compartir algún tipo 
 
 Por este motivo se decidió utilizar una codificación trivial: seleccionar el casillero de acuerdo a una secuencia criptográficamente segura estándar, totalmente independiente de los otros canales. Este método causará colisiones entre los casilleros de transmisión, que aumentan con el número de clientes activos. Sin embargo, estas colisiones pueden ser corregidas mediante codificación FEC adicional, y se logró una utilización de canal muy cercana al máximo teórico como se demuestra en la próxima sección. De echo, es en esta codificación adicional donde reside el principal aporte de esta Tesis.
 
+\section{Parámetro de seguridad}
+(De Cryptograpy by V. V. IAshchenko)\cite{primes}
+
+Para el análisis de complejidad de un sistema criptográfico se suele utilizar un parámetro variable que mide el tamaño del problema y representa a la vez los requerimientos del algoritmo criptográfico tanto como la probabilidad de un adversario de romper la seguridad en el sistema. Este es el llamado \textit{parámetro de seguridad}, que suele estar relacionado, por ejemplo, con el largo de clave.
+Este parámetro puede tomar valores arbitrariamente grandes.
+Además, la definición de seguridad depende de la tarea que el adversario trata de realizar y de la información acerca del esquema criptográfico disponible.
+Se suele especificar un valor en el cual la cantidad de cálculos necesarios por el atacante se presumen irrealizables, y en base a este valór se deberá seleccionar el parámetro de seguridad.
+Según la tesis de Cobham\cite{citeulike:6647003}, el algoritmo del atacante se considera eficiente si esta limitado en tiempo polinomial sobra la longitud de la entrada (el parámetro de seguridad en este caso). En el caso que el atacante solo pueda utilizar un algoritmo no-polinomial con respecto al parametro de seguridad del sistema, el ataque se considera inviable. Nótese que el algoritmo criptográfico en si mismo debe ser eficiente.
+
+Finalmente, se debe fijar un limite debajo del cual la probabilidad de un ataque efectivo es despreciable. El contrato criptográfico estandard trata a la probabilidad de ataque exitoso como despreciable si no excede $\frac{1}{p(n)}$  para un polinomio $p$ y el parámetro de seguridad $n$\cite{primes}.
+
+Aceptadas estas definiciones, para probar que un algoritmo criptográfico es seguro basta con probar que la imposibilidad de un algoritmo polinomial que realize la tarea del adversario.
+
+De todas maneras, el estado actual de la teoría de complejidad no permite justificar un limite inferior de un problema como super-polinomial ($P=NP?$) por lo que la mayoría de las pruebas en el mundo de la seguridad están basadas en asumpciones.
+Por lo tanto, la investigación se concentra usualmente en buscar las condiciones suficientes mas débiles (o necesarios y suficientes) para la existencia de un esquema seguro.
+Las asumpciones son usualmente generales (Basadas en la teoría de complejidad) o basadas en intratabilidad de problemas en la teoría de números, etc.
+
 \subsection{Consideraciones de seguridad y fuerza de cifrado}\label{Seguridad-fuerza}
 %% extraido de dline-pub.tex
 Existen varios aspectos de seguridad en un canal de comunicaciones: autenticación, confiabilidad, confidencialidad e integridad.
@@ -235,7 +253,7 @@ Se denominan códigos de corrección de errores asimétricos o unidireccionales,
 Recientemente surgió interés en campo de corrección de errores de canales asimétricos, debido a la utilidad de estos algoritmos en sistemas de almacenamiento digitales\cite{tanakamaru201195}. Sin embargo, el número de artículos publicados acerca del tema sigue siendo muy reducido en comparación con las investigaciones de códigos de corrección para canales convencionales. Como ejemplo de un códigos unidireccionales podemos citar los códigos de Berger \cite{berger1961note} y códigos de Gallager o LDPC unidireccionales \cite{neri2008gallager}.
 
 \subsection{Sistemas de comunicaciones ópticas}
-
+\label{defPON}
 Existen muchos esquemas tales como EPON~\cite{kramer2002ethernet} y sus derivados APON/BPON, utilizados por millones de usuarios en la actualidad \cite{chanclou2013france}.
 Sin embargo, el sistema que mas se aproxima al descrito en esta Tesis es el SPON (Secure Passive Optical Network). Existen muchos sistemas comerciales que proveen SPONs actualmente \cite{armoredshield}. En estos sistemas, se agrega una capa de seguridad clásica por sobre un protocolo de comunicaciones pre-existente como G-PON (\textit{Gigabit Passive Optical Network}).
 
