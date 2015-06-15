@@ -58,19 +58,26 @@ El módulo bfenc/bfdec realiza la codificación/decodificación por software del
 
 \subsection{Simulador de medio acústico}
 
-El medio de transmisión acústico fue simulado mediante módulos que realizan la modulación, demodulación y filtrado de la señal resultante.
-Los módulos transforman los bits de entrada en una señal de audio digital con codificación PCM (\textit{Pulse Coded Modulation}), a las cual se aplica un filtro pasa banda para simular las limitaciones de los transductores, como pueden ser los parlantes y micrófonos de un dispositivo móvil. Este módulo respeta el diseño de los anteriores, emitiendo la señal analógica como un flujo de bytes con codificación PCM vía la salida estándar del sistema. El filtro pasa-banda se codificó como un filtro digital de respuesta finita o FIR.
-Esta etapa presenta un caso especial debido a que la implementación fue tan completa, que tanto los moduladores, demoduladores y módulos de sincronización de audio pudieron ser utilizados sin modificaciones en un medio real. Para mas detalles de estos módulos, ver sección \ref{redacus}.
+El medio de transmisión acústico fue simulado adoptando un modelo físico relativamente sencillo, que solo toma en cuenta ciertas limitaciones en la respuesta en frecuencia. Para esto se crearon módulos independientes que realizan la modulación, sincronización, demodulación y filtrado de la señal resultante.
+Los módulos transforman los bits de entrada en una señal de audio digital con codificación PCM (\textit{Pulse Coded Modulation}), a las cual se aplica un filtro pasa banda para simular las limitaciones en frecuencia de los transductores, como pueden ser los parlantes y micrófonos de un dispositivo móvil. Este módulo respeta el diseño de los anteriores, emitiendo la señal analógica como un flujo de bytes con codificación PCM vía la salida estándar del sistema. El filtro pasa banda fue implementado como un filtro digital de respuesta finita o FIR.
+Este simulador utiliza algoritmos de modulación, filtros y sincronizacíon reales, por lo que muchos módulos pudieron ser utilizados sin modificaciones en un medio real. Para mas detalles de estos módulos, ver sección \ref{redacus}.
 
 \subsection{Simulador de ruido óptico}
 %% de orte.text
 
-El bloque de simulación del canal óptico provee una estimación del BER propio de la fibra óptica del sistema. Los pasos de la simulación son los siguientes:
+El modelo de simulación del canal óptico toma en cuenta tanto efectos lineales como no-lineales en la fibra óptica. Los pasos de la simulación son los siguientes:
 
-El tráfico RZ upstream proveniente de todas las ONUs se asume que alcanza al divisor de $128\times1$ con perfecta Sincronización de bit, o sea, sin fluctuaciones (timing jitter).
-Los slots correspondientes al bit `0' contienen una pequeña intensidad óptica de CW dada por el razón de extinción de Tx.
-Cada ONU on-line en el sistema agrega su propia intensidad de bit `0', incrementando la potencia base total.
-Se asume que cada bit `1' agrega un pulso super-Gaussiano ($m=4$) al nivel de potencia base, con un ciclo de trabajo (duty cycle) de $1/3$.
+Se asume que el tráfico proveniente de todas las ONUs alcanza al divisor de $128\times1$ con perfecta sincronización de bit, o sea, sin fluctuaciones o \textit{jitter}.
+Los slots correspondientes al bit `0' contienen una pequeña intensidad óptica de CW (\textit{Continous Wave, potencia siempre presente en el Laser}) dada por el razón de extinción de Tx.
+Debido a esta potencia óptica siempre presente, cada ONU agregado al sistema agrega una pequeña intensidad de bit `0', incrementando la potencia base total (ver figura \ref{sim:extinction}).
+Para la simulación se asume que cada bit `1' agrega un pulso super-Gaussiano ($m=4$) al nivel de potencia base, con un ciclo de trabajo (duty cycle) de $1/3$, una aproximación razonable a los parámetros utilizados por el transceptor de gigabit utilizado.
+
+\begin{figure}[!t]
+    \centering
+      \includegraphics[width=3.5 in]{graphs/extinction.pdf}
+      \caption{Diagrama de un bit ideal. Observar que la potencia del nivel del cero no equivale a potencia cero, sino a $P_0$, que se define como $P_0=Ponu*N$ donde N es la cantidad ONUs activas.}
+      \label{sim:extinction}
+\end{figure}
 
 %The physical optical channel simulation block provides an estimate of
 %the BER performance of the optical channel. Simulation steps are as
@@ -83,7 +90,7 @@ Se asume que cada bit `1' agrega un pulso super-Gaussiano ($m=4$) al nivel de po
 %Each `1'-bit adds a super-Gaussian ($m=4$) pulse, duty cycle $1/3$, to the base power level. %, with rising edge at slot start and peak amplitude accordingly to Tx optical mean output power.
 % As many bit `1' intensities are added to base level as active Tx there are at each simulation bit slot.
 
-Tanto el tráfico saliente como el entrante sufren atenuaciones debidas a múltiples factores que incluyen pérdidas en el divisor, fibra y empalme (Splice). El presupuesto de potencia (Power budget) se balancea mediante un EDFA con una ganancia constante de $27$~dB. La emisión espontánea amplificada del EDFA es modelada como ruido blanco gaussiano, con una intensidad proporcional a la figura de ruido del amplificador ($7$~dB), y es agregada luego del EDFA.
+Tanto el tráfico saliente como el entrante sufren atenuaciones debido a múltiples factores que incluyen pérdidas en el divisor, fibra y empalme (\textit{splice}). El presupuesto de potencia (\textit{power budget}) se balancea mediante un EDFA (\textit{erbium-dopped fibre amplifier}) con una ganancia constante de $27$~dB, valór calculado como el necesario para contrarrestar las pérdidas totales sobre un enlace de 10Km. Un factor en el incremento del BER sobre enlaces ópticos es  la emisión espontánea amplificada del amplificador EDFA. Este parámetro es modelado como ruido blanco gaussiano, con una intensidad proporcional a la figura de ruido del amplificador ($7$~dB), y es agregada luego del modelado del EDFA.
 
 %Upstream and downstream merged traffic suffers from attenuation due to
 %splitter, fiber, and
@@ -106,8 +113,8 @@ Tanto el tráfico saliente como el entrante sufren atenuaciones debidas a múlti
 %amounting to a $27.5\,dB$ attenuation; so for one active Tx input power at each
 %Rx would be $-27\,dBm$.
 
-La señal de entrada óptica al receptor es filtrada (con un filtro Butterworth de 2do orden y $25$~GHz de ancho de banda) y foto-detectada asumiendo la respuesta de un dispositivo PD estándar (Ver sección 4.4.3 de ~\cite{Agrawal:xx}).
-Posteriormente, ruido blanco gaussiano es agregado, para representar el ruido térmico y ruido de disparo o ruido shot, y un nuevo filtro eléctrico es aplicado (en este caso es un filtro Butterworth de 2do orden y $14$~GHz de ancho de banda). [Victor, TODO: Porque?]
+La señal de entrada óptica al receptor es filtrada con un filtro Butterworth de segundo orden y $25$~GHz de ancho de banda, para luego simular su deteccion asumiendo la respuesta de un dispositivo PD (\textit{photodiode}) estándar (ver sección 4.4.3 de ~\cite{Agrawal:xx}).
+Finalmente, para simular el ruido térmico y ruido de disparo o \textit{shot}, se agrega un componente de ruido blanco gaussiano.
 
 %The input optical signal at the receiver is filtered (2nd order low-pass Butterworth filter, $25$~GHz bandwidth) and photodetected assuming a standard PD responsivity (see section 4.4.3 of~\cite{Agrawal:xx}).
 %White Gaussian noise accounting for thermal and shot noise is then added
@@ -138,14 +145,15 @@ optical channel simulation output.
 
 
 \section{Redes ópticas}
-La implementación del sistema sobre redes ópticas fue el objetivo principal de la investigación, y solo luego de obtener resultados en este medio se pasó al medio acústico.
-La simulación tuvo un papel muy importante en el desarrollo y pruebas del algoritmo en este medio, ya que las elevadas velocidades de transmisión mínimas del transceptor óptico hace practicamente imposible mediciones directas mas alla de la extracción de valores simples como el ancho de bit y el radio de extinción.
+La implementación del sistema sobre redes ópticas fue el objetivo principal de la investigación.
+La simulación tuvo un papel muy importante en el desarrollo y pruebas del algoritmo en este medio debido a las elevadas tasas de transmisión involucradas (el transceptor utilizado puede utilizarse a un mínimo de 1 Gbps y máximo de 9.33 Gbps), valores que prohiben las mediciones directas por medio de un osciloscopio u herramientas similares. Sin embargo ciertos valores tales como el ancho de bit y radio de extinción pueden obtenerse mediante observación directa del diagrama de ojo de la señal.
+
 \subsection{Simulaciones numéricas}
 
-Las fluctuaciones a niveles de potencia cercanos al límite de sensibilidad del dispositivo PD tienen un importante efecto en la detección de la señal.
+Podemos citar dos resultados importantes obtenidos mediante las simulaciones numéricas. 
+En el primero, detallado en la Fig.~\ref{sim:optical}, se muestra que nivel de razón de extinción mínimo requerido para lograr un BER arbitrario es directamente proporcional al número de ONUs presentes on-line.
+Podemos deducir de este gráfico que mientras mas ONUs utilizen el sistema, se necesitaran Lasers con un radio de extinción mas elevado. Además, con una mayor cantidad de ONUs, se incrementa el BER por problemas físicos: Las fluctuaciones a niveles de potencia cercanos al límite de sensibilidad del dispositivo PD tienen un importante efecto en la detección de la señal.
 El ruido de shot es particularmente preocupante ya que es proporcional al la fotocorriente media. En nuestra propuesta, este ruido es mas alto que en PONs comunes ya que la intensidad del bit `0' de todas las ONUs presentes contribuyen al mismo.
-La intensidad resultante de la potencia de base óptica es por lo tanto altamente dependiente del razón de extinción de Tx.
-En la Fig.~\ref{sim:optical} se muestra el nivel de razón de extinción mínimo requerido para lograr un BER arbitrario en la capa física como una función del número de ONUs presentes on-line.
 %Noise fluctuations at power levels near the PD sensitivity limit have an important effect on signal detection. 
 %Detection being made at power levels near PD sensitivity is highly sensitive to changes in noise.
 %Shot noise is of particular concern as it is proportional to the mean photocurrent.
@@ -159,10 +167,10 @@ En la Fig.~\ref{sim:optical} se muestra el nivel de razón de extinción mínimo
     \centering
       \includegraphics[angle= 270, width=3.5 in]{graphs/orte03.pdf}
 %      \caption{Physical layer simulation result: Minimal extinction ratio required to assure a given BER}
-      \caption{Resultado de simulaciones de la capa física: Nivel de razón de extinción mínimo requerido para asegurar un cierto BER}
+      \caption{Resultado de simulaciones de la capa física: razón de extinción mínimo requerido para asegurar un cierto BER.}
       \label{sim:optical}
 \end{figure}
-En el escenario de $128$ ONUs presentes, un BER de $<10^{-3}$ puede ser logrado utilizando transmisores del tipo comercial con un razón de extinción de $\simeq16.6$~dB.
+En el escenario de $128$ ONUs presentes, un BER menor a 10e-3 puede ser logrado utilizando transmisores del tipo comercial con un razón de extinción de $\simeq16.6$~dB.
 Este BER es lo suficientemente bajo para permitir rutinas de corrección de errores al nivel del canal lógico, que garanticen la transmisión libre de errores realizando una utilización acotada de la capacidad total del canal.
 %In the $128$ ONUs scenario a  BER$<10^{-3}$ can be achieved using
 %commercially available transmitters with an extinction ratio $\simeq16.6$~dB.
@@ -187,16 +195,16 @@ Este BER es lo suficientemente bajo para permitir rutinas de corrección de erro
 \begin{figure}[t]
   \centering
   \includegraphics[width=4in]{graphs/BER-tesis.pdf} 
-  \caption{BER del canal de 10 Gbps vs la cantidad de ONUs activos.}
+  \caption{BER del canal de un ONU a 10 Gbps Vs. la cantidad de ONUs activos.}
   \label{sim:access}
 \end{figure}
 aaaa
 
-La Fig.~\ref{sim:access} muestra los resultados de la simulación del canal, comparando el BER medido en un solo canal, con respecto la número total de ONUs on-line. Se observan tres mediciones, las dos primeras comparando la diferencia en performance al utiliza símbolos de 8 bits contra símbolos de 16 bits, y la tercera para apreciar la diferencia en el resultado al agregar el ruido óptico dentro de la simulación.
-Los resultados fueron obtenidos enviando un gigabit de datos por cada ONU simultáneamente. El mismo método se utilizó para realizar las simulaciones reflejadas en la Fig.~\ref{BERvsExpansion}, pero en ese caso modificando los parámetros para apreciar la mejora al utilizar el algoritmo de reducción de peso de Hamming.
-Puede apreciarse que cuando la cantidad de ONUs supera los 128, el BER se eleva marcadamente.
-De la misma figura podemos observar una penalización de $8$ ONUs cuando el ruido de la capa óptica es tomado en cuenta (Mayormente la razón de extinción y el ruido producido por el EDFA y los PDs).
-Considerando que el sistema fue diseñado para soportar comunicaciones asincrónicas (Ej. Ethernet), no es probable que en el uso normal todas las ONUs transmitan simultáneamente; por lo tanto este sistema tiene un BER de $<10^{-8}$ para cada canal cuando 119 ONUs estan transmitiendo al mismo tiempo lo que supone una carga máxima del $90\%$ ($119/128>0.9$). 
+La Fig.~\ref{sim:access} muestra los resultados de la simulación del canal, comparando el BER de un ONU con respecto la número total de ONUs activos. Las dos primeras mediciones muestran la diferencia en rendimiento al utilizar símbolos de 8 bits contra símbolos de 16 bits, y la tercera para apreciar la diferencia en el resultado al agregar el ruido óptico dentro de la simulación.
+Los resultados fueron obtenidos enviando un gigabit de datos por cada ONU simultáneamente. El mismo método se utilizó para realizar las simulaciones cuyo resultados se presentan en la Fig.~\ref{BERvsExpansion}, donde se aprecia una mejora de rendimiento importante al utilizar el algoritmo de reducción de peso de Hamming.
+Volviendo a la Fig.~\ref{sim:access}, puede verse que cuando la cantidad de ONUs supera los 128, el BER se eleva marcadamente.
+De la misma figura podemos observar una disminución de la capacidad en aproximadamente $8$ ONUs cuando el ruido de la capa óptica es agregado a la simulación, debido a la razón de extinción y el ruido producido por el EDFA y los PDs.
+Finalmente, la carga máxima que soporta el sistema con un BER máximo de 10e-8 es del $90\%$, lo que significa que en una red de 128 clientes, es posible que 119 ONUs esten transmitiendo al mismo tiempo.
 
 
 %Fig.~\ref{sim:access} shows simulation results for the fraction of the total
@@ -242,49 +250,46 @@ Considerando que el sistema fue diseñado para soportar comunicaciones asincrón
 El estudio de PONs plantea el desafío de generar, transmitir y recibir
 señales de 10 Gbps en el laboratorio. El costo de estos sistemas
 suele ser muy elevado. En este trabajo proponemos una alternativa de muy
-bajo costo basada en la generación y trasmisión de señales en FPGAs.
+bajo costo basada en la generación y trasmisión de señales utilizando dispositivos del tipo FPGA.
 
-\subsection{Arquitectura alto-nivel de la FPGA Xilinx ML507}
-El equipamiento consta de un kit de desarrollo ML-507 de Xilinx y un
+\subsection{Arquitectura alto nivel de la FPGA Xilinx ML507}
+El equipamiento se compone de un kit de desarrollo ML-507 de Xilinx \cite{virtex5fpga} y un
 transceptor SFP+ con varios emisores Láser XFP de 1330 nm y 1550 nm, con capacidad de hasta 10 Gbps
-en modulación NRZ y alcance de 10km en fibra monomodo. Para realizar
-las mediciones presentadas en este trabajo se utilizaron dos dispositivos:
+en modulación NRZ y alcance de 10km en fibra monomodo \cite{virtex5fpgaRIO}. Para realizar
+las mediciones presentadas en este trabajo se utilizaron dos herramientas de medición:
 \begin{itemize}
- \item {\em Integrated Bit Error Rate Tester} (iBERT) \cite{4gtxs}: Es
-un medidor de tasa de error que utiliza un analizador lógico embebido dentro
-del mismo diseño de la FPGA, con interfaz para la herramienta de
-verificación y depuración ChipScope. Mediante este agregado, que debe
-ser sintetizado dentro del diseño, es posible medir en tiempo real
-varios parámetros del transceptor asi como realizar estadísticas y
-mediciones de error, variando tasas y características de la transmisión
-en tiempo real.
  \item Osciloscopio Óptico Agilent 86100A con módulo óptico 86105A: Para
 realizar las mediciones físicas contamos con este equipo que posee un
-ancho de banda de 20 Ghz en potencia óptica, suficiente para capturar en
+ancho de banda óptico 20 Ghz, suficiente para capturar en
 tiempo real los bits individuales o realizar un diagrama de ojo.
+\item {\em Integrated Bit Error Rate Tester} (iBERT) \cite{4gtxs}: Este dispositivo es un medidor de tasa de error con interfaz para la herramienta de
+verificación y depuración ChipScope \cite{arshak2006testing}. Esta herramienta puede denominarse ``virtual'' ya que consiste íntegramente en nucleos IP (\textit{intellectual preperty}) púramente lógicos, que deben ser sintetizados y embebidos junto con el diseño dentro de la FPGA.
+Con iBERT es posible medir en tiempo real varios parámetros del transceptor asi como realizar estadísticas y mediciones de error, variando tasas y características de la transmisión en tiempo real.
+ 
 \end{itemize}
-\subsection{Transmisión a multi-gigabit}
-La plataforma de FPGA de Xilinx no fue seleccionada solamente porque la lógica programable es necesaria para la transmisión a altas velocidades, sino por la cuestión práctica de que los vendedores de FPGAs suelen incluir transceptores de multi-gigabit en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos, asi como las interfaces para conectar las salidas directamente a las entradas de transceptores ópticos como uno o mas XFPs \cite{ug198}.
-Es normal que los transceptores de multi-gigabit puedan ser utilizados con otros medios, por ejemplo sobre cables trenzados de cobre o lineas de transmisión de alta velocidad sobre PCBs. Serial-ATA y PCI-Express son buses de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Estos medios de transmisión eléctricos no fueron considerados debido a las distancias muy limitadas entre los nodos, por lo que la implementación de alta velocidad con la FPGA fue puramente sobre fibras ópticas.
+\subsection{Transmisión a multi gigabit}
+La plataforma de FPGA de Xilinx no fue seleccionada solamente porque la lógica programable es necesaria para la transmisión a altas velocidades, sino por la versatilidad y velocidad de los transceptores de multi gigabit incluidos en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos, asi como las interfaces para conectar las salidas directamente a las entradas de transceptores ópticos, como uno o más XFPs \cite{ug198}.
+
+Los transceptores de multi gigabit estan preparados para operar sobre diversos medios físicos, como por ejemplo sobre cables trenzados de cobre o líneas de transmisión de alta velocidad sobre PCBs (\textit{printed circuit boards}). Serial-ATA y PCI-Express son protocolos de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Sin embargo, en redes de comunicaciones PON se requieren alcances del orden de Kms, que solo pueden ser alcanzado mediante fibras ópticas.
 
 \subsection{Diseño del sistema propuesto}
 En la Fig.~\ref{fig:fpgadesign} puede observarse el diseño propuesto en el cual se implementó y probó exitosamente el algoritmo transmitiendo a tasas de 5 Gigabits mediante una fibra óptica.
-El echo que el algoritmo pueda transmitir a altas velocidades se da gracias a ciertas características del diseño que serán descritas a continuación.
+Estas velocidades fueron logradas gracias a ciertas características del diseño que serán descritas a continuación.
 
-A nivel de diseño digital, el sistema puede verse como 4 módulos separados:
+A nivel de diseño digital, el sistema puede separarse en 4 módulos:
 
 \begin{description}
- \item[transceptor de gigabit:] esto es un hardware provisto por la FPGA que puede verse como un serializador/deserializador pero contiene mas de 15 subsistemas incluyendo buffers, PLLs, codificadores y decodificadores. Asi mismo el transceptor posee herramientas para sincronización y depuración, permitiendo realizar mediciones y crear loopbacks en 3 puntos diferentes del flujo de datos para detectar anomalías. Se conecta a la lógica programable de la FPGA por medio de mas de 200 señales de control y transferencia de datos, cuyas funciones son encapsuladas por un módulo especial de lógica que simplifica la interfaz con el resto del sistema. Esta lógica de interfaz se implementó como un módulo de Verilog, llamado ``v5\_gtxwizard\_v1\_7\_tile.v''. Debido a la alta cantidad de opciones y señales disponibles, así también como las distintas configuraciones posibles, este módulo fue generado a partir de una plantilla, que es generada a su vez con una herramienta provista por Xilinx.
+ \item[Transceptor de gigabit:] este componente de hardware es provisto por la FPGA. Puede verse como un serializador/deserializador pero contiene mas de 15 subsistemas incluyendo buffers, PLLs (\textit{phase-locked loop}), codificadores y decodificadores. Adicionalmente, el transceptor posee herramientas para sincronización y depuración, permitiendo realizar mediciones y crear lazos de realimentación o \textit{loopbacks} en 3 puntos diferentes del flujo de datos para detectar anomalías. Se conecta a la lógica programable de la FPGA por medio de más de 200 señales de control y transferencia de datos, cuyas funciones son encapsuladas por un módulo especial de lógica que simplifica la interfaz con el resto del sistema. Esta lógica de interfaz se implementó como un módulo de Verilog, llamado ``v5\_gtxwizard\_v1\_7\_tile.v'' en el árbol de código fuente.
 
- \item[Generador de frame:] Este módulo se encarga de codificar los datos a transmitir y enviarlos por el transceptor de gigabit. Contiene implementaciones de las etapas necesarias, como el codificador de RC4, Bloomfilter encriptado y expansión de peso de Hamming, así también como del sistema de sincronización de frame. La estructura interna es la de una máquina de estados finita, por lo que no requiere de CPU ni de software, estando implementada íntegramente en lógica digital. Se implementó en un solo módulo de Verilog llamado ``frame\_gen.v''. Exporta múltiples señales de control y depuración al módulo de control.
+ \item[Generador de frame:] este módulo se encarga de codificar los datos a transmitir y enviarlos por el transceptor de gigabit. Contiene implementaciones de las etapas necesarias, tales como el codificador de RC4, Bloomfilter encriptado y expansión de peso de Hamming, así también como del sistema de sincronización de frame. La estructura interna es la de una máquina de estados finita, estando implementada íntegramente en lógica digital (sin utilizar ningún componente de software). Se implementó en un solo módulo de Verilog llamado ``frame\_gen.v''.
  
- \item[Decodificador de frame:] La contrapartida del generador del frame es el decodificador, que posee los decodificadores correspondientes tales como Reed-Solomon, RC4, Bloomfilter y expansión de peso de Hamming, así también como el sincronizador de frame y word, que utiliza parcialmente el hardware de sincronización del transceptor de gigabit para sincronizar a nivel de byte, sumado a una sincronización propia para lograr la sincronización a nivel de double-word y finalmente, sincronización de frame. La implementación también consiste de una sola maquina de estados finitos sin CPU o software de ningún tipo.Se implementó en un solo módulo de Verilog llamado ``frame\_dec.v''. Adicionalmente un contador de BER se implementó en esta fase, dado que los datos enviados son un patrón de prueba y es posible medir la tasa de errores de manera simple. Las estadísticas de errores son exportadas mediante señales conectadas al módulo de control.
+ \item[Decodificador de frame:] La contrapartida del generador del frame es el decodificador, que posee los decodificadores correspondientes tales como Reed-Solomon, RC4, Bloomfilter y expansión de peso de Hamming, así también como el sincronizador de frame y word, que utiliza parcialmente el hardware de sincronización del transceptor de gigabit para sincronizar a nivel de byte, sumado a una sincronización propia para lograr la sincronización a nivel de double-word y finalmente, sincronización de frame (ver sección \ref{fpga:sync}). La implementación también consiste de una sola maquina de estados finitos sin utilizar software de ningún tipo. Se implementó en un solo módulo de Verilog llamado ``frame\_dec.v''. Adicionalmente, un contador de BER se implementó en esta fase, dado que los datos enviados son un patrón de prueba y es posible medir la tasa de errores de manera simple. Las estadísticas de errores son exportadas mediante señales conectadas al módulo de control.
  
- \item[Módulo de control:] Este módulo cumple la función de interfaz entre el sistema y el usuario, permitiendo modificar y estudiar parámetros de manera sencilla, asi también como presentar las estadísticas de una manera rápida. Utiliza una interfaz serial del tipo RS232 mediante la que el operador puede realizar acciones y leer valores del sistema. Para su implementación se utilizo un CPU del tipo Xilinx Microblaze \cite{Xilinx:DS865}, y un programa en lenguaje C encargado de imprimir los menús de control y enviar y recibir datos hacia los módulos generadores y decodificadores de frame. Las operaciones se realizan de manera asincrónica por lo que la velocidad del CPU puede ser mínima. Es necesaria cierta ``glue logic'' o lógica de pegamento entre las señales que exportan los demás módulos y el bus de tipo FSL que utiliza el CPU Microblaze. Esto se implementa en el módulo ``copro1.v'' que tambien es el módulo principal del diseño, interconectando las señales de todos los sub-módulos.
+ \item[Módulo de control:] este módulo cumple la función de interfaz entre el sistema y el usuario, permitiendo modificar parámetros de manera sencilla, así también como presentar las estadísticas de una manera rápida. Se presenta como un sistema de menús en modo texto, mediante los cuales el operador puede ejecutar comandos y leer valores del sistema. La comunicación con el usuario se realiza a través de una interfaz serial del tipo RS232. Para su implementación se utilizo un CPU del tipo Xilinx Microblaze \cite{Xilinx:DS865}, y un programa en lenguaje C encargado de imprimir los menús de control y enviar y recibir datos hacia los módulos generadores y decodificadores de frame. Las operaciones se realizan de manera asincrónica con el resto del hardware, por lo que la velocidad de reloj del CPU puede ser muy reducida. Este módulo se implementa en el archivo ``copro1.v'' que también es el módulo principal del diseño, interconectando las señales de todos los sub módulos de generación y decodificación de frames.
 \end{description}
 
-El sistema utiliza buffers tanto de lectura como de escritura al transceptor, por lo que puede operar a velocidades mucho menores que este. Por ejemplo, si el transceptor de gigabit posee un ancho máximo de bus TXDATAWIDTH y la velocidad de transferencia es TXCLOCK, la velocidad de reloj DATACLOCK necesaria para mantener los buffers internos del transceptor llenos es simplemente $DATACLOCK=TXCLOCK/TXDATAWIDTH$, por lo que transmitiendo a 5 Gigabits por segundo utilizando el máximo TXDATAWIDTH de 32 bits, tenemos que $DATACLOCK=156Mhz$ un valor alcanzable para la FPGA utilizada y fácilmente implementable en un ASIC.
-La velocidad de las implementaciones de generador CSPRNG RC4 y el codificador/decodificador de Reed-Solomon son críticas para la performance del sistema ya que el resto de las etapas no introducen mayores retrasos. Para el algoritmo Reed-Solomon se utilizo un IP de la biblioteca de Xilinx que tiene una performance óptima, mientras que el algoritmo ARC4 fue implementado en Verilog poniendo especial énfasis en la performance, logrando un flujo de 1-byte pseudoaleatorio por cada ciclo de reloj.
+El sistema utiliza buffers tanto de lectura como de escritura al transceptor, por lo que puede operar a velocidades mucho menores que este. Por ejemplo, si el transceptor de gigabit posee un ancho máximo de bus TXDATAWIDTH y la velocidad de transferencia es TXCLOCK, la velocidad de reloj DATACLOCK necesaria para mantener los buffers internos del transceptor llenos es simplemente $DATACLOCK=TXCLOCK/TXDATAWIDTH$, por lo que transmitiendo a 5 Gbps utilizando el máximo TXDATAWIDTH de 32 bits, tenemos que $DATACLOCK=156Mhz$ un valor alcanzable para la FPGA utilizada y fácilmente implementable en una futura implementación en un ASIC (\textit{application-specific integrated circuit}).
+La velocidad de las implementaciones de generador CSPRNG RC4 y el codificador/decodificador de Reed-Solomon son críticas para la performance del sistema ya que el resto de las etapas no introducen mayores retrasos. El algoritmo ARC4 fue implementado en Verilog poniendo especial énfasis en la performance, logrando un flujo de 1-byte pseudoaleatorio por cada ciclo de reloj. Para el algoritmo Reed-Solomon se utilizo un IP de la biblioteca de Xilinx que tiene una performance óptima. Exceptuando este último algoritmo, todo el resto del sistema fue implementado desde cero para esta Tesis.
 
 \begin{figure}[t]
   \centering
@@ -411,7 +416,7 @@ Efectivamente el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido d
 Este desbalanceo se soluciona simplemente aplicando las codificaciones de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de Bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva es utilizar un hardware donde la señal no necesite balancearse, pero mientras tanto se opto por la siguiente solución para poder utilizar la placa ML507 y poder realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal pseudoaleatoria superpuesta con una señal 8b/10b, por lo que la señal esta balanceada y es transmitida y recibida correctamente. Son los demás clientes los que transmiten una señal desbalanceada con muy pocos unos, causando solamente interferencias. La señal de estos clientes no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente que esta balanceado, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps) mientras que solo uno de los clientes pueda comunicarse y los demás actúen efectivamente solo como ruido.
 
 \subsection{Sincronización a nivel de bit, word y frame}
-
+\label{fpga:sync}
 \begin{figure}[t]
   \centering
     \includegraphics[width=6in]{graphs/optsync.pdf}
