@@ -611,7 +611,7 @@ En las próximas secciones se describe el sistema en mayor detalle.
 
 A diferencia de la implementación óptica donde se utilizaron algunas funciones provistas por el hardware de FPGA, tales como el mecanismo de sincronización de bit, para la transmisión acústica se implementaron tanto el algoritmo de modulación como el de sincronización totalmente en software.
 Para la modulación, fue utilizado el algoritmo de On-Off Keying (ver Fig. \ref{arch:ook}), que codifica los bits a transmitir como pulsos. La frecuencia de portadora puede variar de 10 kHz a 16 kHz, y la tasa de transmisión se fijo a 1000 bps. Notar la baja velocidad de este canal, que introduce un problema inexistente en la implementación óptica: el retraso de la red (el tiempo que tarda un bit en atravesar toda la red) es alto, debido principalmente a la etapa de Reed-Solomon que necesita recibir 256 bytes para poder empezar a decodificar un frame. Este problema se ve potenciado por el echo de que el canal soporta una velocidad máxima de 1000 bps, elevando el retraso a niveles inaceptables, del orden de los 30 segundos.
-Una selección mas apropiada del algoritmo de FEC (tal como BCH \cite{Moon:05}) podría reducir reducir el retraso total del sistema.
+Una selección mas apropiada del algoritmo de FEC (tal como BCH) podría reducir reducir el retraso total del sistema.
 Adicionalmente, una etapa de \textit{pulse shaping} o formación de pulso se agrega utilizando un filtro pasa-banda a la salida de la modulación y también en la entrada del demodulador. Este filtro ayuda a rechazar interferencia acústica o ruido ambiente.
 
 \begin{figure}[t]

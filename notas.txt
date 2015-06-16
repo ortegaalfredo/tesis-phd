@@ -4,3 +4,10 @@ Agregar optimizaciones LDPC y mover cosas especificas a apendices
 Agregar citas a calculos de entropia y minimizar la explicacion
 Agregar bloque de expansion de simbolo, al lado de bloomfilter
 Mover simulaciones a 3.7.1 y 3.7.2, o sea en la parte especifica para cada medio optico o acustico
+
+Consultas a diego jun 2015:
+
+"1s" "unos" "bits en unos"
+
+
+

@@ -252,11 +252,15 @@ señales de 10 Gbps en el laboratorio. El costo de estos sistemas
 suele ser muy elevado. En este trabajo proponemos una alternativa de muy
 bajo costo basada en la generación y trasmisión de señales utilizando dispositivos del tipo FPGA.
 
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=6in]{graphs/ml507.jpg}
+\caption {Placa de desarrollo ML570 de Xilinx. Los conectores utilizados son: 1: SFP+, 2: JTAG, 3: alimentación +5V, 4: Switch on/off, 5: Interfaz serial RS232, 6: Salida de reloj.}
+\label{fig:fpga}
+\end{figure}
+
 \subsection{Arquitectura alto nivel de la FPGA Xilinx ML507}
-El equipamiento se compone de un kit de desarrollo ML-507 de Xilinx \cite{virtex5fpga} y un
-transceptor SFP+ con varios emisores Láser XFP de 1330 nm y 1550 nm, con capacidad de hasta 10 Gbps
-en modulación NRZ y alcance de 10km en fibra monomodo \cite{virtex5fpgaRIO}. Para realizar
-las mediciones presentadas en este trabajo se utilizaron dos herramientas de medición:
+El equipamiento se compone de un kit de desarrollo ML-507 de Xilinx \cite{virtex5fpga} (ver figura \ref{fig:fpga}) y un transceptor óptico con varios emisores Láser con longitudes de onda de 1330 nm y 1550 nm, ambos con capacidad de hasta 10 Gbps en modulación NRZ y alcance de 10km en fibra monomodo \cite{virtex5fpgaRIO}. Para realizar las mediciones presentadas en este trabajo se utilizaron dos herramientas de medición:
 \begin{itemize}
  \item Osciloscopio Óptico Agilent 86100A con módulo óptico 86105A: Para
 realizar las mediciones físicas contamos con este equipo que posee un
@@ -268,9 +272,9 @@ Con iBERT es posible medir en tiempo real varios parámetros del transceptor asi
  
 \end{itemize}
 \subsection{Transmisión a multi gigabit}
-La plataforma de FPGA de Xilinx no fue seleccionada solamente porque la lógica programable es necesaria para la transmisión a altas velocidades, sino por la versatilidad y velocidad de los transceptores de multi gigabit incluidos en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos, asi como las interfaces para conectar las salidas directamente a las entradas de transceptores ópticos, como uno o más XFPs \cite{ug198}.
+La plataforma de FPGA de Xilinx no fue seleccionada solamente porque la lógica programable es necesaria para la transmisión a altas velocidades, sino por la versatilidad y velocidad de los transceptores de multi gigabit incluidos en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos, asi como las interfaces para conectar las salidas directamente a las entradas de transceptores ópticos, como uno o más SFPs \cite{ug198} (ver figura \ref{fig:fpga}, punto 1).
 
-Los transceptores de multi gigabit estan preparados para operar sobre diversos medios físicos, como por ejemplo sobre cables trenzados de cobre o líneas de transmisión de alta velocidad sobre PCBs (\textit{printed circuit boards}). Serial-ATA y PCI-Express son protocolos de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Sin embargo, en redes de comunicaciones PON se requieren alcances del orden de Kms, que solo pueden ser alcanzado mediante fibras ópticas.
+Los transceptores de multi gigabit estan preparados para operar sobre diversos medios físicos, como por ejemplo sobre cables trenzados de cobre o líneas de transmisión de alta velocidad sobre PCBs (\textit{printed circuit boards}). Serial-ATA y PCI-Express son protocolos de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Sin embargo, en redes de comunicaciones PON se requieren alcances del orden de Kms, que solo pueden ser alcanzado mediante fibras ópticas.  El transceptor posee la capacidad de realizar una codificación 8B/10B \cite{widmer1983dc} adicional con el objetivo de mantener el balance de DC (\textit{direct current}), pero este módulo fue desactivado ya que interfiere con los demás codificaciones.
 
 \subsection{Diseño del sistema propuesto}
 En la Fig.~\ref{fig:fpgadesign} puede observarse el diseño propuesto en el cual se implementó y probó exitosamente el algoritmo transmitiendo a tasas de 5 Gigabits mediante una fibra óptica.
@@ -301,17 +305,32 @@ La velocidad de las implementaciones de generador CSPRNG RC4 y el codificador/de
 % de confEUA.tex
 
 \subsection{Transmisión a 9 Gbps con SFP+}
-El montaje para la experiencia se realizó conectando el transceptor SFP+
+
+\begin{figure}[!t]
+   \centering
+   \subfloat[Tasa de $4.5$ Gbps, 50ns por división.]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/eye45G.png} }}%
+   \qquad
+   \subfloat[Tasa de $7.5$ Gbps, 20ns por división.]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/eye71G.png} }}%
+   \qquad
+  \caption {Diagramas de ojo de la señal óptica a la salida de la fibra. Se aprecia una degradación importante de la calidad de la señal al aumentar la tasa de bits.}
+  \label{fig:ImgOjo}
+\end{figure}
+
+
+La norma SFP+ \cite{sff4sff} (\textit{enhanced small form-factor pluggable}) especifica las dimensiones físicas y conectores eléctricos del transceptor electro-óptico. Permite velocidades de hasta 16 Gbit/s, y es el formato de transceptor utilizado en la mayoría de los kits de desarrollo de FPGA comerciales actuales.
+El transceptor SFP+ consta básicamente de un emisor Láser, un detector y circutos ser-des (serializadores/des-serializadores).
+El montaje para la experiencia se realizó conectando un transceptor SFP+ (ver figura \ref{fig:fpga}, punto 1) con un Láser de 1550 nm 
 al conector correspondiente en la placa de desarrollo ML-507 y un bucle de
 fibra óptica ({\em loopback}), con el objetivo de realizar las
-mediciones de BER. Luego, para realizar las mediciones con el
-osciloscopio, se debe conectar el extremo de recepción de la fibra
-óptica al osciloscopio. En este caso generamos el disparo del
-osciloscopio mediante la señal de reloj del sistema (placa ML-507) que
-se obtiene a través de los conectores SMA J12 y J13 (si bien es
-diferencial sólo utilizamos uno de ellos).  Para la depuración y
-configuración se utilizó la interfaz JTAG USB de Xilinx ``Platform Cable
-USB II''.
+mediciones de BER. Luego, para realizar las mediciones, se debe conectar el extremo de recepción de la fibra a la entrada óptica del osciloscopio. En este caso, generamos el disparo del
+osciloscopio mediante la señal eléctrica de reloj del sistema que
+se obtiene a través de los conectores SMA J12 y J13 (ver figura \ref{fig:fpga}, punto 6).  
+Al disparar el osciloscopio con la señal de reloj sincronizada con la señal de salida, podemos obtener el diagrama de ojo de la señal (ver figura \ref{fig:ImgOjo}).
+
+Para la depuración y configuración se utilizó la interfaz JTAG USB de Xilinx ``Platform Cable
+USB II'' \cite{XilJtag} (ver figura \ref{fig:fpga}, punto 2).
+
+
 \subsection{Configuración del reloj del transceptor}
 
 La tasa de transmisión del transceptor GTX está dada por la
@@ -319,7 +338,7 @@ frecuencia de reloj de entrada $F_{PLL\_Clock}$, donde se transmite un
 bit por cada semiciclo (la modulación es NRZ); entonces la tasa de
 transmisión será
 $R_{line}\mbox{[bps]}=F_{PLL\_Clock}\mbox{[1/s]} \times 2$.  La
-frecuencia del reloj de entrada del PLL está gobernada por la ecuación
+frecuencia del reloj de entrada del PLL está especificada por la ecuación
 5-1 \cite[Pag. 88]{ug198}, que reproducimos a continuación:
 
 \begin{equation}
@@ -330,18 +349,13 @@ DIV}{PLL\_DIVSEL\_REF}% \enspace
 donde las constantes $PLL\_DIVSEL\_REF = \{1;2\}$, $DIV = \{4;5\} $ y
 $PLL\_DIVSEL\_FB = \{1;2;3;4;5\}$ son configurables por software;
 mientras que la frecuencia base se configura con las llaves
-SW6~\cite[Tabla 1-32]{ug347}: $
-F_{CLKIN} (Mhz)= \{62.5;75;77.76;100;125;150;156.25;311.04;622.08\}$.
+SW6~\cite[Tabla 1-32]{ug347}.
 
 
  Modificando los parámetros puede lograrse, en teoría, un amplio rango
-de la frecuencias $F_{PLL\_Clock}$, pero de acuerdo a la documentación
-del PLL \cite[Pág. 71]{ug366}~\footnote{La velocidad máxima no se
-detalla en la documentación del GTX de Virtex5, pero si en la
-documentación del Virtex-6, que excepto en el modelo HTX posee parámetros
-similares.}, este tiene un rango de operación nominal desde $1.2$ a
-$2.7$ Ghz en FPGAs de grado $-1$ tal como el que se encuentra en la
-placa de desarrollo ML-507. Sin embargo en este artículo documentamos la
+de frecuencias $F_{PLL\_Clock}$, pero de acuerdo a la documentación
+del PLL \cite[Pág. 71]{ug366}, este tiene un rango de operación nominal desde $1.2$ a
+$2.7$ Ghz. Sin embargo es posible \cite{ortegaaltas} la
 obtención y medición de velocidades de oscilación estables para el PLL
 de hasta $4.5$ Ghz (lo que implica una tasa de transmisión de $9$ Gbps),
 fuera del rango de operación especificado por el fabricante.
@@ -350,11 +364,11 @@ fuera del rango de operación especificado por el fabricante.
   \centering
     %\includegraphics[scale=0.70]{plot.png}
     \includegraphics[width=3.5in,angle=270]{graphs/BER_sp_gray.pdf}
-\caption {BER vs. punto de muestreo: como es esperable, el BER aumenta al samplear los extremos del bit, donde el diagrama de ojo es mas cerrado}
+\caption {BER Vs. punto de muestreo: el BER aumenta cuando el punto de muestreo esta cerca de los extremos del bit (valores 0 y 128), donde el diagrama de ojo es mas cerrado. Los diagramas de ojo pueden verse en la figura \ref{fig:ImgOjo}.}
 \label{fig:BERvsSamplingPoint}
 \end{figure}
 
-\subsection{características del transceptor de gigabit a altas velocidades}
+\subsection{Características del transceptor de gigabit a altas velocidades}
 
 
 \begin{figure}[!t]
@@ -370,7 +384,7 @@ fuera del rango de operación especificado por el fabricante.
    \subfloat[Señal óptica a $12.44$ Gbps]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen7.png} }}%
    \qquad
    \subfloat[Señal óptica a $12.44$ Gbps, transmisión 10110101010]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/screen12.png} }}%
-  \caption {Capturas de pantalla de la medición de la señal óptica a la salida del XFP variando la tasa de transmisión de $4.5$ a $12.44$ Gbps}
+  \caption {Medición de la señal óptica variando la tasa de transmisión de $4.5$ Gbps a $12.44$ Gbps. Se debe tener en cuenta que la señal será afectada debido al ancho de banda máximo del módulo de entrada óptico del osciloscopio, que es de 20 Ghz.}
   \label{fig:ImgTasa}
 \end{figure}
 
@@ -379,77 +393,81 @@ fuera del rango de operación especificado por el fabricante.
 
 
 Las Fig.~\ref{fig:ImgTasa} muestran la evolución de la señal óptica producida a diferentes
-tasas. Nótese que aunque el equipo puede generar señales estables de
-hasta $12.44$ Gbps pero no puede recibirlas a esa frecuencia, por lo que las
-mediciones de BER se realizaron solo hasta $9.33$ Gbps. Todas las señales
-corresponden a la secuencia 10101010, excepto la última figura,
-que fue generada con una secuencia distinta para demostrar el total
-control sobre la señal generada. El transceptor posee la capacidad de
-realizar una codificación 8B/10B adicional, pero para estas mediciones
-ese módulo fue desactivado.
-El punto de muestreo de la señal es importante, ya que si se elige correctamente se minimizará el BER, tal como lo muestra la Fig.~\ref{fig:BERvsSamplingPoint}, donde se aprecia como el BER es minimizado si el punto de muestreo cae exactamente en la mitad del bit. También en la misma figura puede compararse distintas tasas de transmisión y ver que las curvas de BER causadas por el punto de muestreo son diferentes para cada tasa. Esto es porque como puede verse en las Figs.~\ref{fig:ImgTasa}, a tasas elevadas el pulso del bit se deforma y el punto de muestreo óptimo se modifica, acompañando esta deformación del bit transmitido.
+tasas. Segun la documentación del tranceptor \cite{ug198}, la máxima velocidad de transmisión es de 6.5 Gbps. Sin embargo en la figura se observan mediciones a tasas mucho mayores, hasta $12.44$ Gbps. Esto obedece a dos factores:
+\begin{itemize}
+ \item Es posible transmitir y recibir datos hasta una tasa de 9.33 Gbps, si en lugar de utilizar el procesador de la FPGA para realizar las mediciones, se utiliza el contador interno del transceptor. Esto es, los datos no son generados ni contabilizados por FPGA, sino por circuitos de testeo dentro del mismo tranceptor, por lo que es posible alcanzar tasas mayores.
+ \item Si eliminamos la necesidad de actualmente recibir y contabilizar los datos, el tranceptor puede generar señales de hasta $12.44$ Gbps. A estas tasas el transceptor solo puede ser utilizado como un generador de señales, ya que no es posible realizar mediciones de BER. Un estudio mas detallado de estos métodos pueden verse en \cite{ortegaaltas}.
+\end{itemize}
+
+
+Todas las señales corresponden a la secuencia 10101010, excepto la última figura,
+que fue generada con una secuencia distinta para demostrar el control sobre la señal generada.
+
+Para determinar el valor del bit, el circuito receptor muestrea la señal de entrada en un punto determinado dentro del tiempo de bit. Este punto de muestreo de la señal es importante, ya que si se elige correctamente se minimizará el BER, tal como lo muestra la Fig.~\ref{fig:BERvsSamplingPoint}, donde se aprecia como el BER es minimizado si el punto de muestreo se encuentra en la mitad del tiempo de bit. También en la misma figura pueden compararse distintas tasas de transmisión y ver que las curvas de BER causadas por el punto de muestreo son diferentes para cada tasa. Esto se debe a que, como puede verse en las Figs.~\ref{fig:ImgOjo}, a tasas elevadas el pulso del bit se deforma y el punto de muestreo óptimo se modifica.
 
 
 \subsection{Problema de linea desbalanceada y codificación 8B/10B}
-La conexión eléctrica de la FPGA al Láser XFP debe soportar la transmisión de señales de 4 Gigahertz o mas, y puede verse como un canal con características de un filtro pasa-altas. Esto requiere que la señal este balanceada eléctricamente, por lo que deben codificaciones de balanceo para una correcta transmisión. Dichos algoritmos pueden ser el conocido 8B/10B u otras codificaciones, aunque 8B/10B tiene soporte de codificación/decodificación por hardware en el transceptor de gigabit de Xilinx.
+La conexión eléctrica de la FPGA al módulo Láser SFP+ se compone de 4 pares diferenciales, que deben transportar señales de hasta 4 GHz. En amplificadores eléctricos de alta velocidad, es deseable que la señal este balanceada para obtener un componente nulo de corriente continua y poder acotar el ancho de banda necesario. Adicionalmente, una codificación donde se garanticen las transiciones de nivel cada un determinado número de bits, elimina el requerimiento de tener relojes de alta precisión en ambos lados de la línea de transmisión, al poder el reloj receptor re-sincronizarse utilizando dichas transiciones.
+Uno de estos algoritmos es el denominado 8B/10B aunque existen otras codificaciones mas complejas. El transceptor de gigabit de Xilinx tiene un módulo de hardware interno que soporta codificación 8B/10B .
 
 El hardware de prototipado no permite implementar el algoritmo diseñado sin modificaciones. En la Fig.~\ref{fig:expansionbit} se aprecia una expansión progresiva a medida que el desbalanceo de la señal se hace mas pronunciado. Los efectos de la expansión del tamaño de bit son evidentes en la fig.~\ref{fig:ImgExpansion} donde las gráficas de potencia óptica ponen en evidencia la expansión e interferencia causada por una señal desbalanceada.
-Efectivamente el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido de manera desbalanceada, generando una interferencia que impide el funcionamiento del sistema.
+Efectivamente, el receptor recibe hasta 3 ``unos'' por cada ``uno'' transmitido de manera desbalanceada, generando una interferencia que impide el funcionamiento del sistema.
 
 \begin{figure}[t]
   \centering
     \includegraphics[width=4in]{graphs/expansionbit.pdf}
-\caption {Se detalla la expansión del tiempo de bit en una señal desbalanceada a medida que la cantidad de unos por frame va disminuyendo. El tamaño de frame es de 512 bits, por lo que el mínimo de tamaño de bit esta con 256 unos por frame con una señal perfectamente balanceada. La tasa nominal es de 2.5Gbps}
+\caption {Se detalla la expansión del tiempo de bit en una señal desbalanceada a medida que la cantidad de unos por frame va disminuyendo. El tamaño de frame es de 512 bits, por lo que son necesarios 256 bits en uno para lograr una señal perfectamente balanceada. La tasa nominal es de 2.5Gbps.}
 \label{fig:expansionbit}
 \end{figure}
 
 \begin{figure}[!t]
    \centering
-   \subfloat[Señal con 256 unos por frame (8B/10B), 400 ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion1.jpg} }}%
+   \subfloat[Señal con 256 bits en uno por frame (8B/10B), 400 ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion1.jpg} }}%
    \qquad
-   \subfloat[Señal con 48 unos por frame, 1100 ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion2.jpg} }}%
+   \subfloat[Señal con 48 bits en uno por frame, 1100 ps por bit]{{\includegraphics[width=0.45 \textwidth]{graphs/expansion2.jpg} }}%
    \qquad
-  \caption {Señal de potencia óptica de un Láser XFP Sumitomo de 1330 nm. Se observa una expansión de bit cuando se reduce la cantidad de unos por frame, desbalanceando la señal. La tasa nominal utilizada es de 2.5 Gbps}
+  \caption {Señal de potencia óptica de un Láser SPF+ Sumitomo de 1330 nm. Se observa una expansión de bit cuando se reduce la cantidad de unos por frame, desbalanceando la señal. La tasa nominal utilizada es de 2.5 Gbps}
   \label{fig:ImgExpansion}
 \end{figure}
 
-Este desbalanceo se soluciona simplemente aplicando las codificaciones de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de Bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva es utilizar un hardware donde la señal no necesite balancearse, pero mientras tanto se opto por la siguiente solución para poder utilizar la placa ML507 y poder realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal pseudoaleatoria superpuesta con una señal 8b/10b, por lo que la señal esta balanceada y es transmitida y recibida correctamente. Son los demás clientes los que transmiten una señal desbalanceada con muy pocos unos, causando solamente interferencias. La señal de estos clientes no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente que esta balanceado, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps) mientras que solo uno de los clientes pueda comunicarse y los demás actúen efectivamente solo como ruido.
+Este desbalanceo se soluciona simplemente aplicando las codificaciones de balanceo a los datos antes de transmitirlos. Sin embargo, esta transformación es incompatible con el filtro de Bloom, ya que la interferencia de dos señales basta para eliminar la codificación y desbalancear nuevamente la señal. La solución definitiva, es utilizar un circuito de transmisión eléctrico donde la señal no necesite balancearse, pero para el prototipo se utilizó la siguiente solución, para utilizar la placa ML507 y poder  realizar mediciones sobre el protocolo: Al realizar las experiencias, uno de los clientes transmite su señal encriptada normal, mientras que los demás clientes son simulados mediante un patrón aleatorio pero balanceado eléctricamente, por lo que la señal es transmitida y recibida correctamente. La señal de estos clientes simulados no puede recuperarse pero las mediciones son solamente realizadas sobre el cliente real, por lo que el sistema puede funcionar a la máxima tasa soportada por la FPGA (hasta 5Gbps).
 
 \subsection{Sincronización a nivel de bit, word y frame}
 \label{fpga:sync}
 \begin{figure}[t]
   \centering
     \includegraphics[width=6in]{graphs/optsync.pdf}
-\caption {Flujo de datos en la sincronización óptica. El primer bloque, sincronización de bit alinea a un límite de byte, lo que resulta en cuatro posibles alineaciones distintas. El frame es luego es alineado a 32 bytes mediante desplazamientos o shifts.}
+\caption {Flujo de datos en la sincronización óptica. El mecanismo de sincronización consta de dos etapas: En la primera etapa, el circuito de sincronización de bit alinea la señal entrante al buffer de entrada, colocando el prefijo de sincronización en cuatro posibles alineaciones distintas. La segunda etapa realiza una segunda alineación, detectando la posición del prefijo y utilizando desplazamientos o \textit{shifts} para llevarlo siempre al comienzo del buffer.}
 \label{fig:optsync}
 \end{figure}
 
 
-La sincronización no se trató detenidamente en la sección teórica de esta tesis ya que desde un principio se consideró como un tema ajeno a la misma. Sin embargo, para la implementación real es imprescindible obtener la sincronización entre los nodos que deseen utilizar un canal. Esto no es una tarea sencilla considerando que debe hacerse sobre un canal que contiene elevadas tasas de ruido.
+La sincronización no se trató detenidamente en la sección teórica de esta tesis ya que desde un principio se consideró como un tema ajeno a la misma. Sin embargo, para la implementación real es imprescindible obtener la sincronización entre los nodos que deseen utilizar un canal. Esto no es una tarea sencilla considerando que debe hacerse sobre un canal que contiene una baja relación señal-ruido.
 
-La estrategia utilizada para la transmisión por medio óptico es utilizar el hardware de sincronización que posee el transceptor de multi-gigabit ya incluido en la FPGA. Este módulo \cite{ug198} denominado ``Comma Alignment and Detection'' se basa en la utilización de un prefijo o coma configurable que es una serie de bits (que puede ser de 10 o 20 bits de largo en el transceptor GTX) que se transmite cada vez que se desea sincronizar la estapa RX (receptor) con la TX (transmisor). Esta serie de bits es configurable pero es deseable que posea ciertas características como una alta auto-correlación, para optimizar su detección en el flujo de datos recibidos.
+La estrategia utilizada para la transmisión por el medio óptico es utilizar el hardware de sincronización que posee el transceptor de multi gigabit ya incluido en la FPGA. Este módulo \cite{ug198} denominado ``\textit{Comma Alignment and Detection}'' se basa en la utilización de un prefijo o coma configurable que es una serie de bits (que puede ser de 10 o 20 bits en el transceptor de tipo GTX) que se transmite cada vez que se desea sincronizar la etapa RX (receptor) con la TX (transmisor). Esta serie de bits es configurable, pero es deseable que posea ciertas características como una alta autocorrelación, para optimizar su detección en el flujo de datos recibidos.
 La sincronización se realiza en dos fases:
 \begin{enumerate}
- \item El cliente que desea establecer un canal seguro envía el prefijo de sincronización (14 bits) y éste es detectado por el módulo de alineación del receptor. Este módulo alinea a nivel de bit y byte, o sea que garantiza que en el buffer de salida de 32 bits, el prefijo aparece en el bit 0, 8, 16 o 24 (Ver fig.\ref{fig:optsync}).
- \item Una vez alineado el prefijo en el buffer de salida, solo resta detectar en qué posición ha quedado y comenzar a leer el frame desde la posición siguiente. Esto se realiza en el código Verilog sintetizando cuatro detectores que simultáneamente testearan por cada posición y deciden en un solo reloj cual es la alineación correcta. Al ser solo 4 posiciones posibles, es una solución eficiente.
+ \item El cliente que desea establecer un canal seguro envía al principio de sus datos el prefijo de sincronización o \textit{comma} (14 bits). Este prefijo es detectado por el módulo de alineación del receptor, que lo coloca en el buffer de entrada. Sin embargo, no se garantiza que el prefijo este siempre al principio del buffer, sino que puede estar tanto en el bit 0 (que seria una alineación perfecta), como en el bit 8, 16 o 24 (Ver fig.\ref{fig:optsync}), debido a que esta memoria se implementa como un buffer de anillo (\textit{ring buffer}).
+ \item Una vez alineado el prefijo en el buffer de entrada, solo resta detectar en qué posición ha quedado y comenzar a leer el frame desde la posición siguiente. Esto se realiza en el código Verilog sintetizando cuatro detectores que simultáneamente testearan por cada posición y deciden en un solo ciclo de reloj cuál es la alineación correcta. Al ser solo 4 posiciones posibles, es una algoritmo eficiente.
 \end{enumerate}
 
-En teoría, solo debería realizarse la sincronización al principio de las comunicaciones. En la práctica los relojes no son perfectos y es necesario sincronizar periódicamente. En la implementación óptica se envía el prefijo de sincronización al comienzo de cada frame.
-Para evitar colisiones, el hardware de alineamiento se desactiva al detectarse una buena sincronización y se reactiva al finalizar la recepción del frame. Esta es una operación extremadamente rápida, recordemos que a una velocidad de 5Gbps, cada frame de 1024 bits tiene una duración temporal de 200 nanosegundos.
+En teoría, solo debería realizarse la sincronización al principio de las comunicaciones. En la práctica, los relojes no son perfectos y es necesario sincronizarlos periódicamente. En la implementación óptica se envía el prefijo de sincronización al comienzo de cada frame.
+Para evitar colisiones, el hardware de alineamiento se desactiva al detectarse una buena sincronización y se reactiva al finalizar la recepción del frame. Esta es una operación extremadamente rápida, ya que al utilizar una tasa de 5Gbps, cada frame de 1024 bits tiene una duración temporal de 200 nanosegundos.
 
 \section{Redes acústicas}
 \label{redacus}
-Debido en parte a la dificultad de implementación y depuración sobre la lógica de la FPGA, y la imposibilidad de realizar mediciones a muy altas velocidades, se propuso la implementación sobre un medio acústico como solución intermedia. Las señales acústicas se interfieren típicamente de manera aditiva y un modem acústico debe representarse como un canal binario simétrico en lugar de un canal-Z. Pero si utilizamos ciertas modulaciones, tales como OOK (on-off Keying) de manera que la frecuencia portadora sea varias veces mayor al ancho de bit, la interferencia entre bits tendrá siempre un efecto aditivo, mientras que los ceros no causan interferencia. Esto forma un canal-Z mediante el cual puede implementarse el sistema de comunicación segura descripto en esta tesis. Debido a las características de modulación necesarias, las velocidades de transmisión son muy bajas, ya que ancho de banda de un parlante o micrófono es relativamente reducido (de 2 a 15 khz) y la modulación OOK tiene una baja densidad espectral. 
-No obstante es un excelente medio para realizar pruebas ya que pueden ser implementadas totalmente via software, y puede ser utilizado en todas las aplicaciones que no requieren elevadas tasas de transmisión.
+
+El segundo medio de transmisión físico que resulto ser una aplicación ideal del sistema son las señales de audio o acústicas. Las señales acústicas se interfieren típicamente de manera aditiva y un modem acústico debe representarse como un canal binario simétrico en lugar de un canal Z. Pero si utilizamos ciertas modulaciones, tales como OOK (\textit{on-off Keying}) en donde la frecuencia portadora es varias veces mayor al ancho de bit, existen bajas posibilidades de que la interferencia de dos señales sea destructiva (es decir, que una señal de audio anule a la otra), mientras que los ceros se modulan como silencios y no causan interferencia. Esto puede modelarse como un canal Z mediante el cual puede implementarse el sistema de comunicación segura descripto en esta Tesis. Debido a las características de modulación necesarias, las velocidades de transmisión son muy bajas, ya que la respuesta en frecuencia un transductor acústico típico, como un parlante o micrófono, es relativamente reducida, de 2 KHz a 15 KHz, por lo que el ancho de banda disponible es mucho menor en comparación con la implementación óptica.
+No obstante las pruebas e implementaciones sobre este medio pueden ser implementadas totalmente vía software, y puede ser utilizado en todas las aplicaciones que no requieran elevadas tasas de transmisión.
 
 \subsection{Modulación}
 % de newJIS_140512
-El medio de transmisión acústico utiliza ondas de presión en lugar de electromagnéticas pero las técnicas de modulación que pueden utilizarse son las mismas.
+Las técnicas de modulación de medios de transmisión acústicos son las mismas que pueden utilizarse en medios electromagnéticos.
 Sin embargo, no todas las modulaciones siguen el comportamiento de canal Z descrito en la Sección \ref{canalZ}.
-La modulación On-Off Keying (Un caso especial de modulación ASK, Amplitude Shift Keying), es uno de los tipos de modulación que permite implementar un canal Z sobre un medio acústico si se utiliza sobre cierto rango de parámetros. Utilizando transductores (micrófonos y parlantes) comerciales del tipo presentes en la mayoría de los dispositivos móviles probados, la frecuencia de portadora puede variar de 10 Khz a 16 Khz. Se obtienen resultados buenos con una tasa de transmisión de 1000 bps al nivel de frame. En los experimentos que se detallaran en las secciones siguientes, el retraso (delay) o tiempo que le lleva a un bit atravesar la red, fue extremadamente alto debido a una combinación de baja velocidad de transmisión y la necesidad de un buffer muy grande (1024 bits) necesario para la utilización del esquema de corrección de errores seleccionado (Reed-Solomon 223/255). Si bien aumentar la velocidad de transmisión no es sencillo, modificar el algoritmo de corrección de errores o sus parámetros (Por ejemplo, utilizar algún esquema tipo BCH [12]) podría reducir el retraso de datos drásticamente.
+La modulación OOK (Un caso especial de modulación ASK, \textit{amplitude shift keying}), es uno de los tipos de modulación que permite implementar un canal Z sobre un medio acústico si se utiliza sobre cierto rango de parámetros. Utilizando transductores (micrófonos y parlantes) comerciales del tipo presentes en la mayoría de los dispositivos móviles, la frecuencia de portadora puede variar de 10 KHz a 16 KHz. El mejor rendimiento del sistema se obtuvo con una tasa de transmisión de 1000 bps al nivel de frame. En las secciones siguientes se detallaran mediciones del retraso (\textit{delay}) o tiempo que le lleva a un bit atravesar la red, que fue elevado debido a una combinación de baja velocidad de transmisión y la necesidad de un buffer relativamente grande (1024 bits), necesario para la utilización del esquema de corrección de errores seleccionado (Reed-Solomon 223/255). Si bien aumentar la velocidad de transmisión requiere un esfuerzo considerable debido al bajo ancho de banda disponible, la modificación del algoritmo de corrección de errores o sus parámetros (por ejemplo, utilizar algún esquema tipo BCH \cite{bose1960class}) podría reducir el retraso de datos de manera considerable.
 
-Como técnica de ``pulse-shaping'' se utiliza un simple filtro FIR pasa-banda a la salida de la etapa de modulación, así como también en la entrada de la etapa de demodulación. Este filtro además de reducir el ancho de banda utilizado, ayuda a rechazar interferencias.
-Adicionalmente un duty-cycle de 50\% demostró ser el óptimo para la modulación.
+Como técnica de ``\textit{pulse-shaping}'' se utiliza un simple filtro FIR \cite{oppenheim1989discrete} (\textit{finite impulse response}) pasa banda a la salida de la etapa de modulación, así como también en la entrada de la etapa de demodulación. Este filtro además de reducir el ancho de banda utilizado, ayuda a rechazar interferencias.
+Adicionalmente, un ciclo de trabajo (\textit{duty-cycle}) de 50\% demostró ser el óptimo para la modulación.
 %On-Off Keying modulation of sound waves, following the Z-channel interface model described in Section 2.2., encode the transmitted bits as pulses. Carrier frequency can vary from 10 kHz to 16 kHz. Good results can be obtained with a rate of 1000 bps at frame level. In experiments, delay (the time for a bit to traverse the network) was very high, due to Reed-Solomon 223/255 coding, a frame to support up to 16 users and the low capacity of the physical media. A more sensible choice of FEC algorithm (like BCH [12]) could drastically reduce data delay. 
 
 %Simple pulse shaping is realized using a pass-band filter at the output of the modulation and also at the input of the demodulator. This filter also helps reject unwanted interference.
@@ -464,23 +482,23 @@ Adicionalmente un duty-cycle de 50\% demostró ser el óptimo para la modulació
 \end{figure}
 
 Como se desprende de la descripción del canal de comunicaciones, la sincronización entre el transmisor y el receptor es esencial para la correcta decodificación de la información. 
-En el caso del medio óptico la sincronización de bit y word (16 bits) debe realizarse a tasas tan elevadas que requiere necesariamente soporte de hardware por parte del transceptor.
-Sin embargo a las reducidas tasas (1000 bps) utilizadas en el canal acústico permiten realizar una sincronización por software sin ningún soporte de hardware adicional. 
-El método es muy similar al utilizado en el canal óptico: Un patrón inicial de sincronización es enviado, para que el receptor pueda realizar un ajuste de parámetros tales como fase y umbral de decisión (Ver Fig.~\ref{fig:acusync}). La deriva y fluctuación del reloj del sistema (drift y jitter) no son significantes a esta baja velocidad de transmisión por lo que no se requiere corrección de ningún tipo, haciendo que la Implementación del modem por software sea muy sencilla.
-Ciertos parámetros si bien son inicializados en la etapa de sincronización, son por naturaleza dinámicos y se ajustan periódicamente, como por ejemplo el umbral de decisión, que es recalculado a partir de un promedio de los datos de entrada. La fase es también corregida utilizando los datos de entrada como referencia. Notar que este método de sincronización simple permite detectar el comienzo de frame a su vez que se alinea a nivel de bit; ambas alineaciones son necesarias en cada comunicación (pero la alineación de frame solamente entre los ONUs comunicantes). Adicionalmente, una vez comenzada la transmisión, los datos serán indescifrables gracias al algoritmo CDMA de time-hopping guiado por un CS-PRNG.
+En el caso del medio óptico, la sincronización de bit y word (16 bits) debe realizarse a tasas tan elevadas que requiere necesariamente soporte de hardware por parte del transceptor.
+Sin embargo, las tasas de transmisión de 1 Kbps utilizadas en el canal acústico permiten realizar una sincronización por software sin ningún soporte de hardware adicional, al ser una velocidad manejable por cualquier procesador moderno.
+El método es muy similar al utilizado en el canal óptico: un patrón inicial de sincronización es enviado, para que el receptor pueda realizar un ajuste de parámetros tales como fase y umbral de decisión (ver Fig.~\ref{fig:acusync}). La deriva y fluctuación del reloj del sistema (\textit{drift y jitter}) no son significativas a esta baja velocidad de transmisión, por lo que no se requiere corrección de ningún tipo, haciendo que la implementación del modem por software sea muy sencilla.
+Ciertos parámetros si bien son inicializados en la etapa de sincronización, son por naturaleza dinámicos y se ajustan periódicamente, como por ejemplo el umbral de decisión que es recalculado a partir de un promedio de los datos de entrada. La fase es también corregida utilizando los datos de entrada como referencia. Este método de sincronización simple permite detectar el comienzo del frame a su vez que se alinea a nivel de bit; ambas alineaciones son necesarias en cada comunicación (pero la alineación del frame solamente entre los ONUs comunicantes). Adicionalmente, una vez comenzada la transmisión, los datos serán indescifrables gracias al algoritmo CDMA de \textit{time-hopping} guiado por un CS-PRNG.
 
 %As it follows from the description of the communication channel, synchronization between the transmitter and receiver is essential for the correct decoding of information. For this purpose, an initial synchronization pattern is sent, so the receiver can adjust parameters like phase and decision level (see Figure 3). For the data bits transmission a duty cycle of 50\% showed in our experiments an enhanced detection. Clock drift and jitter are not significant at this low transmission speed and so no correction is required, making the software modem implementation very simple. Decision level is dynamic, meaning it is constantly re-calculated from averaged input data. The receiver symbol phase is also corrected using the input data as reference. Notice that this simple synchronization method allows detecting the frame start as well as the bit slot; both are needed at every communication. Moreover, once the data began to be transmitted, the communication becomes indecipherable thanks to the CS-PRNG.
 
 
-\subsection{Medición multi-usuario}
+\subsection{Medición multi usuario}
 
-Todas las mediciones fueron realizadas a una tasa de 1000 bps, utilizando una señal portadora acústica de 16 kHz, que se encuentra en el límite auditivo de la mayoría de los adultos de más de 40 años \cite{gordon2005hearing} aunque también es posible que ciertos parlantes tengan problemas a esta frecuencia, en cuyo caso puede reducirse y utilizar una portadora de 12 kHz.
-La cantidad total de datos transmitidos por canal fue de 4096 bits en cada medición. El volumen de la señal fue configurado al máximo para cada dispositivo, mientras que la amplificación de entrada de la señal obtenida por el micrófono fue optimizada en cada caso para obtener el menor BER.
-Con el modulador y circuito de sincronización implementados, el sistema opera con tasas de error aceptables con una separación máxima entre nodos de 1 metro, una distancia que normalmente excede la existente entre un terminal móvil (Celular, etc.) y una computadora fija en el mismo escritorio (Ver Fig.~\ref{fig:acudist}). Aún para un alto número de clientes simultáneos (>10) el sistema no presenta altas tasas de error o ancho de banda reducido, como puede verse en la Fig.~\ref{fig:acumult}.
-En las pruebas con el software actual, el retraso del canal es de mas de 60 segundos, excesivo para muchas aplicaciones que no necesitan alto ancho de banda pero requieren un corto tiempo de respuesta (por ejemplo, aplicaciones bancarias). El retraso puede ser disminuido de dos maneras: 
+Todas las mediciones fueron realizadas a una tasa de 1 Kbps, utilizando una señal portadora acústica de 16 kHz, que se encuentra en el límite auditivo de la mayoría de los adultos de más de 40 años \cite{gordon2005hearing}. Es posible que algunos parlantes no respondan correctamente a esta frecuencia, en cuyo caso puede reducirse y utilizar una portadora de 12 kHz. El objetivo de utilizar una frecuencia de audio tan cercana al límite de reproducción de los transductores es aumentar el nivel de confort acústico de los usuarios, que solo podrán escuchar el modem con bajo volumen, o directamente será inaudible. Adicionalmente, las altas frecuencias presentaron menos interferencias de ruido ambiente.
+La cantidad total de datos transmitidos por canal fue de 4096 bits en cada medición. El volumen de la señal de salida fue configurado al máximo para cada dispositivo, mientras que la amplificación de la señal obtenida por el micrófono fue optimizada en cada caso para obtener el menor BER.
+Con el modulador y circuito de sincronización implementados, el sistema opera con tasas de error aceptables con una separación máxima entre nodos de 1 metro, una distancia que normalmente excede la existente entre un terminal móvil (celular, etc.) y una computadora fija en el mismo escritorio (Ver Fig.~\ref{fig:acudist}). Aún para un alto número de clientes simultáneos ($> 10$) el sistema no presenta altas tasas de error o ancho de banda reducido, como puede verse en la Fig.~\ref{fig:acumult}.
+En las mediciones, el retraso del canal fue de más de 60 segundos, excesivo para muchas aplicaciones que no necesitan alto ancho de banda pero requieren un corto tiempo de respuesta (por ejemplo, aplicaciones bancarias). El retraso puede ser disminuido de dos maneras: 
 \begin{enumerate}
  \item Decrementando la cantidad máxima de clientes simultáneos soportados por el sistema.
- \item Utilizando algoritmos de ECC de bajo retraso, tales como BCH, ya que actualmente el retraso esta causado por el algoritmo de Reed-Solomon que requiere llenar un buffer de 256 bytes (2048 bits) antes de poder comenzar la decodificación.
+ \item Utilizando algoritmos de ECC de bajo retraso y de bloque reducido, tales como BCH, ya que actualmente el retraso se produce en su mayor parte durante la recepción de un bloque completo para el algoritmo de Reed-Solomon (2048 bits).
 \end{enumerate}
 
 \begin{figure}[t]
@@ -505,18 +523,18 @@ En las pruebas con el software actual, el retraso del canal es de mas de 60 segu
 %error correction algorithm like BCH
 %
 
-\subsection{Medición a distinta separación}
+\subsection{Mediciónes a distintas distancias}
 
 \begin{figure}[t]
   \centering
     \includegraphics[width=4in]{graphs/mediciones-distancia-fig7.pdf}
-\caption {Distancia: Enlace entre una Laptop (Lenovo T420) y un celular (HTC Status) presenta errores detectables solo cuando se supera 60 cm de separación.}
+\caption {Distancia vs BER: El enlace acústico entre una Laptop (Lenovo T420) y un celular (HTC Status) presenta errores detectables cuando se superan los 60 cm de separación entre ambos dispositivos.}
 \label{fig:acudist}
 \end{figure}
 
-Las comunicaciones acústicas utilizando como portadora un tono de 12 kHz son muy susceptibles al ruido ambiente. Un enlace acústico con 50 cm de separación entre un Laptop Lenovo T420 y un celular HTC Status sufrió mas de un $15\%$ de BER con solo una ligera interferencia (como por ejemplo golpear una mesa cercana). Esta observación motivo el uso de la frecuencia mas alto posible. Una portadora de 16 kHz presentó el mayor rango de compatibilidad entre los dispositivos testeados, algunos de ellos demostraron no poder emitir audio a frecuencias mayores.
-Independientemente, algunas mediciones fueron realizadas a mayor frecuencia en dispositivos que lo soportaron. Por ejemplo, los parlantes de una Laptop T420 y otra Laptop Lenovo X60 fueron capaces de establecer un enlace utilizando como portadora un tono a 19.2 kHz, aunque solo en cortas distancias (20 cm). De todas formas, esta frecuencia de portadora permitió mayor ancho de banda en el enlace (2000 bps en lugar de 1000 bps) con la misma tasa de error.
-La señal acústica modulada puede causar molestias a personas o animales cercanos. Distintos tonos de portadora causan distintos efectos y niveles de molestia, aunque este último parámetro es subjetivo. La portadora de 19.2 kHz fue descrita como no audible, mientras que la portadora a 16 kHz y 12 kHz son claramente audibles. Se notó que el volumen del sonido modulado y las molestias asociadas al mismo aumentan con el numero de clientes simultáneos transmitiendo en el medio.
+Las comunicaciones acústicas utilizando como portadora un tono de 12 kHz son muy susceptibles al ruido ambiente. Un enlace acústico con 50 cm de separación entre un Laptop Lenovo T420 y un celular HTC Status sufrió mas de un $15\%$ de BER con solo una ligera interferencia (como por ejemplo, golpear una mesa cercana). Esta observación motivó el uso de la frecuencia mas alta posible. Una portadora de 16 kHz presentó el mayor rango de compatibilidad entre los dispositivos, algunos de ellos demostraron no poder emitir audio a frecuencias mayores.
+Los parlantes de una Laptop T420 y otra Laptop Lenovo X60 fueron capaces de establecer un enlace utilizando como portadora un tono a 19.2 kHz, aunque solo en cortas distancias (20 cm). De todas formas, esta frecuencia de portadora permitió mayor ancho de banda en el enlace (2 Kbps en lugar de 1 Kbps) con la misma tasa de error.
+%La señal acústica modulada puede causar molestias a personas o animales cercanos. Distintos tonos de portadora causan distintos efectos y niveles de molestia, aunque este último parámetro es subjetivo. La portadora de 19.2 kHz fue descrita como no audible, mientras que la portadora a 16 kHz y 12 kHz son claramente audibles. Se notó que el volumen del sonido modulado y las molestias asociadas al mismo aumentan con el numero de clientes simultáneos transmitiendo en el medio.
 
 % De JIS2014MathType.pdf
 %Communications using a 12 kHz tone carrier were extremely susceptible to ambient noise. Indeed, a 50 cm
