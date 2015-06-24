@@ -2,7 +2,7 @@
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=3.5in]{graphs/hub}
+\includegraphics[width=4in]{graphs/hub}
 \caption{Estructura de alto nivel del sistema propuesto}
 \label{fig_hub}
 \end{figure}
@@ -24,7 +24,7 @@ La pila de codificación se detalla en la figura \ref{fig_comstack} donde puede 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=4.5in]{graphs/Soft-stack3}
+\includegraphics[width=5in]{graphs/Soft-stack3}
 \caption{Diagrama esquemático del sistema de comunicaciones}
 \label{fig_comstack}
 \end{figure}
@@ -75,7 +75,7 @@ Sumando ambos valores e ignorando la mínima latencia de codificación, podemos 
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.6 \textwidth]{graphs/rsDelay.pdf} 
+  \includegraphics[width=0.8 \textwidth]{graphs/rsDelay.pdf} 
   \caption{Retraso de proceso de la implementación de Reed-Solomon utilizada~\cite{Xilinx:DS252}.}
   \label{fig_rslat}
 \end{figure}
@@ -104,7 +104,7 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 
 \begin{figure}[t]
   \begin{center}
-    \includegraphics[scale=0.60]{graphs/canalBinario.png}
+    \includegraphics[scale=0.50]{graphs/canalBinario.png}
   \end{center}
 \caption {Canal binario: esquema de probabilidad}
 \label{fig:canbin}
@@ -259,7 +259,7 @@ Los canales Z se usan generalmente para modelar sistemas de transmisión óptico
 
 \begin{figure}[th]
   \begin{center}
-    \includegraphics[scale=0.5]{graphs/zchannel}
+    \includegraphics[scale=1]{graphs/zchannel}
   \end{center}
   \caption{Diagrama: Canal Z}
   \label{fig:Gal}
@@ -279,7 +279,7 @@ La diferencia entre las capacidades de ambos tipos de canal puede apreciarse en 
 
 \begin{figure}[th]
   \begin{center}
-    \includegraphics[scale=0.9]{graphs/grafico_comparacion_capacidad_binaria_z}
+    \includegraphics[scale=1.1]{graphs/grafico_comparacion_capacidad_binaria_z}
   \end{center}
   \caption{Capacidad de un canal binario simétrico con respecto a uno asimétrico o canal Z}
   \label{fig:CompBZ}
@@ -299,7 +299,7 @@ En la figura \ref{fig:Bloomf} puede apreciarse gráficamente como se utiliza un 
 
 \begin{figure}[th]
   \begin{center}
-    \includegraphics[scale=0.5]{graphs/frame-sp}
+    \includegraphics[scale=0.55]{graphs/frame-sp}
   \end{center}
   \caption{Filtro de Bloom}
   \label{fig:Bloomf}
@@ -499,18 +499,19 @@ En la selección de los algoritmos de corrección de errores siempre se utilizó
 
 \section{Aplicación en distintos medios físicos}
 Al poseer una fuerte capacidad de corrección de errores, la arquitectura del sistema lo hace confiable frente a todo tipo de interferencias de la capa física, por lo que modificando la etapa de modulación pueden utilizarse diferentes medios físicos, siempre que los mismos puedan modelarse como un canal Z.
+\begin{figure}[t]
+  \centering
+      \subfloat[Distribución via acoplador tipo estrella 1]{{\includegraphics[width=0.62 \textwidth]{graphs/StarCoupler} }}%
+    \qquad
+    \subfloat[Distribución via EDFA]{{\includegraphics[width=0.62 \textwidth]{graphs/EDFA} }}%
+    \caption{Diseño de red propuesto para la capa óptica: un acoplador de tipo estrella es la base para la arquitectura de red en distancias inferiores a $10~\mathrm{km}$. Para extender el alcance de la red, un amplificador óptico del tipo EDFA \textit{(Erbium-Doped Fiber Amplifier)} puede ser utilizado en el concentrador central.}
+    \label{arch:fig1}
+\end{figure}
+
 \subsection{Redes ópticas}
 % de orte.text
 
 
-\begin{figure}[t]
-  \centering
-      \subfloat[Distribución via acoplador tipo estrella 1]{{\includegraphics[width=0.45 \textwidth]{graphs/StarCoupler} }}%
-    \qquad
-    \subfloat[Distribución via EDFA]{{\includegraphics[width=0.45 \textwidth]{graphs/EDFA} }}%
-    \caption{Diseño de red propuesto para la capa óptica: un acoplador de tipo estrella es la base para la arquitectura de red en distancias inferiores a $10~\mathrm{km}$. Para extender el alcance de la red, un amplificador óptico del tipo EDFA \textit{(Erbium-Doped Fiber Amplifier)} puede ser utilizado en el concentrador central.}
-    \label{arch:fig1}
-\end{figure}
 
 %\begin{figure}[t]
 %  \centering
@@ -567,7 +568,7 @@ De esto se desprende que la potencia de transmisión del bit `0' debe ser la men
 % de newJIS_140512-1.pdf (paper JIS)
 \begin{figure}[!t]
   \centering
-    \includegraphics[width=3in]{graphs/compucelus.pdf}
+    \includegraphics[width=4.5in]{graphs/compucelus.pdf}
     \caption{El diseño de red acústica propuesta puede contener nodos heterogéneos, tales como teléfonos del tipo smartphone o computadoras personales.}
     \label{arch:chain}
 \end{figure}
@@ -585,7 +586,7 @@ Con respecto a la implementación sobre medio óptico, es necesario ajustar algu
 
 \begin{figure}[t]
   \centering
-    \includegraphics[width=4in]{graphs/audio-fig6}
+    \includegraphics[width=5in]{graphs/audio-fig6}
     \caption{Sn M=256 y K=9}
     \label{arch:AudioSimul}
 \end{figure}
@@ -603,7 +604,7 @@ En las próximas secciones se describe el sistema en mayor detalle.
 \subsection{Redes acústicas: Modulación y sincronización}
 \begin{figure}[t]
   \centering
-    \includegraphics[width=4.5in]{graphs/modulated.pdf}
+    \includegraphics[width=5in]{graphs/modulated.pdf}
     \caption{Modulación OOK}
     \label{arch:ook}
 \end{figure}
@@ -616,7 +617,7 @@ Adicionalmente, una etapa de \textit{pulse shaping} o formación de pulso se agr
 
 \begin{figure}[t]
   \centering
-    \includegraphics[width=4in]{graphs/Audio-Sync2.pdf}
+    \includegraphics[width=4.5in]{graphs/Audio-Sync2.pdf}
     \caption{Sincronización}
     \label{arch:sync}
 \end{figure}
