@@ -17,3 +17,8 @@ de entrada. Otro par ́metro i
 REVISAR ESTO EQ. Pag 27
 signos de puntuacion en las ecuaciones ??
 y solo es posible d
+
+Consultas a diego jul 2015:
+
+ps, utilizando un Laser DBF (Distributed Feedback)
+de 2 dBm de potencia y 1550 nm de color/frecuencia.
