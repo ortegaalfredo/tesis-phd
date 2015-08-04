@@ -1,7 +1,39 @@
 \chapter{Introducción}
 
 En este trabajo se presenta una técnica novedosa de transmisión de datos en redes de tipo broadcast de manera criptográficamente segura utilizando técnicas de espectro expandido.
+
+\section{Motivación}
 Los sistemas de comunicaciones ópticos han echo posible las comunicaciones modernas, tecnologías como Internet comunicaciones celulares no son posibles sin una infraestructura optica de comunicaciones de alta velocidad.
 Generalmente las redes de alta velocidad son switcheadas y sobre la capa física solo recientemente han sido utilizadas modulaciones y codificaciones mas complejas que un simple Xon-Xoff.
-El Backbone ha evolucionado recientemente de 10Gbps, 100Gbps y 400Gbps al momento de escribir este documento, en donde se comienzan utilizan modulaciones de tipo WDM y modulación coherente [CITA]. Estas redes son generalmente switcheadas, en los que un ruteador central procesa electrónicamente los paquetes de datos y los retransmite a los nodos clientes por lo que es un canal dedicado.
-Existen redes de tipo broadcast donde existen ventajas como un sistema de ruteo mucho mas simple que puede ser totalmente óptico, pero también poseen varios problemas como tener que compartir el ancho de banda, y problemas de seguridad inherentes al enviar la información a todos los nodos de la red. Este trabajo apunta a solucionar este ultimo problema utilizando tecnicas de tipo CDMA para la transmisión y un código corrector de errores que aprovecha la naturaleza asimétrica de la interferencia en fibra óptica.
+La columna vertebral (\textit{backbone}) de internet ha evolucionado recientemente de 10Gbps, 100Gbps y 400Gbps al momento de escribir este documento, en donde se comienzan utilizan modulaciones de tipo WDM y modulación coherente \cite{shieh2008coherent}. Estas redes son generalmente switcheadas, en los que un ruteador procesa electrónicamente los paquetes de datos y los retransmite a los nodos clientes por lo que es un canal dedicado.
+
+Existen redes de tipo difusión o \textit{broadcast} donde existen ventajas como un sistema de ruteo mucho mas simple que puede ser totalmente óptico, pero también poseen desventajas como la necesidad de compartir el ancho de banda, y problemas de seguridad inherentes al enviar la información a todos los nodos de la red. De esto se desprende que las redes de difusión deben ser privadas, o de lo contrario su uso se restringe a aplicaciones que, o bien no requieren de ningun tipo de privacidad, o la privacidad se logra utilizando protocolos de alto nivel.
+
+Una red acústicas abierta, por ejemplo, es trivialmente interceptable por cualquier atacante que tenga un simple micrófono. 
+
+Estos problemas motivaron el diseño de una red óptica o acústica donde la privacidad esté implementada en la capa física, sin requerir ningún tipo de soporte de software o del sistema operativo. El objetivo es crear una VLAN donde cada cliente pueda realizar comunicaciones de datos con cualquier otro, sin revelar ninguna información a los demás clientes.
+
+\section{Contribución}
+
+Este trabajo apunta a solucionar este último problema utilizando técnicas de tipo CDMA para la transmisión y un código corrector de errores que aprovecha la naturaleza asimétrica de la interferencia en fibra óptica para mejorar su performance.
+
+Así mismo, el mismo esquema de transmisión puede utilizarse en un medio de transmisión diferente, tal como las ondas sonoras o acústicas. El mismo protocolo desarrollado para la transmisión sobre fibra óptica fue exitosamente demostrado en una red acústica de baja velocidad entre dispositivos móviles. Esto abre las puertas a redes ad-hoc privadas entre dispositivos, simplificando aplicaciones que hasta ahora requieren de una conexión continua a Internet.
+
+Concretamente, se presenta el diseño de una red de difusión con un grado de privacidad criptográficamente fuerte. Para ello se utiliza un filtro de Bloom \cite{Bloom70space/timetrade-offs} encriptado, que es utilizado a la vez como el elemento de cifrado y como una primera etapa de corrección de errores. Adicionalmente, se presenta una codificación de datos novedosa\cite{6476559} que incrementa la eficiencia del filtro de Bloom como algoritmo de corrección de errores.
+
+El resultado es un protocolo de red privada o VLAN \textit{(Virtual Local Area Network)} capaz de soportar un volumen de información o \textit{throughput} constante sin importar la carga de la red, manteniendo completa privacidad entre sus nodos.
+
+\section{Organización}
+
+Esta tesis se compone de 4 capítulos principales:
+
+En el primer capítulo ``Introducción'', que es el actual, se presentan las motivaciones, contribuciones y algunas definiciones. Se describe generalmente la estructura del documento y se presentan las convenciones de escritura.
+
+En el capítulo segundo, ``Fundamentos y Estado del arte'' se presenta un resumen de todas las tecnologías utilizadas, así como las definiciones necesarias.
+El tercer capítulo ``Sistema propuesto: teoría y simulaciones'' se discute a fondo las decisiones de diseño, y se simula de manera numérica el sistema completo, prensentándose el resultado de las mediciones.
+
+Finalmente, en el capítulo cuatro se describen los detalles de implementación en ambos medios: tanto ópticos como acústicos. Se detalla el diseño de alto nivel de los a de frame en una FPGA para el protocolo en el medio óptico, y la implementación en software que precisan los dispositivos móviles que utilizarán el medio acústico.
+
+\section{Convenciones}
+
+En este documento utiliza la fuente itálica al describir acrónimos o palabras en ingles, por ejemplo FPGA (\textit{field programmable gate array}).

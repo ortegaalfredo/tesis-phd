@@ -11,8 +11,8 @@
 #    	gnuplot home:     http://www.gnuplot.info
 #    	faq, bugs, etc:   type "help FAQ"
 #    	immediate help:   type "help"  (plot window: hit 'h')
-# set terminal wxt 0
-# set output
+# set terminal pdfcairo  transparent fontscale 0.5 monochrome size 5.00in, 3.00in 
+# set output './medidas_clientes_JIS-fig6.pdf'
 unset clip points
 set clip one
 unset clip two
@@ -31,12 +31,12 @@ set timefmt x2 "%d/%m/%y,%H:%M"
 set x2data 
 set boxwidth
 set style fill  empty border
-set style rectangle back fc lt -3 fillstyle   solid 1.00 border lt -1
+set style rectangle back fc  lt -3 fillstyle   solid 1.00 border lt -1
 set style circle radius graph 0.02, first 0, 0 
 set style ellipse size graph 0.05, 0.03, first 0 angle 0 units xy
 set dummy x,y
 set format x "% g"
-set format y "% g"
+set format y "%2.0e"
 set format x2 "% g"
 set format y2 "% g"
 set format z "% g"
@@ -49,7 +49,7 @@ set grid xtics nomxtics ytics nomytics noztics nomztics \
 set grid layerdefault   linetype 0 linewidth 1.000,  linetype 0 linewidth 1.000
 set raxis
 set key title ""
-set key inside right top vertical Right noreverse enhanced autotitles nobox
+set key inside right bottom vertical Right noreverse enhanced autotitles nobox
 set key noinvert samplen 4 spacing 1 width 0 height 0 
 set key maxcolumns 0 maxrows 0
 set key noopaque
@@ -155,5 +155,5 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-plot "./medidas_clientes_JIS-fig6.dat" using 1:2  lc 0 with linesp title "Mediciones", "./medidas_clientes_JIS-fig6.dat" using 1:3 pt 7 lc 0 title "Simulacion" with linesp
+plot "./medidas_clientes_JIS-fig6.dat" using 1:2  lc 0 with linesp title "Mediciones", "./medidas_clientes_JIS-fig6.dat" using 1:3 pt 7 lc 0 title "Simulación" with linesp
 #    EOF

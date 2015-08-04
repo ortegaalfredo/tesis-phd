@@ -154,5 +154,5 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-plot "./deformacion-bit.dat" w lp title "Tamano de bit"
+plot "./deformacion-bit.dat" w lp title "Tamaño de bit"
 #    EOF
