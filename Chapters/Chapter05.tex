@@ -1,14 +1,31 @@
 \chapter{Conclusiones}
-En este capítulo final se presenta un resumen, conclusiones y futuros trabajos que se desprenden de esta tesis.
 
-\section{Resumen o Sumario}
+En esta Tesis se documentó el diseño un sistema de comunicaciones criptográficamente seguro que aprovecha las técnicas de CDMA sobre fibra óptica. Durante el transcurso de la investigación, se desarrolló un algoritmo de corrección de errores asimétrico, optimizado para canales de tipo Z.
 
-Se presentó un sistema de comunicaciones privado del tipo broadcast capaz de crear múltiples VLANs utilizando cualquier medio de transmisión que pueda ser modelado como un canal-Z.
-Para ello, fue necesario desarrollar varios algoritmos y codificaciones con el objetivo de proveer principalmente privacidad.
+El resultado es un sistema de red de tipo difusión, capaz de crear múltiples VLANs criptográficamente seguras utilizando cualquier medio de transmisión que pueda ser modelado como un canal Z. 
+Se implementaron simuladores en software con el objetivo de obtener estadísticas y mediciones. Luego se realizaron prototipos funcionales tanto sobre software para el caso del medio acústico, como sobre un dispositivo FPGA en el caso del medio de fibra óptica. El protocolo alcanzó una velocidad de 1000 bps con 16 clientes sobre el medio acústico y 5 Gbps con 128 clientes simultáneos con una separación máxima de 20 km, sobre el medio óptico, con una utilización total del medio del 32\%.
 
-Se demostró la viabilidad del proyecto mediante implementaciones de prototipos tanto sobre fibra óptica con velocidades de transmisión de 5 Gbps implementados sobre una FPGA, y con un segundo prototipos puramente implementados por software, que utiliza el mismo protocolo, esta vez sobre una red encriptada acústica entre dispositivos móviles sin ningun tipo de modificación.
+Se mostraron resultados tanto de cálculos teóricos, simulaciónes numéricas y mediciones realizadas sobre los prototipos. Los resultados de los cálculos, simulaciones y mediciones fueron consistentes entre sí.
 
-\section{Conclusiones}
+El esquema de transmisión desarrollado puede utilizarse en cualquier medio de transmisión que pueda representarse como un canal Z, tal como por ejemplo ondas sonoras o acústicas bajo ciertas modulaciones. Debido a esta característica, el mismo protocolo desarrollado con el objetivo de utilizar fibra óptica como medio de transmisión, fue utilizado en una red acústica de baja velocidad entre dispositivos móviles, con un máximo de 16 dispositivos en la red a una distancia de hasta 1.2 metros. Esto abre las puertas a redes ad hoc privadas entre dispositivos, simplificando aplicaciones que hasta ahora necesitaban de una conexión continua a Internet o de tecnologías del tipo NFC.
 
-\section{Trabajo futuro}
+Concretamente, se presentó el diseño de una red de difusión con un grado de privacidad criptográficamente fuerte. Para ello se utilizó un filtro de Bloom \cite{Bloom70space/timetrade-offs} encriptado, que es utilizado a la vez como el elemento de cifrado y como una primera etapa de corrección de errores. Adicionalmente, se presentó una codificación de datos novedosa\cite{6476559} que incrementa la eficiencia del filtro de Bloom como algoritmo de corrección de errores. El resultado es un protocolo de VLAN capaz de soportar un volumen de información o \textit{throughput} constante sin importar la carga de la red, manteniendo completa privacidad entre sus nodos.
+
+%asfd_hasta_aca
+
+Se demostró la viabilidad del protocolo mediante la implementacion y medición de dos prototipos: el primer prototipo del sistema de comunicaciónes fue realizado sobre fibra óptica con velocidades de transmisión de 5 Gbps. La plataforma de desarrollo es un transceptor laser de comunicaciones del tipo XFP+, y una FPGA del tipo Xilinx Virtex 5.
+El segundo prototipo fue implementado exclusivamente en software y utiliza el mismo protocolo pero con diferentes parámetros, esta vez sobre una red encriptada acústica entre dispositivos móviles sin ningun tipo de modificación o hardware adicional.
+
+\section{Trabajos futuros}
+
+Todos los prototipos realizados son completamente funcionales y cumplen con los objetivos de la Tesis sin embargo, para una implementación comercial a gran escala es posible optimizar ciertos módulos, que serán nombrados a continuación:
+\begin{description}
+ \item[Codificación] 
+El problema de la codificación de línea fue descrito en \ref{problemacodificacion} y una solución aceptable, que permite la creación de un prototipo funcional, fue adoptada. Sin embargo, en una implementación final, se debe contemplar la imposibilidad de utilizar cualquier algoritmo de balanceo ya que no es compatible con el algoritmo de filtro de Bloom. Dado que el problema es de naturaleza eléctrica, es probable que un diseño cuidadoso de los buses entre la FPGA y el transceptor óptico solucione este problema.
+ \item[Sincronización] 
+ El algoritmo de sincronización es crítico en una implementación real. Las implementaciones realizadas para los prototipos son funcionales pero no son ideales ya que, al utilizar prefijos conocidos, un atacante puede obtener información acerca del comienzo y finalización del frame. La codificación es suficientemente fuerte para que este conocimiento no perjudique el nivel de seguridad, pero es posible el desarrollo de un algoritmo de sincronización criptográficamente seguro, que no revele ninguna información a un posible atacante (ver \cite{jung1999encryption} para un ejemplo de sincronización segura).
+ \item[Eliminación del frame] 
+ En la sección \ref{Seguridad} se explica que se divide la transmisión en frames, que son segmentos de bits cargados directamente dentro del filtro de Bloom. Esta división en segmentos de los datos no es absolutamente necesaria y podría implementarse una variación del algoritmo que no utilice frames, sino que todas las posiciones de bits sean relativas entre sí, en lugar de relativas al comienzo del frame. Esta variación no incrementa la seguridad pero, probablemente, simplifique la implementación.
+ \item[] 
+\end{description}
 

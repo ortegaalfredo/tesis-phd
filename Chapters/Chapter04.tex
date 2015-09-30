@@ -280,22 +280,35 @@ Los transceptores multigigabit están preparados para operar sobre diversos medi
 \begin{figure}[t]
   \centering
     \includegraphics[width=6in]{graphs/fpgadesign.pdf}
-\caption {Diseño de alto nivel sobre FPGA}
+\caption {Diseño lógico de alto nivel sobre FPGA}
 \label{fig:fpgadesign}
 \end{figure}
 
 En la Fig.~\ref{fig:fpgadesign} puede observarse el diseño digital propuesto en el cual se implementó y probó exitosamente el algoritmo transmitiendo a tasas de 5 Gigabits mediante una fibra óptica.
-Estas velocidades fueron logradas gracias a ciertas características del diseño que serán descritas a continuación. A nivel de diseño digital, el sistema puede separarse en cuatro módulos:
+Estas velocidades fueron logradas gracias a ciertas características del diseño que serán descritas a continuación. En la Fig.~\ref{fig:fpgahard} se muestra el diseño digital o de hardware. En esta figura, puede verse que el sistema se compone de dos módulos principales: el CPU que actua de módulo de control y el coprocesador de comunicaciones. El diseño fue realizado íntegramente para la Tesis, y puede manejar tasas de 5 Gbps con un reloj del sistema de solo 75 Mhz.
+
+El módulo de control cumple la función de interfaz entre el sistema y el usuario, permitiendo modificar parámetros de manera sencilla y presentar las estadísticas de una manera rápida. Se presenta al usuario como un sistema de menús en modo texto, mediante los cuales el operador puede ejecutar comandos y leer valores del sistema. La interfaz al usuario se realiza a través de un puerto serial del tipo RS-232. Para su implementación se utilizó un soft-CPU (CPU sintetizado dentro de la misma FPGA) del tipo Xilinx Microblaze \cite{Xilinx:DS865}, y un programa en lenguaje C encargado de imprimir los menús de control y enviar y recibir datos hacia los módulos generadores y decodificadores de frame. Las operaciones se realizan de manera asincrónica con el resto del hardware, por lo que la velocidad de reloj del CPU puede ser muy reducida. Este módulo se implementa en el archivo ``copro1.v'' que también es el módulo principal del diseño, interconectando las señales de todos los submódulos de generación y decodificación de frames.
+
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=5.25in]{graphs/diagramaXilinx.png}
+\caption {Diseño de hardware sobre la FPGA: Se aprecian los módulos principales, siendo copro1 el coprocesador de comunicaciones. microblaze\_0 es el CPU y bram\_block es el bloque de memoria utilizado por el CPU, conectado al mismo mediante dos buses: dlmb y ilmb, buses de datos e instrucciones del tipo LMB (\textit{local memory bus}). El coprocesador se conecta mediantes dos buses, llamados copro1\_0\_to\_microblaze\_0 y microblaze\_0\_to\_copro1, ambos buses del tipo FSL (\textit{fast simplex link}). Finalmente, el CPU se conecta a los periféricos como RS232 y switches por medio del bus mb\_plb, del tipo PLB (\textit{peripheral local bus)}.}
+\label{fig:fpgahard}
+\end{figure}
+
+El coprocesador de comunicaciones puede separarse en cuatro sub-módulos:
 
 \begin{description}
- \item[Transceptor de gigabit:] este componente de hardware es provisto por la FPGA. Puede pensarse en alto nivel como un serializador/deserializador (SERDES), pero contiene más de 15 subsistemas, incluyendo buffers, PLLs (\textit{phase-locked loop}), codificadores y decodificadores. Adicionalmente, el transceptor posee herramientas para sincronización y depuración, permitiendo realizar mediciones y crear lazos de realimentación o \textit{loopbacks} en tres puntos diferentes del flujo de datos para detectar anomalías. Se conecta a la lógica programable de la FPGA por medio de más de 200 señales de control y transferencia de datos, cuyas funciones son encapsuladas por un módulo especial de lógica, que simplifica la interfaz con el resto del sistema. Esta lógica de interfaz se implementó como un módulo de Verilog, llamado ``v5\_gtxwizard\_v1\_7\_tile.v'' en el árbol de código fuente.
+ \item[Transceptor de gigabit:] este componente de hardware es provisto por la FPGA. Puede pensarse en alto nivel como un serializador/deserializador (SERDES), pero contiene más de 15 subsistemas, incluyendo buffers, PLLs (\textit{phase-locked loop}), codificadores y decodificadores. Adicionalmente, el transceptor posee herramientas para sincronización y depuración, permitiendo realizar mediciones y crear lazos de realimentación o \textit{loopbacks} en tres puntos diferentes del flujo de datos para detectar anomalías. Se conecta a la lógica programable de la FPGA por medio de más de 200 señales de control y transferencia de datos, cuyas funciones son encapsuladas por un módulo especial de lógica, que simplifica la interfaz con el resto del sistema. Esta lógica de interfaz se implementó como un módulo de Verilog, llamado ``v5\_gtxwizard\_v1\_7\_tile.v'' en el código fuente.
 
  \item[Generador de frame:] este módulo se encarga de codificar los datos a transmitir y enviarlos por el transceptor de gigabit. Contiene implementaciones de todas las etapas necesarias, tales como el codificador de ARC4, Bloomfilter encriptado y expansión de peso de Hamming, así como también el sistema de sincronización de frame. La estructura interna es la de una máquina de estados finita, estando implementada íntegramente en lógica digital (sin utilizar ningún componente de software). Se implementó en un sólo módulo de Verilog llamado ``frame\_gen.v''.
  
  \item[Decodificador de frame:] la contrapartida del generador de frame es el decodificador, que posee los decodificadores correspondientes tales como Reed-Solomon, ARC4, Bloomfilter, expansión de peso de Hamming y finalmente el sincronizador de frame, que utiliza parcialmente el hardware de sincronización del transceptor de gigabit para ajustar los tiempos de recepción a nivel de byte, sumado a una sincronización propia para lograr ajustes a nivel de double-word y finalmente, sincronización de frame completo (ver sección \ref{fpga:sync}). En lugar de un diseño convencional del tipo CPU+memoria, el diseño de este módulo consiste en una máquina de estados finitos implementada puramente utilizando elementos lógicos de la FPGA. Se implementó en un sólo módulo de Verilog llamado ``frame\_dec.v''. Adicionalmente, un contador de BER se implementó en esta fase, dado que los datos enviados son un patrón de prueba y es posible medir la tasa de errores de manera simple. Las estadísticas de errores son exportadas mediante señales conectadas al módulo de control.
  
- \item[Módulo de control:] este módulo cumple la función de interfaz entre el sistema y el usuario, permitiendo modificar parámetros de manera sencilla y presentar las estadísticas de una manera rápida. Se presenta al usuario como un sistema de menús en modo texto, mediante los cuales el operador puede ejecutar comandos y leer valores del sistema. La interfaz al usuario se realiza a través de un puerto serial del tipo RS-232. Para su implementación se utilizó un soft-CPU (CPU sintetizado dentro de la misma FPGA) del tipo Xilinx Microblaze \cite{Xilinx:DS865}, y un programa en lenguaje C encargado de imprimir los menús de control y enviar y recibir datos hacia los módulos generadores y decodificadores de frame. Las operaciones se realizan de manera asincrónica con el resto del hardware, por lo que la velocidad de reloj del CPU puede ser muy reducida. Este módulo se implementa en el archivo ``copro1.v'' que también es el módulo principal del diseño, interconectando las señales de todos los submódulos de generación y decodificación de frames.
-\end{description}
+ \end{description}
+
+ 
 
 El sistema utiliza buffers tanto de lectura como de escritura al transceptor, por lo que puede operar a velocidades de reloj mucho menores. Por ejemplo, si el transceptor de gigabit posee un ancho máximo de bus TXDATAWIDTH y la velocidad de transferencia es TXCLOCK, la velocidad de reloj DATACLOCK necesaria para mantener los buffers internos del transceptor llenos es simplemente $DATACLOCK=TXCLOCK/TXDATAWIDTH$, por lo que transmitiendo a 5 Gbps utilizando el máximo TXDATAWIDTH de 32 bits, tenemos que $DATACLOCK=156Mhz$ un valor alcanzable para la FPGA utilizada y fácilmente implementable en un futuro diseño de ASIC (\textit{application-specific integrated circuit}).
 La velocidad de las implementaciones de generador CSPRNG ARC4 y el codificador/decodificador de Reed-Solomon son críticas para la performance del sistema ya que el resto de las etapas no introducen mayores retrasos. El algoritmo ARC4 fue implementado en Verilog poniendo especial énfasis en la performance, logrando un flujo de salida de un byte pseudoaleatorio por cada ciclo de reloj. Para el algoritmo Reed-Solomon se utilizó un IP de la biblioteca de Xilinx que tiene una performance óptima. Exceptuando este último algoritmo de Reed-Solomon, todo el resto del sistema fue implementado desde cero.
@@ -406,7 +419,7 @@ Como puede verse en las Figs.~\ref{fig:ImgOjo}, a tasas elevadas el pulso del bi
 
 
 \subsection{Problema de línea desbalanceada y codificación 8B/10B}
-
+\label{problemacodificacion}
 \begin{figure}[t]
   \centering
     \includegraphics[width=5in]{graphs/expansionbit.pdf}
@@ -468,6 +481,7 @@ No obstante, las pruebas e implementaciones sobre este medio pueden ser realizad
  \item Compartir URLs
 \end{itemize}
 
+La viabilidad de este sistema se demuestra con la reciente publicación de aplicaciones que utilizan este mismo método, utilizando ondas sonoras, para compartir fragmentos de información tales como URLs y contactos. Una aplicación popular de este tipo es Google Tone \cite{GoogleTone}, desarrollada por la empresa Google, que funciona como una extensión de su navegador de Internet.
 
 \subsection{Modulación}
 % de newJIS_140512
