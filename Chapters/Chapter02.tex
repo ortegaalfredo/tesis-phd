@@ -82,7 +82,7 @@ Existen muchos métodos para construir la matriz de paridad; uno muy utilizado c
 \section{CDMA}
 \label{espectroensanchado}
 La multiplexación por división de código, acceso múltiple por división de código o CDMA (del inglés, \textit{Code Division Multiple Access}) es el nombre genérico de varias técnicas de comunicación basadas en el espectro expandido, con el fin de lograr multiplexación o control de acceso al medio. 
-Se denomina espectro expandido a la utilización de mayor ancho de banda que el necesario para la transmisión correcta de los datos. Generalmente, se logra mediante la combinación de una señal señal de ensanchamiento o de pseudo-ruido, con la señal original, utilizando diferentes métodos.
+Se denomina espectro expandido a la utilización de mayor ancho de banda que el necesario para la transmisión correcta de los datos. Generalmente, se logra mediante la combinación de una señal señal de ensanchamiento o de pseudoruido, con la señal original, utilizando diferentes métodos.
 
 Los orígenes de este algoritmo se remontan al año 1903, cuando Nicola Tesla patentó el concepto de \textit{Frequency hopping} o salto en frecuencia, uno de los métodos de CDMA utilizados actualmente.
 
@@ -93,12 +93,20 @@ Estas tecnicas apuntan a conferir las siguientes propiedades al sistema de comun
 \item Capacidad de acceso múltiple: varios usuarios pueden transmitir utilizando el mismo medio y la misma área espectral mientras utilicen diferentes códigos.
 \end{enumerate} 
 
-Existen varios métodos de CDMA, entre ellos:
+Existen varios métodos de CDMA (ver Fig. \ref{fig_tdmacdma} para una representación gráfica), entre ellos:
 \begin{enumerate} 
 \item \textit{Direct-Sequence Spread Spectrum} (DSSS): se expande la señal combinándola con un código de pseudoruido o señal de ensanchamiento, mediante la operación lógica XOR, o mediante desplazamientos de fase. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares \cite{dixon1994spread}, el sistema GPS \cite{kaplan2005understanding}, etc.
-\item \textit{Frecuency-Hopping Spread Spectrum} (FHSS): la señal de ensanchamiento o pseudoruido es en este caso utilizada para variar la frecuencia portadora o canal de la señal original. Este método es empleado, por ejemplo, en el sistema BlueTooth de comunicación digital. En este caso se utiliza una variación llamada \textit{Adaptive Frequency Hopping}, un método para evitar frecuencias con mucha interferencia \cite{golmie2003bluetooth}.
+\item \textit{Frequency-Hopping Spread Spectrum} (FHSS): la señal de ensanchamiento o pseudoruido es en este caso utilizada para variar la frecuencia portadora o canal de la señal original. Este método es empleado, por ejemplo, en el sistema BlueTooth de comunicación digital. En este caso se utiliza una variación llamada \textit{Adaptive Frequency Hopping}, un método para evitar frecuencias con mucha interferencia \cite{golmie2003bluetooth}.
 \item \textit{Time-Hopping Spread Spectrum}: en este método, también llamado modulación por posición de pulso, la señal de datos no se transmite todo el tiempo sino que se divide en pulsos de transmisión, que sufren de un retraso que depende de la señal de ensanchamiento o pseudoruido. Actualmente, esta técnica no es tan utilizada como las anteriores, aunque se estudiará detenidamente en nuestro caso ya que fue el método seleccionado.
 \end{enumerate} 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.38 \textwidth]{graphs/tdmacdma} 
+  \caption{Comparación gráfica entre las separaciones de canal en TDMA (\textit{Time División Multiple Access}), FDMA (\textit{Frequency División Multiple Access}) y CDMA (\textit{Code División Multiple Access})}
+  \label{fig_tdmacdma}
+\end{figure}
+
 
 
 \section{Códigos de generación de pseudoruido}
@@ -115,7 +123,7 @@ Si fuera necesario que la comunicación sea privada, es deseable que la secuenci
 
  Estas caracteristicas pueden lograrse utilizando un algoritmo denominado "generador pseudoaleatorio" (PRBS, segun la sigla en inglés), que genera la secuencia basado en un parámetro de inicialización o semilla, siendo capaz de generar un flujo de números aparentemente aleatorio pero, en realidad, totalmente determinístico. Adicionalmente, un generador que cumple con el punto 3) se denomina \textit{criptográficamente seguro}, ya que es apto para su uso en criptografía. Es necesario que los nodos que participen de toda comunicación privada puedan generar exactamente la misma secuencia, por lo que deberán compartir la \textit{semilla} del PRBS.
 
-Existen muchos métodos o algoritmos para generar flujos de números pseudo-aleatorios. Un parámetro importante es la cantidad de bits que el generador es capaz de producir antes de que se repita la secuencia o período. Este parámetro es denominado  del "periodo del generador", y en aplicaciones criptográficas es deseable que sea lo mayor posible. Sin embargo, el hecho de tener un período largo no es suficiente para que el generador pseudoaleatorio pueda ser utilizado en aplicaciones criptográficas. Podemos citar el caso del algoritmo denominado Mersenne-twister \cite{matsumoto1998mersenne}, cuya aplicación más popular tiene un periodo de $2^{19937}-1$; sin embargo existen métodos para predecir la secuencia sin conocer la semilla \cite{argyros2012forgot}, por lo que no es apto para su uso en aplicaciones seguras.
+Existen muchos métodos o algoritmos para generar flujos de números pseudoaleatorios. Un parámetro importante es la cantidad de bits que el generador es capaz de producir antes de que se repita la secuencia o período. Este parámetro es denominado  del "periodo del generador", y en aplicaciones criptográficas es deseable que sea lo mayor posible. Sin embargo, el hecho de tener un período largo no es suficiente para que el generador pseudoaleatorio pueda ser utilizado en aplicaciones criptográficas. Podemos citar el caso del algoritmo denominado Mersenne-twister \cite{matsumoto1998mersenne}, cuya aplicación más popular tiene un periodo de $2^{19937}-1$; sin embargo existen métodos para predecir la secuencia sin conocer la semilla \cite{argyros2012forgot}, por lo que no es apto para su uso en aplicaciones seguras.
 Otras características deseables en un generador PRBS son, su baja complejidad, bajo consumo de recursos y alta velocidad de generación. Un generador PRBS muy popular utilizado en implementaciones de software es el denominado "generador congruencial lineal", un algoritmo extremadamente simple que solo precisa de dos operaciones: una multiplicación y una suma, siendo utilizado en aplicaciones de estadística y software \cite{park1988random}.
 
 \subsection{Generadores criptográficamente seguros}
@@ -186,11 +194,10 @@ Como el algoritmo propuesto se basa en CDMA del tipo \textit{time hopping}, efec
   \centering
   \includegraphics[width=0.5 \textwidth]{graphs/concentrador} 
   \caption{Esquema del concentrador central donde se observa que el flujo de datos de retorno es siempre la sumatoria de todos los datos de entrada.}
-%  \caption{Utilizacion del canal de 10 Gbps. Cada uno de los clientes (variando de 123 a 158) transmitieron 1 Gbit de datos. Notar la mejora en la utilización del ancho de banda comparada con~\cite{ortega11}.}
   \label{fig_use}
 \end{figure}
 
-Podría argumentarse que el sistema es similar al esquema \textit{Time Division Multiple Access} (TDMA) donde también se divide el tiempo en tramas y casilleros. Pero en contraste con TDMA, en el esquema propuesto el atacante necesita interceptar cada una de las fibras ópticas para identificar a cada usuario, ya que no es posible identificar exactamente el casillero de transmisión luego de pasar por el concentrador central. Por último, aún si el atacante pudiera identificar los datos, no podría descifrarlos sin poseer la clave correcta, ya que estos están desordenados por el time hopping y tienen normalizado el peso de Hamming.
+Podría argumentarse que el sistema es similar al esquema \textit{Time Division Multiple Access} (TDMA, ver Fig. \ref{fig_tdmacdma}) donde también se divide el tiempo en tramas y casilleros. Pero en contraste con TDMA, en el esquema propuesto el atacante necesita interceptar cada una de las fibras ópticas para identificar a cada usuario, ya que no es posible identificar exactamente el casillero de transmisión luego de pasar por el concentrador central. Por último, aún si el atacante pudiera identificar los datos, no podría descifrarlos sin poseer la clave correcta, ya que estos están desordenados por el time hopping y tienen normalizado el peso de Hamming.
 
 
 \section{Estado del Arte}
@@ -202,7 +209,7 @@ Las comunicaciones ópticas pueden utilizar algoritmos de criptografía clásico
 
 Actualmente, un dispositivo muy utilizado capaz de realizar criptografía a alta velocidad sobre fibra óptica es la FPGA, la cual, con la correcta paralelización del procesamiento de datos, puede alcanzar la velocidad máxima permitida por sus transceptores (por ejemplo, 400 Gbps~\cite{Algotronix}).
 
-\subsection{Criptografía puramente óptica}
+\subsection{Criptografía púramente óptica}
 \label{optocry}
 Un campo de investigación activo en la actualidad es el de la criptografía puramente óptica. La eliminación de las etapas electrónicas y la conversión electro óptica de los datos para su procesamiento tiene muchas ventajas, principalmente en la velocidad y la potencia consumida por el sistema.
 La dificultad principal de este método consiste en lograr una fuerza de cifrado adecuada, y en la implementación de los algoritmos necesarios utilizando solamente componentes ópticos. Podemos mencionar algunos resultados publicados tales como los avances en la creación de compuertas lógicas puramente ópticas \cite{jung2008demonstration}, o la utilización de señales caóticas para transmisión~\cite{liu2002synchronized}.
