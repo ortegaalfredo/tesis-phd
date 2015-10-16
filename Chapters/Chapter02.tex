@@ -1,7 +1,7 @@
-\chapter{Fundamentos y Estado del arte}
+\chapter{Fundamentos y estado del arte}
 
 %En este capítulo se intentara dar una breve reseña de las investigaciones mas recientes en el campo de las comunicaciones ópticas. 
-En este capítulo se presentan las bases y fundamentos de las técnicas desarrolladas y utilizadas en esta Tésis. 
+En este capítulo se presentan las bases y fundamentos de las técnicas desarrolladas y utilizadas en esta Tesis. 
 Primeramente, se da una breve explicación del concepto de códigos correctores de errores, continuando con los distintos algoritmos utilizados en la implementación. Luego, se define el concepto de espectro ensanchado, una técnica utilizada en comunicaciones pero implementada de un modo poco convencional en esta Tesis. Posteriormente, se definen los aspectos de seguridad a tener en cuenta al utilizar los algoritmos previamente mencionados, asi como el el concepto de nivel de fuerza criptográfica y de cual es el objetivo a alcanzar con respecto a este último tema.
 
 Para finalizar, en la sección de estado del arte se repasa el estado de las tecnologías y sistemas en uso actualmente, y se lo compara con el sistema descrito en esta Tesis.
@@ -88,8 +88,8 @@ Los orígenes de este algoritmo se remontan al año 1903, cuando Nicola Tesla pa
 
 Estas tecnicas apuntan a conferir las siguientes propiedades al sistema de comunicaciones:
 \begin{enumerate} 
-\item Resistencia contra ruido e interferencias: Como una fuente de ruido generalmente sólo afecta una parte del espectro, la mayor parte de la señal no se verá afectada, pudiéndose recuperar el resto de la información mediante técnicas de corrección de errores.
-\item Resistencia a interceptación: si un atacante no conoce la secuencia que se utilizó para expandir el espectro de la señal original (secuencia creada, por ejemplo, por un generador de números pseudoaleatorios o PRBS, ver \ref{PRNGs}), se dificulta o imposibilita diferenciar la señal expandida del ruido.
+\item Resistencia contra ruido e interferencias: como una fuente de ruido generalmente sólo afecta una region del espectro, la mayor parte de la señal no se verá interferida, pudiéndose recuperar el resto de la información mediante técnicas de corrección de errores.
+\item Privacidad: si un atacante no conoce la secuencia que se utilizó para expandir el espectro de la señal original (secuencia creada, por ejemplo, por un generador de números pseudoaleatorios o PRBS, ver \ref{PRNGs}), se dificulta o imposibilita diferenciar la señal expandida del ruido.
 \item Capacidad de acceso múltiple: varios usuarios pueden transmitir utilizando el mismo medio y la misma área espectral mientras utilicen diferentes códigos.
 \end{enumerate} 
 
@@ -103,7 +103,7 @@ Existen varios métodos de CDMA (ver Fig. \ref{fig_tdmacdma} para una representa
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.38 \textwidth]{graphs/tdmacdma} 
-  \caption{Comparación gráfica entre las separaciones de canal en TDMA (\textit{Time División Multiple Access}), FDMA (\textit{Frequency División Multiple Access}) y CDMA (\textit{Code División Multiple Access})}
+  \caption{Comparación gráfica entre las separaciones de canal en TDMA (\textit{Time Division Multiple Access}), FDMA (\textit{Frequency Division Multiple Access}) y CDMA (\textit{Code Division Multiple Access})}
   \label{fig_tdmacdma}
 \end{figure}
 
@@ -247,7 +247,7 @@ Vale mencionar que la distribución segura de claves también puede realizarse u
 Resumiendo, la seguridad de los sistemas de criptografía cuántica se basa en las bases de la mecánica cuántica, en contraste con los sistemas de criptografía tradicional que se basan en la complejidad computacional de ciertas funciones matemáticas~\cite{kohnfelder1978towards}. Sin embargo, vulnerabilidades y fallas en la implementación siempre afectarán la seguridad de ambos tipos de sistemas~\cite{lydersen2010hacking}.
 
 
-\subsection{Corrección de errores de canales asimétricos}
+\subsection{Corrección de errores en canales asimétricos}
  
 Se denominan códigos de corrección de errores asimétricos o unidireccionales, a todo código de corrección especializado en canales de comunicaciones cuya probabilidad de error no se aplica simétricamente a todos los símbolos. Un caso sencillo, es por ejemplo, el del llamado canal Z, un canal binario (símbolos ``1'' y ``0'') pero cuyos errores sólo pueden afectar a uno de los símbolos, como podría suceder en un sistema donde al transmitir el símbolo ``0'' un error provoque la recepción de un símbolo ``1'', pero donde lo contrario no es posible. En la figura~\ref{fig:Gal} se observa el diagrama de probabilidades del canal binario asimétrico o canal Z. En la sección~\ref{canalZ} se desarrolla el límite de capacidad del canal Z.
 

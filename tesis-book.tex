@@ -2,7 +2,8 @@
 
 \usepackage{hyperref}
 %\usepackage[spanish,english]{babel}
-\usepackage[spanish]{babel}
+\usepackage[spanish,english]{babel}
+
 \usepackage[utf8]{inputenc}
 %-------------------------------------
 
@@ -50,6 +51,7 @@
 
 
 \begin{document}
+\selectlanguage{spanish} 
 \title{\textbf{Sistema de transmisión segura punto a punto y multipunto en medios compartidos.}}
 \author{Alfredo Adrián Ortega}
 \dept{Doctorado}
@@ -67,6 +69,7 @@
 \degreeinitial{Doctor en Informática}
 
 \supervisor{Dr. Ignacio Alvarez-Hamelin}
+\supervisor{Dr. Diego Grosz}
 
 \firstreader{Dra. Jurado}
 \secondreader{Dr. Jurado}
@@ -83,7 +86,7 @@
 %\submitdate{Month Day, Year}
 %\defencedate{Month Day, Year}
 %\copyrightyear{Year}
-%\convocation{Month}{Year}
+\convocation{12}{2015}
 % FINNNNN
 
 
@@ -106,8 +109,17 @@
 %}
  
 \begin{abstract}
-En este trabajo se presenta una técnica novedosa de transmisión de datos en redes de tipo broadcast de manera criptográficamente segura utilizando técnicas de espectro expandido.
+En esta Tesis se presenta una técnica novedosa de transmisión de datos en redes del tipo difusión de manera criptográficamente segura utilizando técnicas de espectro expandido y corrección de errores. Específicamente, el esquema propuesto implementa la multiplexación aleatoria de la información transmitida por clientes que comparten un medio de transmisión. En particular, se demuestra un sistema capaz de crear múltiples Virtual Local Area Networks (VLANs), criptográficamente seguras, utilizando cualquier medio de transmisión que pueda ser modelado como un canal Z. Se muestran prototipos funcionales, sobre software para el caso de la transmisión a tasas de kpbs en un medio acústico, y utilizando  Field-Programmable Gate Arrays (FPGAs) en el caso de la transmisión a tasas de Gbps en un medio óptico. En el primer caso, se demuestra una tasa de 1 kbps con 16 clientes transmitiendo información simultáneamente y hasta una distancia de 1,2 m y, en el segundo, una tasa de 5 Gbps con 128 clientes simultáneos y distancias de hasta 20 km, con bajas tasas de error. El trabajo aquí presentado busca aportar alternativas para la implementación de  seguridad en capa física para redes de comunicación multiusuario.
 \end{abstract}
+
+\begin{otherlanguage}{english} 
+\begin{abstract}
+In this Thesis we present an original implementation of cryptographically secure transmission in broadcast-type networks by means of expanded spectrum and error correction techniques. Specifically, the proposed scheme relies on the random multiplexing of the information sent by clients sharing a transmission medium. 
+We demonstrate a system capable of creating multiple cryptographically-secure Virtual Local Area Networks (VLANs) operating over any transmission medium which renders itself to be modeled as a Z channel.
+Working prototypes of the proposed scheme are demonstrated: A 1 kbps rate wireless, acoustic, communication system implemented on software, supporting up to 16 clients 1.2 m apart, and a 5 Gbps communication system implemented on a Field-Programmable Gate Array (FPGA), supporting the simultaneous transmission of up to 128 clients, with a reach of 20 km and low bit error rates. 
+The ideas developed in this Thesis seek to offer alternatives to the implementation of security in the physical layer in multiuser communication networks.   
+\end{abstract}
+\end{otherlanguage}
 
 % \newpage
 % \mbox{}
@@ -119,20 +131,19 @@ En este trabajo se presenta una técnica novedosa de transmisión de datos en re
 
 
 \begin{listofpubs}
-Lo reportado en las siguientes publicaciones conforma la base de la
-presente tesis.
+Lo reportado en las siguientes publicaciones conforma la base de la presente Tesis:
 
 \begin{itemize}
-\item \textbf{Altas velocidades de transferencia en fibra óptica utilizando FPGAs de bajo costo. } \textit{A. A. Ortega, V. A. Bettachini, ; D.F. Grosz,; J. I. Alvarez-Hameln - Congreso de Microelectrónica Aplicada 2010 BsAs}
-\item \textbf{ Point-to-point and Point-to-multipoint CDMA Access Network with Enhanced Security} \textit{ A. A. Ortega, V. A. Bettachini, ; J. I. Alvarez-Hameln ; D.F. Grosz, Advanced Photonics 2011 Congress - Access Networks and In-house CommunicationsAccess Networks and In-house Communications, OSA Technical Digest, Optical Society of America}
-\item \textbf{Hamming-weight minimisation coding for CDMA optical access networks with enhanced security} \textit{ A. A. Ortega, V. A. Bettachini, ; J. I. Alvarez-Hameln ; D.F. Grosz, Future Generation Communication Technology (FGCT), 2012}
-\item \textbf{Encrypted CDMA Audio Network.} \textit{ A. A. Ortega, V. A. Bettachini, P. I. Fierens, y J. I. Alvarez-Hamelin.  Journal of Information Security - 2014}
-\item \textbf{DISPOSITIVO Y MÉTODO PARA TRANSMISIÓN SEGURA DE DATOS SOBRE CANALES Z MEDIANTE CDMA (AR084155B1)}\textit{José Ignacio ALVAREZ HAMELIN, Victor Alexis BETTACHINI, and Alfredo ORTEGA. PCT, 12 2012. (Asignada)}
+\item \textbf{Altas velocidades de transferencia en fibra óptica utilizando FPGAs de bajo costo. } \textit{A. A. Ortega, V. A. Bettachini, D.F. Grosz, J. I. Alvarez-Hamelin - Congreso de Microelectrónica Aplicada 2010 BsAs}
+\item \textbf{ Point-to-point and Point-to-multipoint CDMA Access Network with Enhanced Security} \textit{ A. A. Ortega, V. A. Bettachini, J. I. Alvarez-Hamelin, D.F. Grosz, Advanced Photonics 2011 Congress - Access Networks and In-house Communications, OSA Technical Digest, Optical Society of America}
+\item \textbf{Hamming-weight minimisation coding for CDMA optical access networks with enhanced security} \textit{ A. A. Ortega, V. A. Bettachini, J. I. Alvarez-Hamelin, D.F. Grosz - Future Generation Communication Technology (FGCT) 2012}
+\item \textbf{Encrypted CDMA Audio Network.} \textit{ A. A. Ortega, V. A. Bettachini, P. I. Fierens, J. I. Alvarez-Hamelin -  Journal of Information Security - 2014}
+\item \textbf{DISPOSITIVO Y MÉTODO PARA TRANSMISIÓN SEGURA DE DATOS SOBRE CANALES Z MEDIANTE CDMA (AR084155B1)}\textit{José Ignacio ALVAREZ HAMELIN, Victor Alexis BETTACHINI y  Alfredo ORTEGA. PCT, 12 2012. (Asignada)}
 \end{itemize}
 \end{listofpubs}
 
 \begin{acknowledgements}
-Agradecimientos...
+Esta Tesis esta dedicada a las personas que me alentaron constantemente y la hicieron posible: mis supervisores Dr. Alvarez Hamelin y Dr. Grosz, los investigadores del laboratorio de Optoelectrónica del ITBA, y por supuesto, mi familia.
 \end{acknowledgements}
 
 

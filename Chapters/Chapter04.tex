@@ -50,8 +50,8 @@ Una simple modificación al ejemplo anterior permite prescindir del uso de archi
 
 En la primera configuración del simulador se puede acceder a los archivos temporales intermedios, útiles para depuración y mediciones por etapa, mientras que la segunda configuración tiene la ventaja de aprovechar la totalidad de los procesadores disponibles en el sistema, ya que en un sistema multiprocesador, el sistema operativo usualmente asigna un CPU a cada etapa y estas se ejecutan en paralelo.
 
-La implementación sobre un medio acústico no presenta mayores inconvenientes con respectos a la velocidad de procesamiento, , ya que las tasas de transmisión son bajas, acotadas naturalmente por el medio de transmisión y ancho de banda disponible, por lo que los recursos computacionales necesarios para la simulación son limitados. 
-Utilizando el medio óptico, normalmente se necesita simular una transmisión de 10e9 bits o más para obtener una medición confiable del BER del sistema, ya que este medio tiene naturalmente una tasa de transmisión elevada y un BER pequeño, del orden de 10e-12. Adicionalmente, sobre este último medio el sistema soporta un máximo de 128 clientes que son simulados simultáneamente, por lo que los recursos computacionales requeridos son considerables. A raíz de este problema, y aprovechando que la simulación es altamente paralelizable, se implementó un sistema de estilo cliente-servidor donde los cálculos son distribuidos en un grupo de nodos.
+La implementación sobre un medio acústico no presenta mayores inconvenientes con respectos a la velocidad de procesamiento, ya que las tasas de transmisión son bajas, acotadas naturalmente por el medio de transmisión y ancho de banda disponible, por lo que los recursos computacionales necesarios para la simulación son limitados. 
+Utilizando el medio óptico, normalmente se necesita simular la transmisión de un gigabit o más para obtener una medición confiable del BER del sistema, ya que este medio tiene naturalmente una tasa de transmisión elevada y un BER pequeño, del orden de 10e-12. Adicionalmente, sobre este último medio el sistema soporta un máximo de 128 clientes que son simulados simultáneamente, por lo que los recursos computacionales requeridos son considerables. A raíz de este problema, y aprovechando que la simulación es altamente paralelizable, se implementó un sistema de estilo cliente-servidor donde los cálculos son distribuidos en un grupo de nodos.
 
 \subsection{Etapa de corrección de errores/scrambler}
 
@@ -198,7 +198,7 @@ Este BER es lo suficientemente bajo para permitir rutinas de corrección de erro
 \begin{figure}[t]
   \centering
   \includegraphics[width=5in]{graphs/BER-tesis.pdf} 
-  \caption{BER del canal de un ONU a 10 Gbps Vs. la cantidad de ONUs activos. La curva de ``BER 16-bits'' utiliza símbolos de 16-bits. Tiene mejor performance que la curva ``BER 8-bits'' con símbolos de 8 bits. Finalmente, si simulamos el ruido óptico del canal, la performance disminuye ligeramente como puede verse en la curva ``BER 8-bits con ruido óptico''.}
+  \caption{BER del canal de un ONU a 10 Gbps vs. la cantidad de ONUs activos. La curva de ``BER 16 bits'' utiliza símbolos de 16-bits. Tiene mejor performance que la curva ``BER 8 bits'' con símbolos de 8 bits. Finalmente, si simulamos el ruido óptico del canal, la performance disminuye ligeramente como puede verse en la curva ``BER 8 bits con ruido óptico''.}
   \label{sim:access}
 \end{figure}
 
@@ -271,10 +271,10 @@ verificación y depuración ChipScope \cite{arshak2006testing}. Esta herramienta
 Con iBERT es posible medir en tiempo real varios parámetros del transceptor, así como realizar estadísticas y mediciones de error, variando tasas y características de la transmisión en tiempo real.
  
 \end{itemize}
-\subsection{Tranceptores de multigigabit}
-La plataforma de FPGA de Xilinx no fue seleccionada solamente para utilizar la capacidad de procesamiento de la lógica programable para transmisión de datos a altas velocidades, sino por la versatilidad y velocidad de los transceptores de multigigabit incluidos en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos a muy alta velocidad, así como las interfaces para conectar las salidas eléctricas directamente a las entradas de transceptores ópticos, como uno o más SFPs \cite{ug198} (ver figura \ref{fig:fpga}, punto 1). Es necesario mencionar que no existe razón técnica para utilizar un proovedor de FPGAs en particular, ya que muchos proovedores de FPGAs, como por ejemplo Altera \cite{Altera}, poseen disponibles dispositivos de similares características y precio que Xilinx.
+\subsection{Tranceptores multigigabit}
+La plataforma de FPGA de Xilinx no fue seleccionada solamente para utilizar la capacidad de procesamiento de la lógica programable para transmisión de datos a altas velocidades, sino por la versatilidad y velocidad de los transceptores multigigabit incluidos en las mismas, esto es, la ``maquinaria'' necesaria para serializar/des-serializar y codificar bits de datos a muy alta velocidad, así como las interfaces para conectar las salidas eléctricas directamente a las entradas de transceptores ópticos, como uno o más SFPs \cite{ug198} (ver figura \ref{fig:fpga}, punto 1). Es necesario mencionar que no existe razón técnica para utilizar un proovedor de FPGAs en particular, ya que muchos proovedores de FPGAs, como por ejemplo Altera \cite{Altera}, venden dispositivos de similares características y precio que Xilinx.
 
-Los transceptores multigigabit están preparados para operar sobre diversos medios físicos como, por ejemplo, sobre cables trenzados de cobre o líneas de transmisión de alta velocidad sobre PCBs (\textit{printed circuit boards}). Serial-ATA \cite{serial2001high} y PCI-Express \cite{budruk2004pci} son protocolos de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Sin embargo, en redes de comunicaciones PON, además de funcionar a tasas transmisión  multigigabit se necesitan alcances del orden de kilómetros, características que suelen requerir un medio de transmisión que utiliza fibras ópticas.  El transceptor posee varios módulos adicionales como, por ejemplo, un sistema de sincronización por hardware, sistemas de recuperación de reloj y la capacidad de realizar una codificación 8B/10B \cite{widmer1983dc} adicional, con el objetivo de mantener el balance de DC (\textit{direct current}), pero este último módulo fue desactivado ya que interfiere con los demás codificaciones (para una explicación mas detallada, ver sección \ref{problema8b10b}).
+Los transceptores multigigabit están preparados para operar en diversos medios físicos como, por ejemplo, cables trenzados de cobre o líneas de transmisión de alta velocidad sobre PCBs (\textit{printed circuit boards}). Serial-ATA \cite{serial2001high} y PCI-Express \cite{budruk2004pci} son protocolos de transmisión de datos que suelen ser implementados utilizando los transceptores de la FPGA. Sin embargo, en redes de comunicaciones PON, además de funcionar a tasas transmisión  multigigabit se necesitan alcances del orden de kilómetros, características que suelen requerir un medio de transmisión que utiliza fibras ópticas.  El transceptor posee varios módulos adicionales como, por ejemplo, un sistema de sincronización por hardware, sistemas de recuperación de reloj y la capacidad de realizar una codificación 8B/10B \cite{widmer1983dc} adicional, con el objetivo de mantener el balance de DC (\textit{direct current}), pero este último módulo fue desactivado ya que interfiere con los demás codificaciones (para una explicación mas detallada, ver sección \ref{problema8b10b}).
 
 \subsection{Diseño digital del sistema propuesto}
 \begin{figure}[t]
@@ -293,7 +293,7 @@ El módulo de control cumple la función de interfaz entre el sistema y el usuar
 \begin{figure}[t]
   \centering
     \includegraphics[width=5.25in]{graphs/diagramaXilinx.png}
-\caption {Diseño de hardware sobre la FPGA: Se aprecian los módulos principales, siendo copro1 el coprocesador de comunicaciones. microblaze\_0 es el CPU y bram\_block es el bloque de memoria utilizado por el CPU, conectado al mismo mediante dos buses: dlmb y ilmb, buses de datos e instrucciones del tipo LMB (\textit{local memory bus}). El coprocesador se conecta mediantes dos buses, llamados copro1\_0\_to\_microblaze\_0 y microblaze\_0\_to\_copro1, ambos buses del tipo FSL (\textit{fast simplex link}). Finalmente, el CPU se conecta a los periféricos como RS232 y switches por medio del bus mb\_plb, del tipo PLB (\textit{peripheral local bus)}.}
+\caption {Diseño de hardware sobre la FPGA: se aprecian los módulos principales, siendo copro1 el coprocesador de comunicaciones. microblaze\_0 es el CPU y bram\_block es el bloque de memoria utilizado por el CPU, conectado al mismo mediante dos buses: dlmb y ilmb, buses de datos e instrucciones del tipo LMB (\textit{local memory bus}). El coprocesador se conecta mediantes dos buses, llamados copro1\_0\_to\_microblaze\_0 y microblaze\_0\_to\_copro1, ambos buses del tipo FSL (\textit{fast simplex link}). Finalmente, el CPU se conecta a los periféricos como RS232 y switches por medio del bus mb\_plb, del tipo PLB (\textit{peripheral local bus)}.}
 \label{fig:fpgahard}
 \end{figure}
 
@@ -323,7 +323,7 @@ La velocidad de las implementaciones de generador CSPRNG ARC4 y el codificador/d
    \qquad
    \subfloat[Tasa de $7.5$ Gbps, 20ns por división.]{{\includegraphics[width=0.45 \textwidth]{graphs/medicionesPaper/eye71G.png} }}%
    \qquad
-  \caption {Diagramas de ojo de la señal óptica a la salida de la fibra. Se aprecia una degradación importante de la calidad de la señal al aumentar la tasa de bits.}
+  \caption {Diagramas de ojo de la señal óptica a la salida de la fibra. Se observa una degradación importante de la calidad de la señal al aumentar la tasa de bits.}
   \label{fig:ImgOjo}
 \end{figure}
 
@@ -375,7 +375,7 @@ fuera del rango de operación especificado por el fabricante.
   \centering
     %\includegraphics[scale=0.70]{plot.png}
     \includegraphics[width=4.2in,angle=270]{graphs/BER_sp_gray.pdf}
-\caption {BER vs. punto de muestreo: La FPGA permite muestrear el valor del bit en 128 puntos equidistantes dentro del tiempo de bit. El BER aumenta cuando el punto de muestreo esta cerca de los extremos del bit (valores 0 y 128), donde el diagrama de ojo es más cerrado. Los diagramas de ojo pueden verse en la Fig. \ref{fig:ImgOjo}.}
+\caption {BER vs. punto de muestreo: la FPGA permite muestrear el valor del bit en 128 puntos equidistantes dentro del tiempo de bit. El BER aumenta cuando el punto de muestreo esta cerca de los extremos del bit (valores 0 y 128), donde el diagrama de ojo es más cerrado. Los diagramas de ojo pueden verse en la Fig. \ref{fig:ImgOjo}.}
 \label{fig:BERvsSamplingPoint}
 \end{figure}
 
@@ -423,7 +423,7 @@ Como puede verse en las Figs.~\ref{fig:ImgOjo}, a tasas elevadas el pulso del bi
 \begin{figure}[t]
   \centering
     \includegraphics[width=5in]{graphs/expansionbit.pdf}
-\caption {Se detalla la expansión del tiempo de bit (en picosegundos) en una señal desbalanceada a medida que la cantidad de unos por trama va disminuyendo. El tamaño de la trama es de 512 bits, por lo que son necesarios 256 bits en uno para lograr una señal perfectamente balanceada. La tasa nominal en este caso es de 2.5 Gbps, por lo que el ancho de bit normal es 400 ps.}
+\caption {Se detalla la expansión del tiempo de bit (en picosegundos) en una señal desbalanceada a medida que la cantidad de unos por trama va disminuyendo. El tamaño de trama es de 512 bits, la tasa nominal es 2.5 Gbps y la duracion del bit es de 400ps.}
 \label{fig:expansionbit}
 \end{figure}
 
@@ -459,7 +459,7 @@ Este desbalanceo se soluciona simplemente aplicando las codificaciones a los dat
 
 La sincronización no se trató detenidamente en la sección teórica de esta Tesis ya que desde un principio se consideró como un tema ajeno a la misma. Sin embargo, para la implementación final es imprescindible obtener la sincronización entre los nodos que deseen utilizar un canal. Esto no es una tarea sencilla considerando que debe hacerse sobre un canal que contiene una baja relación señal-ruido.
 
-La estrategia utilizada para la transmisión por el medio óptico es utilizar el hardware de sincronización que posee el transceptor de multigigabit ya incluido en la FPGA. Este módulo \cite{ug198} denominado ``\textit{Comma Alignment and Detection}'' se basa en la utilización de un prefijo o coma configurable que se compone de una serie de bits (que pueden tener 14 o 20 bits de largo en transceptores de tipo GTX) que se transmite cada vez que se desea sincronizar la etapa RX (receptor) con la TX (transmisor). Esta serie de bits es configurable pero es deseable que posea ciertas características, tales como una alta autocorrelación, para optimizar su detección en el flujo de datos recibidos.
+La estrategia utilizada para la transmisión por el medio óptico es utilizar el hardware de sincronización que posee el transceptor multigigabit ya incluido en la FPGA. Este módulo \cite{ug198} denominado ``\textit{Comma Alignment and Detection}'' se basa en la utilización de un prefijo o coma configurable que se compone de una serie de bits (que pueden tener 14 o 20 bits de largo en transceptores de tipo GTX) que se transmite cada vez que se desea sincronizar la etapa RX (receptor) con la TX (transmisor). Esta serie de bits es configurable pero es deseable que posea ciertas características, tales como una alta autocorrelación, para optimizar su detección en el flujo de datos recibidos.
 La sincronización se realiza en dos etapas:
 \begin{enumerate}
  \item El cliente que desea establecer un canal seguro envía al principio de sus datos el prefijo de sincronización o \textit{comma} (14 bits). Este prefijo es detectado por el módulo de alineación del receptor, que lo coloca en el buffer de entrada. Sin embargo, no se garantiza que el prefijo este siempre al principio del buffer, sino que puede estar tanto en el bit 0 (que sería una alineación perfecta), como en el bit 8, 16 o 24 (Ver fig.\ref{fig:optsync}). Esto es debido a que este buffer es de tipo anillo (\textit{ring buffer}).
