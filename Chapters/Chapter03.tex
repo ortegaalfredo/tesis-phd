@@ -15,7 +15,7 @@ Al ser un sistema de tipo time hopping CDMA \ref{espectroensanchado}, cada clien
  \item Existirá una inevitable interferencia entre los clientes, lo que requiere la utilización de algoritmos de corrección de errores.
 \end{itemize}
 
-Como se describe en la sección \ref{cap2:prng}, existen varios algoritmos CS-PRNG estandarizados \cite{gallagherfips}. Esta Tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera algoritmo utilizado por la industria que no posea ninguna vulnerabilidad conocida. Otra característica que debe maximizar el algoritmo seleccionado es la cantidad de bits pseudoaleatorios generados por ciclo de reloj, ya que al ser utilizados para seleccionar la posición de cada bit en un frame de largo $M$, se necesitarán generar como mínimo $\log_2(M)$ bits aleatorios por cada bit de datos\footnote{Esta cantidad es tal debido a para codificar una posición dentro de $M$ posibles valores, se necesitan $\log_2(M)$ bits.}, por lo que, en general, la velocidad del PRNG afectará directamente la velocidad total de codificación y decodificación del sistema.
+Como se describe en la sección \ref{cap2:prng}, existen varios algoritmos CS-PRNG estandarizados \cite{gallagherfips}. Esta Tesis no ahonda sobre el tema y nos limitaremos a indicar que puede seleccionarse cualquiera algoritmo utilizado por la industria que no posea ninguna vulnerabilidad conocida. Otra característica que debe maximizar el algoritmo seleccionado es la cantidad de bits pseudoaleatorios generados por ciclo de reloj, ya que al ser utilizados para seleccionar la posición de cada bit en una trama de largo $M$, se necesitarán generar como mínimo $\log_2(M)$ bits aleatorios por cada bit de datos\footnote{Esta cantidad es tal debido a para codificar una posición dentro de $M$ posibles valores, se necesitan $\log_2(M)$ bits.}, por lo que, en general, la velocidad del PRNG afectará directamente la velocidad total de codificación y decodificación del sistema.
 
 Un aporte importante de esta Tesis es el desarrollo de un método de corrección de errores adaptados al medio de transmisión, aprovechando las características del canal para recuperar información con una elevada cantidad de interferencia, producida por el método aleatorio de selección de casillero de transmisión.
 
@@ -61,8 +61,8 @@ Un parámetro importante en la selección del algoritmo es la facilidad de imple
 
 A continuación, se listan las características de la implementación en hardware (FPGA) de Reed-Solomon:
 
-El bloque de IP se denomina Reed-Solomon Encoder/Decoder 7.1 de LogiCORE IP. Con respecto al retraso, Reed-Solomon es un algoritmo de complejidad asimétrica, es decir, la complejidad espacio-temporal y ciclomática \cite{mccabe1976complexity} de los algoritmos de codificación de Reed-Solomon son diferentes a las de su correspondiente algoritmo de decodificación. En general, la decodificación es más costosa en términos de recursos de hardware y de latencia agregada al sistema. Según la especificación de esta implementación~\cite{Xilinx:DS252}, el decodificador Reed-Solomon con configuración CCSDS \cite{coding1999consultative} (que implementa el estándar (255,223)) posee un tamaño de 1364 LUTS (\textit{Look-up tables}, los elementos lógicos de la FPGA) y 3 bloques de RAM. Como comparación, el diseño completo posee un tamaño de aproximadamente 20000 LUTS, mientras que la FPGA utilizada posee una capacidad de 50000 LUTS. La velocidad máxima de reloj de este algoritmo en la FPGA utilizada es de aproximadamente 350 Mhz, superior a la velocidad requerida por el sistema completo a máxima velocidad, que es de aproximadamente 70 Mhz.
-La cantidad de recursos utilizados por el codificador es menor: son necesarios solo 300 LUTS y un bloque de memoria, aunque la velocidad máxima es similar~\cite{Xilinx:DS251}.
+El bloque de IP se denomina Reed-Solomon Encoder/Decoder 7.1 de LogiCORE IP. Con respecto al retraso, Reed-Solomon es un algoritmo de complejidad asimétrica, es decir, la complejidad espacio-temporal y ciclomática \cite{mccabe1976complexity} de los algoritmos de codificación de Reed-Solomon son diferentes a las de su correspondiente algoritmo de decodificación. En general, la decodificación es más costosa en términos de recursos de hardware y de latencia agregada al sistema. Según la especificación de esta implementación~\cite{Xilinx:DS252}, el decodificador Reed-Solomon con configuración CCSDS \cite{coding1999consultative} (que implementa el estándar (255,223)) posee un tamaño de 1364 LUTS (\textit{Look-up tables}, los elementos lógicos de la FPGA) y 3 bloques de RAM. Como comparación, el diseño completo presentado en esta tesis, posee un tamaño de aproximadamente 20000 LUTS, mientras que la FPGA utilizada posee una capacidad de 50000 LUTS. La velocidad máxima de reloj de este algoritmo en la FPGA utilizada es de aproximadamente 350 Mhz, superior a la velocidad requerida por el sistema completo a máxima velocidad, que es de aproximadamente 70 Mhz.
+La cantidad de recursos utilizados por el codificador es menor: son necesarios sólo 300 LUTS y un bloque de memoria, aunque la velocidad máxima es similar~\cite{Xilinx:DS251}.
 
 \subsection{Cálculo de latencia de la etapa de corrección de errores}
 La latencia en un sistema se define como el tiempo que demora un bit en atravesarlo en su totalidad. Específicamente, el retraso en la etapa de corrección de errores representa un porcentaje importante de la latencia total en la pila de comunicación del sistema. La latencia de un algoritmo es específica a una implementación en particular.
@@ -97,12 +97,12 @@ Específicamente, las comunicaciones digitales suelen modelarse como un canal di
 
 Otro parámetro importante que define a un canal discreto es la distribución de probabilidades condicionales $P(y|x)$ entre ambos alfabetos, es decir, la posibilidad de que al recibir el símbolo $x$ se haya transmitido el símbolo $y$. Esta distribución puede representarse como un diagrama de distribución de probabilidades (ver figura \ref{fig:canbin}) o una matriz.
 
-De acuerdo con la distribución de probabilidades de error que mejor represente al canal físico de transmisión, el tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (\textit{Z Channel}), un canal digital en el que el ruido afecta solo uno de los símbolos binarios a transmitir.
+De acuerdo con la distribución de probabilidades de error que mejor represente al canal físico de transmisión, el tipo de canal que mejor modela las transmisiones digitales por fibra óptica es el denominado canal Z (\textit{Z Channel}), un canal digital en el que el ruido afecta sólo uno de los símbolos binarios a transmitir.
 
 Es este modelo de ruido nos permite innovar en el diseño de algoritmos, adaptándolos y optimizándolos para aprovechar la distribución de ruido, ya que la mayoría de los algoritmos de corrección de errores están pensados para un canal de ruido simétrico y generalmente analógico.
 Empezaremos primeramente estudiando un modelo simplificado del canal por el cual vamos a trasmitir, el mencionado canal simétrico binario.
 
-\section{Probabilidad de error de canal binario simétrico}
+\section{Probabilidad de error de canal binario simétrico y asimétrico}
 
 \begin{figure}[t]
   \begin{center}
@@ -114,39 +114,51 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 
 Para simplificar los cálculos, consideraremos como ruido solamente las colisiones con otros usuarios, ignorando otros tipos de ruido que pueda tener el canal físico. Por lo tanto, procederemos a calcular la probabilidad de no-colisión de un cliente.
 
-Sea $M$ la cantidad de casilleros por frame y $n$ la cantidad de clientes o usuarios.
+Sea $M$ la cantidad de casilleros por trama y $n$ la cantidad de clientes o usuarios.
 
-Entonces, la probabilidad de no colisión para un usuario en un canal simétrico esta dada por
+Entonces, la probabilidad de no colisión para un usuario en un slot dado es
 \begin{equation}
 P_{nc}=\left(\frac{M-1}{M}\right)^{n-1}
 \end{equation}
 
+Esta ecuación es válida bajo la hipótesis de que todos los clientes eligen el slot a transmitir de manera aleatoria, y de manera independiente. Tambien consideramos que los usuarios utilizan sólo un slot.
+\noindent Esta probabilidad es un poco más compleja en el caso de un canal Z. 
 
-\noindent Mientras que la probabilidad de no colisión para un usuario en un canal Z es
+Siendo $P_{nc}(1)$ la probabilidad de no colisión del símbolo uno, y $P_{nc}(0)$ la probabilidad de no colisión del símbolo cero, la probabilidad total de no colisión para un usuario en un canal Z es
+
+\begin{equation}
+P_{nc}=P(1)\cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) 
+\end{equation}
+Asumiendo que todos los usuarios transmiten un stream de datos aleatorio, tenemos que $P(1)=P(0)=\frac{1}{2}$, y además al ser un canal Z, podemos asumir que $P_{nc}(1)=1$ porque el símbolo uno nunca colisiona (ver Fig. \ref{fig:Gal}). Entonces podemos desarrollar $P_{nc}$ como
+
 \begin{eqnarray}
-P_{nc} & = & P(1) \cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) \\
 P_{nc} & = & \frac{1}{2} \cdot 1 +  \frac{1}{2} \cdot \sum_{i=0}^{n-1} 
 C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{M}\right)^{n-1-i}  \left(\frac{1}{2}\right)^{n-1-i} 
 \end{eqnarray}
 
-\noindent Donde $\left(\frac{M-1}{M}\right)^i$ es la probabilidad de no colisión de $i$ canales (se suma para todo posible número de canales no
+La complejidad de la ecuación 3.2 se encuentra entonces en el desarrollo de $P_{nc}(0)$. Cada término de la sumatoria del segundo término del RHS de la ecuación 3.3 da la probabilidad de que $(n-i-1)$ usuarios escriban un 1 en el slot seleccionado.
+El factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales que no hayan colisionado, que son hechos independientes.
+\noindent Luego, $\left(\frac{M-1}{M}\right)^i$ es la probabilidad de no colisión de $i$ canales (se suma para todo posible número de canales no
 colisionando: $1\leq i\leq n$, que están en otro casillero), $
 \left(\frac{1}{M}\right)^{n-1-i}$ es la probabilidad de colisión de los restantes
 $n-1-i$, y la colisión se produce cuando los otros canales
-transmiten el símbolo $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$. El
-factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales que no
-hayan colisionado, que son hechos independientes.
+transmiten el símbolo $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$.
+%El factor combinatorio (C^{n-1}_{i}) me da la cantidad de grupos de i (o de n-1-i) usuarios de entre los (n-1) restantes puedo formar (es decir, la cantidad de formas que puedo escoger grupos de (n-1-i) personas que me sobreescriban mi querido 0).  El segundo factor me da la probabilidad de que i de los restantes (n-1) usuarios seleccionen OTROS slots. El tercer factor me da la probabilidad de que el grupo selecto de (n-1-i) usuarios elijan MI slot. Finalmente, el último factor me da la probabilidad de que los rhdp del grupo selecto de (n-1-i) usuarios escriban un 1 en MI slot
+
+
 
 \noindent Teniendo en cuenta que $ \sum_{i=0}^{n-1}
 C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{2M}\right)^{n-1-i}$ es la potencia $n-1$ de un binomio, reemplazando tenemos
 \begin{eqnarray}
 P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(\frac{M-1}{M} + \frac{1}{2M} \right)^{n-1} \\
 P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2M} \right)^{n-1} \\
-P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{-1/2} REVISAR ESTO
+P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{\frac{-n}{2M}}
 \end{eqnarray}
 
-\noindent donde la última aproximación vale para $n=M$ y $n > 2AR$.
+\noindent donde la última aproximación vale para $n=M$ y $n > 2$.
 
+
+Es decir, la probabilidad de no colisión depende de la relación $n/M$. Si $M>>n$, entonces $P_{nc}$ se aproxima a 1, que es una característica deseable en el sistema.
 \iffalse
 
 \vspace{5mm}
@@ -291,10 +303,10 @@ La diferencia entre las capacidades de ambos tipos de canal puede apreciarse en 
 \section{Filtros de Bloom}
 \label{Bloomf}
 Como se discutió en la sección \ref{Seguridad} , la colisiones de símbolos son inherentes al tipo de codificación seleccionada.
-En la modulación OOK (\textit{on-off keying}) utilizada en un medio óptico, solo los ‘1’s transmitidos pueden interferir con ‘0’s. Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el casillero de tiempo leído.
+En la modulación OOK (\textit{on-off keying}) utilizada en un medio óptico, sólo los ‘1’s transmitidos pueden interferir con ‘0’s. Este comportamiento puede ser modelado como un canal-Z porque la superposición de pulsos de luz individuales representando ‘1’s puede solamente ser identificados como un ‘1’s. De esto se desprende que un ‘0’ recibido es un signo inequívoco de la ausencia de pulsos en el casillero de tiempo leído.
 Una buena estructura para representar este tipo de datos es el filtro de Bloom \cite{Bloom70space/timetrade-offs}, que se utiliza comúnmente como función de \textit{hash}~ \cite{song2005fast}. Dichas funciones constituyen una familia de algoritmos utilizados como tests eficientes (complejidad temporal $O(1)$) de pertenencia de un miembro en un conjunto, a diferencia de una búsqueda normal que puede tener una complejidad temporal mucho mayor (podemos citar el algoritmo de búsqueda binario, con una complejidad de $O(log_2(n))$.
 
-La manera en que se implementó este algoritmo en el sistema propuesto se basa en copiar cada bit en $K$ casilleros del frame transmitido, siendo el frame la representación física del filtro de Bloom.
+La manera en que se implementó este algoritmo en el sistema propuesto se basa en copiar cada bit en $K$ casilleros de la trama transmitido, siendo la trama la representación física del filtro de Bloom.
 En el extremo receptor es suficiente recibir un solo ‘0’ entre las $K$ copias del bit, para inferir que el bit original era originalmente un ‘0’, mientras que si el bit original era un ‘1’, las colisiones no tienen efecto debido a la naturaleza del canal-Z.
 
 En la figura \ref{fig:Bloomf} puede apreciarse gráficamente como se utiliza un filtro de Bloom para la transmisión de 12 clientes con una repetición $K=3$. 
@@ -303,7 +315,7 @@ En la figura \ref{fig:Bloomf} puede apreciarse gráficamente como se utiliza un 
   \begin{center}
     \includegraphics[scale=0.55]{graphs/frame-sp}
   \end{center}
-  \caption{Filtro de Bloom. M es el largo del frame. $W_1$ es el peso de Hamming mínimo. El parámetro K es el número de repeticiones.}
+  \caption{Filtro de Bloom. M es el largo de la trama. $W_1$ es el peso de Hamming mínimo. El parámetro K es el número de repeticiones.}
   \label{fig:Bloomf}
 \end{figure}
 
@@ -318,15 +330,15 @@ En la figura \ref{fig:Bloomf} puede apreciarse gráficamente como se utiliza un 
 
 \subsection{Filtros de Bloom encriptados}
 
-En esta etapa se realiza la encriptación de los datos, reemplazando el algoritmo de hashing que selecciona las posiciones de los datos dentro del filtro de Bloom por una función pseudoaleatoria criptográficamente segura, de modo que los bits de datos de los diferentes clientes se posicionan aleatoriamente en el frame, y solo es posible decodificar los datos si se tiene exactamente la misma secuencia pseudoaleatoria con que fueron posicionados originalmente. Como esta secuencia está determinada por la semilla del algoritmo PRNG, los participantes deberán compartir esta semilla previamente, que es el equivalente a una clave o password simétrico. 
+En esta etapa se realiza la encriptación de los datos, reemplazando el algoritmo de hashing que selecciona las posiciones de los datos dentro del filtro de Bloom por una función pseudoaleatoria criptográficamente segura, de modo que los bits de datos de los diferentes clientes se posicionan aleatoriamente en la trama, y sólo es posible decodificar los datos si se tiene exactamente la misma secuencia pseudoaleatoria con que fueron posicionados originalmente. Como esta secuencia está determinada por la semilla del algoritmo PRNG, los participantes deberán compartir esta semilla previamente, que es el equivalente a una clave o password simétrico. 
 
-Desde el punto de vista de la modulación, el algoritmo PRNG selecciona la posición temporal dentro del frame, por lo que este esquema es equivalente a una transmisión time hopping, con la única salvedad de que el algoritmo de filtro de Bloom requiere K repeticiones de los datos para poder recuperarlos de colisiones en la recepción.
+Desde el punto de vista de la modulación, el algoritmo PRNG selecciona la posición temporal dentro de la trama, por lo que este esquema es equivalente a una transmisión time hopping, con la única salvedad de que el algoritmo de filtro de Bloom requiere $K$ repeticiones de los datos para poder recuperarlos de colisiones en la recepción.
 
-Para poder decodificar los datos en el filtro de Bloom receptor es necesario que todos los participantes posean la misma secuencia pseudoaleatoria, es decir, la misma clave o semilla generadora \ref{PRNGs} del mismo PRNG utilizado para codificar los datos, y todos deben estar sincronizados a nivel de frame con el nodo originante. Los frames del cliente originante y el receptor deben empezar y terminar al mismo tiempo para poder regenerar exactamente todas las posiciones en donde se transmitieron los datos. 
+Para poder decodificar los datos en el filtro de Bloom receptor es necesario que todos los participantes posean la misma secuencia pseudoaleatoria, es decir, la misma clave o semilla generadora \ref{PRNGs} del mismo PRNG utilizado para codificar los datos, y todos deben estar sincronizados a nivel de trama con el nodo originante. Las tramas del cliente originante y el receptor deben empezar y terminar al mismo tiempo para poder regenerar exactamente todas las posiciones en donde se transmitieron los datos. 
 
-Sin embargo, los demás clientes que utilizan el medio compartido solo causan interferencia y por lo tanto la sincronización a nivel de frame solo es necesaria entre los clientes que deseen compartir el canal encriptado. Esto reduce los requerimientos de sincronización y simplifica la implementación de la red.
+Sin embargo, los demás clientes que utilizan el medio compartido sólo causan interferencia y por lo tanto la sincronización a nivel de trama sólo es necesaria entre los clientes que deseen compartir el canal encriptado. Esto reduce los requerimientos de sincronización y simplifica la implementación de la red.
 
-Finalmente, es deseable, pero no necesario, que todos los clientes mantengan una sincronización a nivel de bit, es decir, que los tiempos de transmisión de todos los clientes estén suficientemente alineados para que el casillero de un cliente solo pueda superponerse con otro casillero de otro cliente y le cause un solo error de bit. Si esta sincronización no se mantiene, un casillero podría interferir con dos casilleros de otro cliente que está desalineado con respecto al primero, provocando dos errores en lugar de uno solo y aumentando los requerimientos de corrección de errores en el sistema.
+Finalmente, es deseable, pero no necesario, que todos los clientes mantengan una sincronización a nivel de bit, es decir, que los tiempos de transmisión de todos los clientes estén suficientemente alineados para que el casillero de un cliente sólo pueda superponerse con otro casillero de otro cliente y le cause un solo error de bit. Si esta sincronización no se mantiene, un casillero podría interferir con dos casilleros de otro cliente que está desalineado con respecto al primero, provocando dos errores en lugar de uno solo y aumentando los requerimientos de corrección de errores en el sistema.
 
 \section{Minimización de peso de Hamming}
 %% extraido de dline-pub.text
@@ -376,19 +388,21 @@ Puede observarse que el número de símbolos únicos con $HW=2$ y $N=363$ no es 
     \label{BERvsExpansion}
 \end{figure}
 
+La Figura \ref{BERvsExpansion} muestra tres simulaciones: una sin expansión, otra con una expansión de 8 bits y otra de 16 bits. En dicha figura se muestra el BER en función de la utilización del canal (el porcentaje real de uso por la totalidad de los clientes cuando se elimina todos los bits extras de las codificaciones, es decir, la capacidad que la suma de usuarios vería sin este sistema). Como se puede apreciar, hay una mejora substancial en el aprovechamiento del canal: para un BER de $10^{-6}$ tenemos 0.16, 0.25 y 0.3 aproximadamente. Es decir que con 8 bit mejoramos un $50\%$ del original, y con 16 bis un $87\%$.
+
 
 \section{Probabilidad de colisión de filtro de Bloom con expansión de símbolo}
 
 %newJIS_140512
-En esta sección, presentaremos una estimación analítica de la probabilidad de error de bit, tomando en cuenta solo las interferencias de otros usuarios en la red.
+En esta sección, presentaremos una estimación analítica de la probabilidad de error de bit, tomando en cuenta sólo las interferencias de otros usuarios en la red.
 No consideraremos ninguna corrección de etapas o algoritmos adicionales como Reed-Solomon, o interferencias producidas en el medio físico.
-Como se explicó en la sección \ref{Bloomf}, cada usuario agrupa sus bits de información en paquetes o frames de largo $n$. Cada paquete es codificado utilizando exactamente $m_{1}$ unos y $m_{0}$ ceros, siendo $m$ la cantidad de bits del frame, donde $$m=m_{1}+m_{0}$$.
+Como se explicó en la sección \ref{Bloomf}, cada usuario agrupa sus bits de información en paquetes o tramas de largo $n$. Cada paquete es codificado utilizando exactamente $m_{1}$ unos y $m_{0}$ ceros, siendo $m$ la cantidad de bits de la trama, donde $$m=m_{1}+m_{0}$$.
 
-Debido a la utilización del filtro de Bloom, cada uno de los $m$ dígitos binarios resultantes es repetido $K$ veces en posiciones elegidas aleatoriamente en el frame de largo $M$. Las K repeticiones de un dígito binario pueden colisionar con otras repeticiones del mismo dígito, con repeticiones de otro dígito o bien con dígitos pertenecientes a otro cliente.
+Debido a la utilización del filtro de Bloom, cada uno de los $m$ dígitos binarios resultantes es repetido $K$ veces en posiciones elegidas aleatoriamente en la trama de largo $M$. Las K repeticiones de un dígito binario pueden colisionar con otras repeticiones del mismo dígito, con repeticiones de otro dígito o bien con dígitos pertenecientes a otro cliente.
 Llamaremos $N$ al número de usuarios activos. Para estimar la tasa de error o BER (Bit Error Rate) del sistema y simplificar los cálculos, asumiremos lo siguiente:
 
 \begin{enumerate}
- \item Los frames de diferentes usuarios están sincronizadas, es decir, cada usuario participante del canal de comunicaciones recibe el mismo frame en el mismo orden, y cada frame contiene (incluyendo colisiones) $W_0 = N\cdot K\cdot m_0$ ceros y $W_1 = N\cdot K\cdot m_1$ unos.
+ \item Las tramas de diferentes usuarios están sincronizadas, es decir, cada usuario participante del canal de comunicaciones recibe la misma trama en el mismo orden, y cada trama contiene (incluyendo colisiones) $W_0 = N\cdot K\cdot m_0$ ceros y $W_1 = N\cdot K\cdot m_1$ unos.
  \item No incluiremos en el análisis la posibilidad de corrección de errores debido a que, en general, 
  \begin{equation}
 \nchoosek{m}{m_1} > 2^n.
@@ -416,7 +430,7 @@ P_{s1}\leq P_{st}.
 \label{eq:union_bound}
 \end{equation}
 %\end{multline}
-Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ casilleros y las $K$ repeticiones del cero dado usa $r ( \leq K)$ casilleros, entonces una condición necesaria para el error es que $s \geq r$. Entonces, esperamos que existan $s$ unos en un frame de $M$ bits. Dados $r$ lugares en el frame, la probabilidad de que los unos ocupen esas $r$ posiciones esta dada por 
+Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ casilleros y las $K$ repeticiones del cero dado usa $r ( \leq K)$ casilleros, entonces una condición necesaria para el error es que $s \geq r$. Entonces, esperamos que existan $s$ unos en una trama de $M$ bits. Dados $r$ lugares en la trama, la probabilidad de que los unos ocupen esas $r$ posiciones esta dada por 
 \begin{equation}
 z_{r,s} = \frac{\nchoosek{M-r}{s-r}}{\nchoosek{M}{s}}= \frac{\frac{(M-r)!}{(M-s)! (s-r)!}}{\frac{M!}{(M-s)!s!}} = \frac{(M-r)!}{M!}\frac{s!}{(s-r)!}\approx (\frac{s}{M})^r,
 \end{equation}
@@ -450,13 +464,13 @@ En las implementaciones de software o acústicas, el poder de procesamiento nece
 
 \subsection{Aplicación al algoritmo de filtro de Bloom encriptado}
 
-Este algoritmo asigna los tiempos de transmisión de $r$ clientes, seleccionándolos entre $M$ posiciones, correspondientes a los $M$ casilleros dentro del frame de transmisión.
+Este algoritmo asigna los tiempos de transmisión de $r$ clientes, seleccionándolos entre $M$ posiciones, correspondientes a los $M$ casilleros dentro de la trama de transmisión.
 La cantidad posible de combinaciones de $M$ posiciones entre todos los clientes es de $ _{M}P_{r} = \frac{M!}{(n-r)!} $.
 Consideraremos que un ataque a este algoritmo fue exitoso cuando un atacante puede inferir la serie de posiciones $M$ para un cliente, obteniendo así todos sus datos.
 
 Existe un algoritmo de selección de $M$ que suponemos no posee ninguna debilidad, es decir, selecciona $r$ conjuntos de $M$ posiciones tal que, aún si el atacante pudo adquirir un número arbitrario de las posiciónes de transmisión pasadas, no puede predecir ninguna de las posiciones futuras.
 
-Esto puede cumplirse simplemente asignando a cada canal de transmisión seguro su propio algoritmo generador pseudoaleatorio criptográficamente seguro, o bien el mismo algoritmo utilizando claves diferentes. Esto provocará colisiones entre los clientes, es decir, al asignarse posiciones de transmisión de manera aleatoria, existirán coincidencias donde a dos o más clientes se les asignará el mismo casillero dentro del frame. Esto es resuelto mediante corrección de errores en capas superiores y para el cálculo del parámetro de seguridad se despreciará este efecto.
+Esto puede cumplirse simplemente asignando a cada canal de transmisión seguro su propio algoritmo generador pseudoaleatorio criptográficamente seguro, o bien el mismo algoritmo utilizando claves diferentes. Esto provocará colisiones entre los clientes, es decir, al asignarse posiciones de transmisión de manera aleatoria, existirán coincidencias donde a dos o más clientes se les asignará el mismo casillero dentro de la trama. Esto es resuelto mediante corrección de errores en capas superiores y para el cálculo del parámetro de seguridad se despreciará este efecto.
 
 Dadas las siguientes suposiciones:
 \begin{itemize}
@@ -467,7 +481,7 @@ Dadas las siguientes suposiciones:
 Un atacante podria tratar de predecir el conjunto de posiciones $n$ de un cliente, para obtener sus datos. Para ello, deberá probar exhaustivamente todo el conjunto de $ _{M}P_{r}$ sobre una trama capturada, o bien probar todas las combinaciones posibles de la clave del generador pseudoaleatorio. De esto se desprende que si $largo(clave)>128\ bits$ y $M>128$ se considera que el algoritmo cuenta con un nivel de seguridad denominada ``fuerte'', ya que una complejidad temporal de $2^{128}$ es considerada segura al momento de la escritura de esta Tesis \cite{eastlake2005s}.
 
 \subsection{Problemas de símbolos con peso de Hamming variable}
-En la sección anterior se nombraron dos condiciones necesarias. La primera condición, la carencia de vulnerabilidades en el algoritmo CS-PRNG, es necesaria e inevitable por motivos obvios. Sin embargo, es posible eliminar la segunda condición, de precisar datos totalmente aleatorios, realizando una modificación a la tabla de expansión. Esto es posible ya que la segunda condición es solo necesaria para prevenir el siguiente escenario donde la seguridad falla:
+En la sección anterior se nombraron dos condiciones necesarias. La primera condición, la carencia de vulnerabilidades en el algoritmo CS-PRNG, es necesaria e inevitable por motivos obvios. Sin embargo, es posible eliminar la segunda condición, de precisar datos totalmente aleatorios, realizando una modificación a la tabla de expansión. Esto es posible ya que la segunda condición es sólo necesaria para prevenir el siguiente escenario donde la seguridad falla:
 
 Supongamos que se desea transmitir dos bytes:
 \begin{itemize}
@@ -487,10 +501,10 @@ De esta manera, al convertir los datos de entrada en símbolos uniformes con el 
 \section{Resumen del sistema completo}
 %% De orte.tex
 El sistema propuesto, cuyo diagrama de alto nivel se muestra en la figura \ref{fig_comstack}, está compuesto primeramente de una capa de acceso, donde se encuentra la implementación de la codificación CDMA y la corrección de errores, y una capa física basada, o bien en una red óptica con similitudes a redes PON \ref{defPON} , o una red acústica de tipo difusión (\textit{broadcast}).
-La capa de acceso está implementada utilizando técnicas CDMA del tipo time-hopping, donde cada uno de los clientes posibles codifica su información en bits y los transmite en un casillero seleccionado de manera aleatoria dentro de un frame de $M$ casilleros\footnote{ El parámetro $M$ debe optimizarse en función del nivel de error aceptable y la máxima cantidad de clientes soportados.}. De esta manera, ocurrirán múltiples colisiones entre diferentes ONUs \textit{(optical network unit)}, pero los errores causados por estas colisiones serán corregidos por la capa de corrección que garantiza una transmisión de datos confiable. Aunque es imposible eliminar totalmente los errores, consideramos una transmisión con un BER de 10e-12 como libre de errores.
+La capa de acceso está implementada utilizando técnicas CDMA del tipo time-hopping, donde cada uno de los clientes posibles codifica su información en bits y los transmite en un casillero seleccionado de manera aleatoria dentro de una trama de $M$ casilleros\footnote{ El parámetro $M$ debe optimizarse en función del nivel de error aceptable y la máxima cantidad de clientes soportados.}. De esta manera, ocurrirán múltiples colisiones entre diferentes ONUs \textit{(optical network unit)}, pero los errores causados por estas colisiones serán corregidos por la capa de corrección que garantiza una transmisión de datos confiable. Aunque es imposible eliminar totalmente los errores, consideramos una transmisión con un BER de 10e-12 como libre de errores.
 
-Si bien existe el requerimiento de que todos los clientes comunicantes deben estar sincronizados a nivel de frame para regenerar correctamente las posiciones de transmisión, esta sincronización no es necesaria para clientes que no participen del canal encriptado.
-Un cliente $X$ puede recibir mensajes de otro cliente $Y$ si y solo si $X$ posee la {\em clave} de $Y$, y viceversa. De esta manera, si un cierto grupo de clientes desea comunicarse sobre un canal encriptado, es necesario cada cliente en el grupo conozca la {\em clave}. El canal encriptado que se forma entre los clientes forma un ``dominio de difusión'' ya que todos los datos que transmita un cliente serán recibidos solo por los otros clientes participantes del dominio. Este dominio es análogo al sistema VLAN \textit{(Virtual Local Area Network)} de particiones lógicas de red.
+Si bien existe el requerimiento de que todos los clientes comunicantes deben estar sincronizados a nivel de trama para regenerar correctamente las posiciones de transmisión, esta sincronización no es necesaria para clientes que no participen del canal encriptado.
+Un cliente $X$ puede recibir mensajes de otro cliente $Y$ si y sólo si $X$ posee la {\em clave} de $Y$, y viceversa. De esta manera, si un cierto grupo de clientes desea comunicarse sobre un canal encriptado, es necesario cada cliente en el grupo conozca la {\em clave}. El canal encriptado que se forma entre los clientes forma un ``dominio de difusión'' ya que todos los datos que transmita un cliente serán recibidos sólo por los otros clientes participantes del dominio. Este dominio es análogo al sistema VLAN \textit{(Virtual Local Area Network)} de particiones lógicas de red.
 
 Los datos de los clientes se codifican con las siguientes técnicas de corrección de errores: Reed-Solomon ($223/255$) (ver \cite{Moon:05} y sus referencias), y un filtro de Bloom\cite{Bloom70space/timetrade-offs}. 
 
@@ -545,7 +559,7 @@ En el concentrador, un splitter de $128\times 1$ concentra el tráfico de todos 
 
 La atenuación de los splitters centrales ($\simeq25$~dB cada uno) sumada a la atenuación propia de la fibra óptica ($\simeq2$~dB por tramo) y pérdidas por inserción (aproximadamente $\simeq1$~dB) contribuyen a la elevada atenuación que el amplificador debe compensar ($\simeq28$~dB).
 
-De utilizarse sin ningún tipo de amplificación, la atenuación que una señal sufriría entre dos ONUs es la suma de la atenuación de ambos tramos, es decir $\simeq56$~dB, que es un valor que supera el límite de la tecnología de detección comercial disponible al momento de la escritura de esta Tesis, teniendo en cuenta potencias de transmision máximas de 2 dBm.
+De utilizarse sin ningún tipo de amplificación, la atenuación que una señal sufriría entre dos ONUs es la suma de la atenuación de ambos tramos, es decir $\simeq56$~dB, que es un valor que supera el límite de la tecnología de detección comercial disponible al momento de la escritura de esta Tesis, teniendo en cuenta potencias de transmisión máximas de 2 dBm.
 
 Sin embargo, es posible utilizar etapas de amplificación intermedias para obtener niveles de señal adecuados. Para proveer la amplificación requerida, un EDFA con $\geq27$~dB de ganancia es colocado entre ambos splitters. Este EDFA incrementa la potencia del tráfico a la salida del primer splitter, elevando la potencia de cada '1' de $\simeq-26$~dBm a $1$~dBm a la entrada del segundo splitter, que será atenuada nuevamente a un nivel de potencia de $-27$~dBm, valor dentro de los parámetros aceptables de un fotodetector de alta sensibilidad (aproximadamente $-28$~dBm~\cite{comapd}).
 
@@ -584,12 +598,12 @@ Sin embargo, la transmisión sobre un canal acústico tiene como ventaja el pode
 En contraste con otras tecnologías como RF o enlaces ópticos, la naturaleza del canal acústico y la facilidad para interceptar o registrar comunicaciones utilizando este medio hace de la privacidad un requerimiento esencial. Algunos sistemas de comunicación de audio han sido propuestos \cite{august2002apparatus}, pero el problema de la privacidad en este tipo de comunicaciones se soluciona generalmente en la capa de aplicación, es decir, en alto nivel. Esta Tesis presenta una aproximación a la seguridad y privacidad desde la capa física, basada también en time-hopping CDMA, similar a aquella presentada en \cite{6476559}. Presentaremos una red segura acústica punto a punto y punto a multipunto de corto alcance y bajo consumo, que no requiere de ningún hardware adicional en clientes móviles.
 
 Un escenario válido para la aplicación de esta tecnología podría ser validación de transacciones financieras pequeñas tales como terminales PoS \textit{(Point of Sale)} o cajeros automáticos (ATM) utilizando un dispositivo móvil (por ejemplo, un celular del tipo \textit{smartphone}) sin modificaciones de hardware. Una tecnología similar que se utiliza en estos casos es la denominada NFC \textit{(Near Field Communications)} \cite{nikitin2007overview}, un protocolo inalámbrico que requiere hardware especializado que, al momento presente, no se encuentra disponible en la mayoría de los dispositivos móviles.
-Con respecto a la implementación sobre el medio óptico, es necesario ajustar algunos parámetros, como por ejemplo el tamaño de frame, que se reduce de $M=4096$ a $M=256$ para la implementación acústica, y el parámetro $K=9$ que es el óptimo para el $M$ seleccionado. El número de clientes también se ve reducido de $N=128$ a $N=12$ ya que al ser la red acústica de corto alcance, no se prevé una elevada cantidad de clientes simultáneos. En la figura \ref{arch:AudioSimul} se muestra una simulación del sistema con estos parámetros contrastada con una medición realizada entre una Notebook (T420) y un celular (Lenovo A789).
+Con respecto a la implementación sobre el medio óptico, es necesario ajustar algunos parámetros, como por ejemplo el tamaño de trama, que se reduce de $M=4096$ a $M=256$ para la implementación acústica, y el parámetro $K=9$ que es el óptimo para el $M$ seleccionado. El número de clientes también se ve reducido de $N=128$ a $N=12$ ya que al ser la red acústica de corto alcance, no se prevé una elevada cantidad de clientes simultáneos. En la figura \ref{arch:AudioSimul} se muestra una simulación del sistema con estos parámetros contrastada con una medición realizada entre una Notebook (T420) y un celular (Lenovo A789).  En dicha figura se puede apreciar que las simulaciones y las mediciones son similares, mostrando estas últimas desde 14 clientes en adelante. La razón por la cual sólo se muestra a partir de 14 clientes reside en que la tasa efectiva de transmisión es muy baja y para medir un BER más grande, se necesitaban tiempos del orden de un día. Teniendo en cuenta que este tipo de sistemas se utilizarían para transacciones de pocos bytes, y la coincidencia entre la curva simulada y la real, consideramos que el desempeño es adecuado.
 
 \begin{figure}[t]
   \centering
     \includegraphics[width=5in]{graphs/audio-fig6}
-    \caption{Sn M=256 y K=9.}
+    \caption{Simulación y medición del BER para una red acústica en función del número de clientes con M=256 y K=9.}
     \label{arch:AudioSimul}
 \end{figure}
 
@@ -613,7 +627,7 @@ En las próximas secciones se describe el sistema en mayor detalle.
 
 
 A diferencia de la implementación óptica donde se utilizaron algunas funciones provistas por el hardware de FPGA, tales como el mecanismo de sincronización de bit, para la transmisión acústica se implementaron tanto el algoritmo de modulación como el de sincronización totalmente en software.
-Para la modulación, fue utilizado el algoritmo de On-Off Keying (ver Fig. \ref{arch:ook}), que codifica los bits a transmitir como pulsos. La frecuencia de portadora puede variar de 10 kHz a 16 kHz, y la tasa de transmisión se fijo a 1000 bps. Debido a la baja velocidad de este canal se introduce un problema inexistente en la implementación óptica: el retraso de la red (el tiempo que tarda un bit en atravesar toda la red) es alto, debido principalmente a la etapa de Reed-Solomon que necesita recibir 256 bytes para comenzar el proceso de decodificación del bloque. Debido a que el canal soporta una velocidad máxima de 1000 bps, el retraso puede alcanzar niveles inaceptables, del orden de los 30 segundos.
+Para la modulación, fue utilizado el algoritmo de OOK (ver Fig. \ref{arch:ook}), que codifica los bits a transmitir como pulsos. La frecuencia de portadora puede variar de 10 kHz a 16 kHz, y la tasa de transmisión se fijo a 1000 bps. Debido a la baja velocidad de este canal se introduce un problema inexistente en la implementación óptica: el retraso de la red (el tiempo que tarda un bit en atravesar toda la red) es alto, debido principalmente a la etapa de Reed-Solomon que necesita recibir 256 bytes para comenzar el proceso de decodificación del bloque. Debido a que el canal soporta una velocidad máxima de 1000 bps, el retraso puede alcanzar niveles inaceptables, del orden de los 30 segundos.
 Una selección mas apropiada del algoritmo de FEC (tal como BCH) podría reducir reducir el retraso total del sistema.
 Adicionalmente, una etapa de \textit{pulse shaping} o formación de pulso fue implementada, utilizando un filtro pasa-banda a la salida de la modulación y también en la entrada del demodulador. Este filtro ayuda a rechazar interferencia acústica o ruido ambiente.
 
