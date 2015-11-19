@@ -1,0 +1,66 @@
+Frecuency Synthesizer GTP/GTX (Sw6) (Doc. UG347, page 46): 150 Mhz
+------------------------------------------------------------------
+Segun IBERT:
+	REFCLK Input: 100.0 Mhz
+	PLL VCO Freq: 2000.0 Mhz
+
+
+screen1.bmp
+screen2.bmp: (waveform8.txt)
+Line Rate: 2.500 Gbps
+Actual: 3.750 Gbps
+
+screen3.bmp: (waveform7.txt)
+Line Rate: 3.000 Gbps
+Actual: 4.500 Gbps
+
+Screen4.bmp: (waveform6.txt)
+Line Rate: 4.000 Gbps
+Actual: 6.000 Gbps
+
+Screen5.bmp: (waveform5.txt)
+Line Rate: 5.00 Gbps (FB=5, Ref=1, DivSel=1)
+Actual: 7.500 Gbps
+
+Frecuency Synthesizer GTP/GTX (Sw6) (Doc. UG347, page 46):311.04 Mhz
+--------------------------------------------------------------------
+
+Screen6.bmp: (waveform4.txt)
+Line Rate: 3.000 Gbps (FB=3,Ref=1,Divsel=1)
+Actual: 9.333 Gbps
+
+Screen7: (waveform3.txt)
+Line Rate: 4.000 Gbps (FB=4,Ref=1,Divsel=1)
+Actual: 13.333 Gbps
+
+
+Frecuency Synthesizer GTP/GTX (Sw6) (Doc. UG347, page 46):100.0 Mhz
+--------------------------------------------------------------------
+
+Screen8.bmp: (waveform9.txt)
+Line Rate: 5.000 Gbps (FB=5, Ref=1, Divsel=1)
+Actual: 5.000 Gbps
+
+Screen9.bmp: (waveform10.txt)
+Line Rate: 4.000 Gbps (FB=4, Ref=1, Divsel=1)
+Actual: 4.000 Gbps
+
+Screen10.bmp: (waveform11.txt)
+Line Rate: 3.000 Gbps (FB=3, Ref=1, Divsel=1)
+Actual: 3.000 Gbps
+
+Screen11.bmp: (waveform12.txt)
+Line Rate: 2.500 Gbps (FB=5, Ref=1, Divsel=2)
+Actual: 2.500 Gbps
+
+
+Frecuency Synthesizer GTP/GTX (Sw6) (Doc. UG347, page 46):611.0 Mhz
+--------------------------------------------------------------------
+
+Screen12.bmp: (waveform13.txt)
+Line rate: 5000 (FB=4, Ref=2, Divsel=1)
+Actual: 1.244 Gbps
+(Pattern 1011010101)
+
+
+

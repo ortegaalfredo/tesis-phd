@@ -90,10 +90,8 @@ Sumando ambos valores, e ignorando la mínima latencia de codificación, podemos
 En esta sección se describe el modelo del canal por el cual estamos transmitiendo datos, específicamente el modelo de ruido del mismo. 
 Un canal de comunicaciones puede clasificarse primeramente según el tipo de información transmitida, sea binaria o analógica \cite{MacKay:2002}.
 Una subclasificación del canal de comunicaciones puede realizarse según el comportamiento del ruido del mismo.
-Por ejemplo, las comunicaciones por radiofrecuencia suelen modelarse como un canal analógico AWGN\footnote{Additive White Gaussian Noise}. 
 
-Específicamente, las comunicaciones digitales suelen modelarse como un canal discreto sin memoria (\textit{discrete memoryless channel}), ya que poseen un alfabeto de símbolos de entrada $A_{x}$, que son los datos que se desea transmitir, y un alfabeto de símbolos de salida $A_{y}$ , que son los símbolos detectados por el receptor. El canal es discreto, ya que la cantidad de símbolos posible es finita. 
-
+Las comunicaciones digitales suelen modelarse como un canal discreto sin memoria (\textit{discrete memoryless channel}), ya que poseen un alfabeto de símbolos de entrada $A_{x}$, que son los datos que se desea transmitir, y un alfabeto de símbolos de salida $A_{y}$ , que son los símbolos detectados por el receptor. El canal es discreto, ya que la cantidad de símbolos posible es finita. Se dice que el canal no posee memoria debido a que la probabilidad de obtener un símbolo de salida dado no depende de todos los símbolos de entrada, sino solamente del último símbolo enviado.
 
 Otro parámetro importante que define a un canal discreto es la distribución de probabilidades condicionales $P(y|x)$ entre ambos alfabetos, es decir, la posibilidad de que al recibir el símbolo $x$ se haya transmitido el símbolo $y$. Esta distribución puede representarse como un diagrama de distribución de probabilidades (ver figura \ref{fig:canbin}) o una matriz.
 
@@ -102,7 +100,7 @@ De acuerdo con la distribución de probabilidades de error que mejor represente 
 Es este modelo de ruido nos permite innovar en el diseño de algoritmos, adaptándolos y optimizándolos para aprovechar la distribución de ruido, ya que la mayoría de los algoritmos de corrección de errores están pensados para un canal de ruido simétrico y generalmente analógico.
 Empezaremos primeramente estudiando un modelo simplificado del canal por el cual vamos a trasmitir, el mencionado canal simétrico binario.
 
-\section{Probabilidad de error de canal binario simétrico y asimétrico}
+\section{Probabilidad de error del canal transmitiendo en un solo slot del frame}
 
 \begin{figure}[t]
   \begin{center}
@@ -112,7 +110,7 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 \label{fig:canbin}
 \end{figure}
 
-Para simplificar los cálculos, consideraremos como ruido solamente las colisiones con otros usuarios, ignorando otros tipos de ruido que pueda tener el canal físico. Por lo tanto, procederemos a calcular la probabilidad de no-colisión de un cliente.
+Procederemos a calcular la probabilidad de no-colisión de un cliente.
 
 Sea $M$ la cantidad de casilleros por trama y $n$ la cantidad de clientes o usuarios.
 
@@ -121,15 +119,16 @@ Entonces, la probabilidad de no colisión para un usuario en un slot dado es
 P_{nc}=\left(\frac{M-1}{M}\right)^{n-1}
 \end{equation}
 
-Esta ecuación es válida bajo la hipótesis de que todos los clientes eligen el slot a transmitir de manera aleatoria, y de manera independiente. Tambien consideramos que los usuarios utilizan sólo un slot.
-\noindent Esta probabilidad es un poco más compleja en el caso de un canal Z. 
+Esta ecuación es válida bajo la hipótesis de que todos los clientes eligen el slot a transmitir de manera aleatoria, y de manera independiente. También consideramos que los usuarios utilizan sólo un slot.
+
+Para simplificar, hablaremos de 'colisión' de símbolos cuando uno o más usuarios escriben en el mismo slot de un usuario y causan un error en el canal. De esta manera, en el canal Z, cuando se transmite un 1, las colisiones con símbolos transmitidos por otros usuarios no causan un error. Diremos, por tanto, que la probabilidad de no colisión de un 1 transmitido es 1, es decir, $P_{nc}(1) = 1$. Por otro lado, cuando se transmite un 0, sólo las colisiones con 1s transmitidos por otros usuarios generan error en el canal.
 
 Siendo $P_{nc}(1)$ la probabilidad de no colisión del símbolo uno, y $P_{nc}(0)$ la probabilidad de no colisión del símbolo cero, la probabilidad total de no colisión para un usuario en un canal Z es
 
 \begin{equation}
 P_{nc}=P(1)\cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) 
 \end{equation}
-Asumiendo que todos los usuarios transmiten un stream de datos aleatorio, tenemos que $P(1)=P(0)=\frac{1}{2}$, y además al ser un canal Z, podemos asumir que $P_{nc}(1)=1$ porque el símbolo uno nunca colisiona (ver Fig. \ref{fig:Gal}). Entonces podemos desarrollar $P_{nc}$ como
+Asumiendo que todos los usuarios transmiten un stream de datos aleatorio, tenemos que $P(1)=P(0)=\frac{1}{2}$. Entonces podemos desarrollar $P_{nc}$ como
 
 \begin{eqnarray}
 P_{nc} & = & \frac{1}{2} \cdot 1 +  \frac{1}{2} \cdot \sum_{i=0}^{n-1} 
@@ -155,7 +154,7 @@ P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2M} \right)^{n-1
 P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{\frac{-n}{2M}}
 \end{eqnarray}
 
-\noindent donde la última aproximación vale para $n=M$ y $n > 2$.
+%\noindent donde la última aproximación vale para $n=M$ y $n > 2$.
 
 
 Es decir, la probabilidad de no colisión depende de la relación $n/M$. Si $M>>n$, entonces $P_{nc}$ se aproxima a 1, que es una característica deseable en el sistema.
@@ -262,7 +261,7 @@ $$ c = 1-\left(p \cdot \log_2\left(\frac{1}{p}\right) + (1-p) \cdot \log_2\left(
 Simplificada:
 $$ c = 1 + p \cdot \log_2(p) + (1 - p) \cdot \log_2(1-p) $$
 
-En la figura \ref{fig:CompBZ} puede verse la evolución de la capacidad del canal binario simétrico, que es máxima para $p=0$ y $p=1.0$, mientras que es cero para $p=0.5$, ya que con 0\% de probabilidad de error la capacidad es la máxima (no hay interferencia) y con 50\% de error la capacidad es cero y es imposible transmitir dato alguno. Quizás contraintuitivamente, con 100\% de posibilidad de error, la capacidad también es máxima, ya que equivale a invertir cada símbolo transmitido, operación que no introduce error alguno en los datos.
+En la figura \ref{fig:CompBZ} puede verse la evolución de la capacidad del canal binario simétrico, que es máxima para $p=0$ y $p=1.0$, mientras que es cero para $p=0.5$, ya que con 0\% de probabilidad de error la capacidad es la máxima (no hay interferencia) y con 50\% de error la capacidad es cero y es imposible transmitir dato alguno. Quizás contra intuitivamente, con 100\% de posibilidad de error, la capacidad también es máxima, ya que equivale a invertir cada símbolo transmitido, operación que no introduce error alguno en los datos.
 
 %Sin embargo esta capacidad es menor que la que realmente tenemos en nuestro canal, ya que un Z-channel se adecua mayormente a los medios de transmisión ópticos. Describiremos en detalle este caso especial en la siguiente sección. ??
 
@@ -275,7 +274,7 @@ Los canales Z se usan generalmente para modelar sistemas de transmisión óptico
   \begin{center}
     \includegraphics[scale=1]{graphs/zchannel}
   \end{center}
-  \caption{Diagrama: canal Z.}
+  \caption{Diagrama: canal Z. El diagrama superior podría representar un canal de fibra óptica donde un 1 representa el Laser encendido.}
   \label{fig:Gal}
 \end{figure}
 
@@ -351,10 +350,10 @@ La interferencia intersímbolo, como fue discutida en la sección \ref{cap2:ECC}
 Considerando que el medio de transmisión se adecua a un canal Z, se propone aprovechar la naturaleza asimétrica de este tipo de medio, en donde solamente el símbolo ``1'' causa interferencia. \footnote{Aunque en un sistema de comunicaciones ópticas real, existe una pequeña diferencia ya que el nivel de ``0'' no es representado con una potencia de cero Watts.}
 En otras palabras, la interferencia de un canal Z es proporcional al peso de Hamming ($HW$) del símbolo transmitido.
 En esta sección se presenta un algoritmo que minimiza este valor, con el objetivo de causar menor interferencia. El algoritmo de minimización de peso de Hamming consiste en una codificación en donde cada símbolo binario es convertido en un equivalente de mayor longitud, que posee una mínima cantidad de dígitos en ``1''. Aplicando esta codificación y transmitiendo el símbolo resultante, se obtiene una menor interferencia, siempre y cuando el medio de transmisión pueda modelarse como un canal Z.
-Intuitivamente, expandir el símbolo original a uno de mayor longitud reduciría el ancho de banda del canal; pero como las simulaciones numéricas muestran (ver sección \ref{simulations}) a medida que la interferencia intersímbolo disminuye, el ancho de banda adicional utilizado por los algoritmos de FEC también se reduce, compensando por el incremento del largo del símbolo, y logrando un mayor ancho de banda neto del sistema.
+Intuitivamente, expandir el símbolo original a uno de mayor longitud reduciría el ancho de banda del canal; pero como las simulaciones numéricas muestran (ver sección \ref{simulations}) a medida que la interferencia intersímbolo disminuye, el ancho de banda adicional utilizado por los algoritmos de FEC también se reduce, compensando por el incremento del largo del símbolo, y logrando un mayor ancho de banda efectivo del sistema.
 Podemos decir que un número binario normal de largo $L$ posee un $HW$ variable, con $L/2$ siendo el promedio, cero siendo el mínimo y $L$ siendo el $HW$ máximo.
 La técnica de reducción logra que $HW=2$, siendo este valor un balance apropiado entre la reducción de interferencia y el largo de símbolo.
-Adicionalmente, es deseable en un sistema de seguridad que no se revele ninguna información acerca de los símbolos transmitidos. Por ejemplo, si transmitiéramos el número cero, representado por todos sus dígitos en cero, sería trivial identificarlo debido a la ausencia de dígitos en uno, condición fácilmente detectable. Para evitar este tipo de actividad maliciosa o ``ataques'' que utilizan análisis estadísticos de los datos, la codificación exige que el peso de Hamming sea fijo en todos los símbolos. Esto causa una ligera perdida en el ancho de banda, pero hace imposible inferir cualquier tipo de información acerca de los datos transmitidos analizando estadísticas de tráfico.
+Adicionalmente, es deseable en un sistema de seguridad que no se revele ninguna información acerca de los símbolos transmitidos. Por ejemplo, si transmitiéramos el número cero, representado por todos sus dígitos en cero, sería trivial identificarlo debido a la ausencia de dígitos en uno, condición fácilmente detectable. Para evitar este tipo de actividad maliciosa o ``ataques'' que utilizan análisis estadísticos de los datos, la codificación exige que el peso de Hamming sea fijo en todos los símbolos. Esto causa una ligera pérdida en el ancho de banda, pero hace imposible inferir cualquier tipo de información acerca de los datos transmitidos analizando estadísticas de tráfico.
 
 \begin{table}[t]
 \begin{center}
@@ -407,7 +406,7 @@ Llamaremos $N$ al número de usuarios activos. Para estimar la tasa de error o B
  \begin{equation}
 \nchoosek{m}{m_1} > 2^n.
 \end{equation}
-Específicamente, cada vez que una secuencia errónea de $m$ dígitos binarios es recibida con mas de $m_1$ unos, se decodifica como una cadena de bits aleatoria de largo $n$.
+Específicamente, cada vez que una secuencia errónea de $m$ dígitos binarios es recibida con más de $m_1$ unos, se decodifica como una cadena de bits aleatoria de largo $n$.
 Por lo tanto, el número esperado de errores será $n/2$.
 \end{enumerate}
 
@@ -415,7 +414,7 @@ Definiremos las siguientes probabilidades:
 $P_{s1}$ como la probabilidad de sobre-escribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros.
 $P_{st}$ como la probabilidad de sobrescribir con unos todas las $K$ repeticiones de uno de los $m_0$ ceros.
 
-Entonces, el BER esta dado por
+Entonces, el BER está dado por
 \begin{equation}
 %\text{BER} = \frac{n}{2}\prob{\text{sobre-escribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros}}.
 \text{BER} = \frac{n}{2}P_{s1}.
@@ -430,10 +429,11 @@ P_{s1}\leq P_{st}.
 \label{eq:union_bound}
 \end{equation}
 %\end{multline}
-Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ casilleros y las $K$ repeticiones del cero dado usa $r ( \leq K)$ casilleros, entonces una condición necesaria para el error es que $s \geq r$. Entonces, esperamos que existan $s$ unos en una trama de $M$ bits. Dados $r$ lugares en la trama, la probabilidad de que los unos ocupen esas $r$ posiciones esta dada por 
+Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ casilleros y las $K$ repeticiones del cero dado usa $r ( \leq K)$ casilleros, entonces una condición necesaria para el error es que $s \geq r$. Entonces, asumimos que existan $s$ unos en una trama de $M$ bits. Dados $r$ lugares en la trama, la probabilidad de que los unos ocupen esas $r$ posiciones está dada por 
 \begin{equation}
 z_{r,s} = \frac{\nchoosek{M-r}{s-r}}{\nchoosek{M}{s}}= \frac{\frac{(M-r)!}{(M-s)! (s-r)!}}{\frac{M!}{(M-s)!s!}} = \frac{(M-r)!}{M!}\frac{s!}{(s-r)!}\approx (\frac{s}{M})^r,
 \end{equation}
+
 Suponiendo que $N,s\gg r$, si $M \gg K$, no es difícil ver que las $K$ repeticiones de un cero dado ocupan $\mu_{R} \approx K$ casilleros en promedio. También puede demostrarse que el número promedio de casilleros ocupados por los $W_{1}$ unos transmitidos por todos los usuarios es
 
 \begin{equation}
