@@ -1,0 +1,15 @@
+\beamer@endinputifotherversion {3.24pt}
+\select@language {spanish}
+\beamer@sectionintoc {1}{Introducci\IeC {\'o}n}{3}{0}{1}
+\beamer@sectionintoc {2}{Estado del Arte}{7}{0}{2}
+\beamer@sectionintoc {3}{Sistema propuesto}{12}{0}{3}
+\beamer@sectionintoc {4}{Metodolog\IeC {\'\i }a}{16}{0}{4}
+\beamer@subsectionintoc {4}{1}{Canal Z}{16}{0}{4}
+\beamer@subsectionintoc {4}{2}{Time hopping}{17}{0}{4}
+\beamer@subsectionintoc {4}{3}{Filtro de Bloom}{20}{0}{4}
+\beamer@subsectionintoc {4}{4}{K \IeC {\'O}ptimo}{23}{0}{4}
+\beamer@subsectionintoc {4}{5}{Minimizaci\IeC {\'o}n de peso de Hamming}{24}{0}{4}
+\beamer@sectionintoc {5}{Implementaci\IeC {\'o}n y mediciones}{25}{0}{5}
+\beamer@subsectionintoc {5}{1}{Fibra \IeC {\'O}ptica}{25}{0}{5}
+\beamer@subsectionintoc {5}{2}{Medio ac\IeC {\'u}stico}{31}{0}{5}
+\beamer@sectionintoc {6}{Conclusi\IeC {\'o}n}{37}{0}{6}

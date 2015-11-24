@@ -61,7 +61,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
  \item Comunicaciones seguras utilizando CDMA sobre fibra óptica.
  \item Velocidades de 5 GBPS o mas.
 \end{itemize}
- \item Subtema: Comunicaciones \color{red}acústicas \color{black} privadas.
+ \item Subtema: Comunicaciones seguras \color{red}acústicas\color{black}.
 \end{itemize}
 
 %\end{column}
@@ -87,14 +87,14 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{frame}{Problemas a resolver}
 
 \begin{itemize}
- \item Privacidad de datos en una red que utiliza un medio compartido
+ \item Privacidad de una red privada en un medio compartido
  \item Protección ante nodos maliciosos
  \item Eliminar toda fuga de información
  \end{itemize}
 \end{frame}
 %------------------------------------------------------------
 
-\begin{frame}{Solucion propuesta}
+\begin{frame}{Soluciones}
 \begin{columns}
   \begin{column}{0.60\textwidth}
 
@@ -126,7 +126,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{enumerate}
  \item Sistema capaz de operar a 5 Gbps+
  \item Evitar protocolos de control que debiliten la criptografía
- \item Aislación completa de canales de comunicación, para evitar ataques del tipo side-channel.
+ \item Aislación completa de canales de comunicación, para evitar side-channels
  \item Alta performance y bajo costo
  \end{enumerate}
 
@@ -150,7 +150,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 %-------------------------------------------------------------
 
-\section{Estado del Arte}
+\section{Background}
 \frame{\frametitle{Seguridad en las capas de red}
 %\framesubtitle{ Capas de red}
 
@@ -263,6 +263,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \vfill
 }
 
+\section{Sistema propuesto}
 \frame{\frametitle{Sistema propuesto: diseño de alto nivel}
 \begin{figure}[t]
 \centering
@@ -271,6 +272,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{figure}
 }
 
+\section{Sistema propuesto}
 \frame{\frametitle{Sistema propuesto: diagrama esquemático}
 \begin{figure}[t]
 \centering
@@ -285,17 +287,6 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 \section{Metodología}
 %------------------------------------------------------------
-\subsection{Canal Z}
-\begin{frame}{Canal Z}
-\begin{figure}[t]
-  \centering
-    \includegraphics[width=5cm]{../graphs/zchannel.pdf}
-    \caption{Diagrama de probabilidad del un canal binario asimétrico o canal Z}
-\end{figure}
-\end{frame}
-
-%------------------------------------------------------------
-\subsection{Time hopping}
 \begin{frame}{Selección de casillero aleatoria: Time hopping}
 \begin{figure}[t]
   \centering
@@ -320,7 +311,6 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{figure}
 \end{frame}
 %------------------------------------------------------------
-\subsection{Filtro de Bloom}
 \begin{frame}{CDMA + Filtro de Bloom (K=3)}
 \begin{figure}[t]
   \centering
@@ -345,29 +335,11 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{figure}
 \end{frame}
 
-
-%------------------------------------------------------------
-\subsection{K Óptimo}
-\begin{frame}{K Óptimo}
-
-\begin{figure}[!t]
-  \centering
-    \includegraphics[width=3in]{../graphs/Kcalc}
-    \caption{Estimación de BER vs. tasa de repetición de filtro de Bloom K.}
-    \label{BERvsK}
-\end{figure}
-
-\begin{equation}
-\text{BER} \approx \frac{n}{2} m_0 z_{\bar{R},\bar{S}} \approx \frac{n}{2} m_0 \left(1-e^{-W_1/M}\right)^K.
-\end{equation}
-\end{frame}
-
 %------------------------------------------------------------
 
-\subsection{Minimización de peso de Hamming}
 
 \frame{\frametitle{Minimización de peso de Hamming}
-\framesubtitle{Símbolo de 3-bits, Peso de Hamming=2, expansión a 5 bits}
+\framesubtitle{Símbolo de 3-bits, Peso de Hamming=2}
 \begin{center}
 \begin{tabular}{c c c}
 
@@ -391,247 +363,60 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 %-------------------------------------------------------------
 
-\section{Implementación y mediciones}
-\subsection{Fibra Óptica}
+\section{Implementación}
+\begin{frame}{Implementación}
 
-\begin{frame}{Implementación: Fibra Óptica}
-
-\begin{figure}[t]
+\framesubtitle{Xilinx ML507 development boards}
   \centering
-      \subfloat[Distribución via acoplador tipo estrella 1]{{\includegraphics[width=0.4 \textwidth]{graphs/StarCoupler} }}%
-    \qquad
-    \subfloat[Distribución via EDFA]{{\includegraphics[width=0.4 \textwidth]{graphs/EDFA} }}%
-    \caption{Diseño de red propuesto para la capa óptica}
-    \label{arch:fig1}
-\end{figure}
+  \includegraphics[width=0.95 \textwidth]{graphs/fpga.jpg} 
 
 \end{frame}
 
 %-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica}
 
-\framesubtitle{Placas de desarrollo Xilinx ML507}
-  \centering
-  \includegraphics[width=0.7\textwidth]{graphs/fpga.jpg} 
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica}
-
-\begin{figure}[t]
-  \centering
-    \includegraphics[width=3.3in]{../graphs/fpgadesign.pdf}
-\caption {Diseño lógico de alto nivel sobre FPGA}
-\label{fig:fpgadesign}
-\end{figure}
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica, FPGA}
-
-\begin{figure}[t]
-  \centering
-    \includegraphics[width=3.5in]{../graphs/diagramaXilinx.png}
-\label{fig:fpgahard}
-\end{figure}
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica, Resultados (Simulaciones)}
-
-\begin{figure}[!t]
-  \centering
-    \includegraphics[width=4in]{../graphs/BERvsChannelES2}
-    \caption{Performance del sistema con respecto a la expansión de símbolo. Simulación numérica de un enlace de 10 Gbps con 128 clientes, M=4096 y K=9.}
-    \label{BERvsExpansion}
-\end{figure}
-
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Efectos de señal desbalanceada}
-
-
-\begin{figure}[!t]
-   \centering
-   \subfloat[Señal con 256 bits en uno por trama (8B/10B), 400 ps por bit]{{\includegraphics[width=0.45 \textwidth]{../graphs/expansion1.jpg} }}%
-   \qquad
-   \subfloat[Señal con 48 bits en uno por trama, 1100 ps por bit]{{\includegraphics[width=0.45 \textwidth]{../graphs/expansion2.jpg} }}%
-   \qquad
-  \caption {Señal de potencia óptica de un Láser SPF+ Sumitomo de 1330 nm, tasa nominal es de 2.5 Gbps}
-  \label{fig:ImgExpansion}
-\end{figure}
-\end{frame}
-
-%------------------------------------------------------------
-\subsection{Medio acústico}
-
-\begin{frame}{Medio acústico: Introducción}
-
-\begin{figure}[t]
-  \centering  
-    \includegraphics[width=6cm]{graphs/compucelus}
-    \vspace{0.5cm}
-    \\ Esquema de transmisión acústica
-    \label{ios_process_mem}
-\end{figure}
+\section{Resultados experimentales}
+\begin{frame}{Resultados experimentales}
 
 \begin{itemize}
- \item Originalmente plataforma de testing del medio óptico
- \item Fácil de depurar e implementar (100\% software)
- \item Equivalente a un módem por software
-\end{itemize}
-
-\end{frame}
-%------------------------------------------------------------
-\begin{frame}{Medio acústico: Modulación}
-
-\begin{columns}
-  \begin{column}{0.40\textwidth}
-
-  \begin{figure}[t]
-  \centering
-    \includegraphics[width=5cm]{graphs/modulated.pdf}
-    \caption{Modulación OOK}
-    \label{arch:sync}
-\end{figure}
-
-  \end{column}
-  \begin{column}{0.40\textwidth}
-\begin{figure}[th]
-  \begin{center}
-    \vspace{0.7cm}
-    \includegraphics[width=3cm]{graphs/zchannel}
-  \end{center}
-  \caption{Diagrama de probabilidad: canal Z}
-  \label{fig:Gal}
-\end{figure}
-
-  \end{column}
-\end{columns}
-
-
-\begin{itemize}
- \item Interferencia de OOK se aproxima a la de un canal Z.
- \item Baja densidad espectral ($0.2 bits/s/Hz$)
-\end{itemize}
-
-\end{frame}
-%------------------------------------------------------------
-
-\begin{frame}{Medio acústico: Sincronización}
-
-\begin{figure}[t]
-  \centering  
-    \includegraphics[width=6cm]{graphs/acusync}
-    \\ Sincronización de bit/nivel de decisión
-    \label{ios_process_mem}
-\end{figure}
-
-\end{frame}
-%------------------------------------------------------------
-
-\begin{frame}{Medio acústico: Características y espectro}
-
-\begin{figure}[t]
-  \centering  
-    \includegraphics[width=10cm]{graphs/spectrum.png}
-    \\ Espectro de señal modulada
-    \label{ios_process_mem}
-\end{figure}
-
-\begin{itemize}
- \item Portadora a 12Khz, modem funcionando a 1Kbps en total
- \item Velocidades de 350 bps (2 usuarios) a 70 bps (10 usuarios)
- \item Dispositivos móviles: buen desempeño Parlante/Micrófono de 100 a 15Khz
+ \item A
+ \item B
+ \item C
 \end{itemize}
 
 \end{frame}
 
-%------------------------------------------------------------
-\begin{frame}{Medio acústico: Resultados (mediciones)}
-  
-  \begin{figure}[t]
-  \centering  
-    \includegraphics[width=8cm]{graphs/medidas_clientes_JIS-fig6}
-    \\ BER $vs.$ Clientes
-    \label{ios_process_mem}
-\end{figure}
-
-\end{frame}
-
-%------------------------------------------------------------
-\begin{frame}{Medio acústico: Resultados (mediciones)}
-  
-\begin{figure}[t]
-  \centering  
-    \includegraphics[width=8cm]{graphs/mediciones-distancia-fig7}
-    \\ BER $vs.$ Distancia
-    \label{ios_process_mem}
-\end{figure}
-
-\end{frame}
-
-
 %-------------------------------------------------------------
 
-\section{Conclusión}
+\section{Conclusión y Trabajos Futuros}
+\begin{frame}{Conclusión}
 
-\frame{\frametitle{Conclusiónes:}
 \begin{itemize}
-\item Se propuse una arquitectura de red de tipo \alert{time-hopping CDMA}:\pause\vfill
-  \begin{itemize}
-  \item Punto-a-Punto, y Punto-a-\alert{Multipunto}.\pause\vfill
-  \item \alert{Red Privada} y criptográficamente segura.\pause\vfill
-  \item Utilizando Filtros de \alert{Bloom} y minimización de peso de \alert{Hamming}.\pause\vfill
-  \item {\bf 29\% de utilización del canal.} \vfill
-  \end{itemize}
+ \item A
+ \item B
+ \item C
 \end{itemize}
-}
-
-%-------------------------------------------------------------
-
-\begin{frame}{Contribuciones:}
-%\small
-\textbf{Altas velocidades de transferencia en fibra óptica utilizando FPGAs de bajo costo. } \textit{A. A. Ortega, V. A. Bettachini, D.F. Grosz, J. I. Alvarez-Hamelin - Congreso de Microelectrónica Aplicada 2010 BsAs}
-
-\
-
-\textbf{ Point-to-point and Point-to-multipoint CDMA Access Network with Enhanced Security} \textit{ A. A. Ortega, V. A. Bettachini, J. I. Alvarez-Hamelin,  D.F. Grosz, Advanced Photonics 2011 Congress - Access Networks and In-house CommunicationsAccess Networks and In-house Communications, OSA Technical Digest, Optical Society of America}
-
-\
-
-\textbf{Hamming-weight minimisation coding for CDMA optical access networks with enhanced security} \textit{ A. A. Ortega, V. A. Bettachini, J. I. Alvarez-Hamelin, D.F. Grosz, Future Generation Communication Technology (FGCT), 2012}
-
 
 \end{frame}
 
-\begin{frame}{Contribuciones:}
-%\small
-\textbf{Encrypted CDMA Audio Network.} \textit{ A. A. Ortega, V. A. Bettachini, P. I. Fierens, y J. I. Alvarez-Hamelin -  Journal of Information Security - 2014}
+%-------------------------------------------------------------
 
-\
+\begin{frame}{Trabajos Futuros}
 
-\textbf{Patente: DISPOSITIVO Y MÉTODO PARA TRANSMISIÓN SEGURA DE DATOS SOBRE CANALES Z MEDIANTE CDMA (AR084155B1)}\textit{José Ignacio ALVAREZ HAMELIN, Victor Alexis BETTACHINI, and Alfredo ORTEGA. PCT, 12 2012. (Asignada)}
+\begin{itemize}
+ \item A
+ \item B
+ \item C
+\end{itemize}
 
-\
-
-\textbf{Patente: Device and Method for the Secure Transmission of Data over Z-Channels Using CDMA (P11104EPPC)}\textit{José Ignacio ALVAREZ HAMELIN, Victor Alexis BETTACHINI, and Alfredo ORTEGA. EPO, Julio 2014. (En trámite)}
-
-\
 \end{frame}
 
 %-------------------------------------------------------------
 
 \footnotesize
-
+%\bibliographystyle{abbrvnat}
+%%\bibliography{IEEEabrv,vb_fgct}
+%\bibliography{vb_fgct}
 \begin{thebibliography}{7}
-
-
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -687,7 +472,6 @@ Z.~Wang, L.~Xu, J.~Chang, T.~Wang, and P.~R. Prucnal.
 \newblock \doi{10.1109/LPT.2010.2061223}.
 
 \end{thebibliography}
-
 
 \end{document}
 
