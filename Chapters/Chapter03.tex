@@ -7,7 +7,7 @@
 \label{fig_hub}
 \end{figure}
 
-Se propone un sistema de comunicaciones punto a punto y punto a multipunto sobre medios compartidos, o también llamados medios de \textit{broadcast}. En la figura \ref{fig_hub} se detalla la estructura de alto nivel del sistema, que en la versión óptica (ver Fig. \ref{arch:fig1}) equivale a una red de tipo estrella con un concentrador/amplificador central. Utilizando diferentes medios de transmisión, esta configuración puede cambiar (por ejemplo, puede no ser necesaria la etapa de amplificación).
+Se propone un sistema de comunicaciones punto a punto y punto a multipunto sobre medios compartidos, o también llamados medios de \textit{broadcast}. En la figura \ref{fig_hub} se detalla la estructura de alto nivel del sistema, que en la versión óptica (ver figura \ref{arch:fig1}) equivale a una red de tipo estrella con un concentrador/amplificador central. Utilizando diferentes medios de transmisión, esta configuración puede cambiar (por ejemplo, puede no ser necesaria la etapa de amplificación).
 Al ser un sistema de tipo time hopping CDMA \ref{espectroensanchado}, cada cliente puede utilizar el medio por un intervalo determinado de tiempo denominado \textit{slot} o casillero. Esto permite utilizar el medio para múltiples clientes asignando a cada uno un casillero diferente. A diferencia de un sistema TDMA estándard, donde el casillero es asignado a cada cliente de manera periódica, en el sistema propuesto el casillero se asigna mediante un algoritmo CS-PRNG \ref{cap2:prng}. Esto tiene dos efectos fundamentales: 
 
 \begin{itemize}
@@ -548,7 +548,7 @@ Al poseer una fuerte capacidad de corrección de errores, la arquitectura del si
 % APD		http://pdf.dzsc.net.cn/200810212/286762.pdf ( max $\simeq-27\,dB$)
 % EDFA		http://www.lambdaphoto.co.uk/pdfs/EDFADatasheet.pdf
 
-Al adaptar el sistema propuesto a una red óptica, la topología física debe ser de tipo estrella (ver Fig.\ref{arch:fig1}) donde splitters ópticos redistribuyen el tráfico proveniente de cada ONU a todo el resto de los terminales, permitiendo comunicaciones punto a punto así como punto a multipunto, con una cantidad máxima de hasta $128$ ONUs simultáneas. Este límite esta dado por las atenuaciones causadas por la fibra óptica y por el concentrador que el sistema debe ser capaz de compensar mediante amplificación.
+Al adaptar el sistema propuesto a una red óptica, la topología física debe ser de tipo estrella (ver figura \ref{arch:fig1}) donde splitters ópticos redistribuyen el tráfico proveniente de cada ONU a todo el resto de los terminales, permitiendo comunicaciones punto a punto así como punto a multipunto, con una cantidad máxima de hasta $128$ ONUs simultáneas. Este límite esta dado por las atenuaciones causadas por la fibra óptica y por el concentrador que el sistema debe ser capaz de compensar mediante amplificación.
 
 %Traffic redistribution is made by optical splitters at the redistribution hub that introduces high attenuation to optical streams.
 Un amplificador óptico de tipo EDFA \textit{(Erbium-Doped Fiber Amplifier)} localizado entre los splitters incrementa la potencia óptica para compensar las perdidas en la red, aunque esto es solamente necesario en distancias entre clientes superiores a 10 km.
@@ -627,7 +627,7 @@ En las próximas secciones se describe el sistema en mayor detalle.
 
 
 A diferencia de la implementación óptica donde se utilizaron algunas funciones provistas por el hardware de FPGA, tales como el mecanismo de sincronización de bit, para la transmisión acústica se implementaron tanto el algoritmo de modulación como el de sincronización totalmente en software.
-Para la modulación, fue utilizado el algoritmo de OOK (ver Fig. \ref{arch:ook}), que codifica los bits a transmitir como pulsos. La frecuencia de portadora puede variar de 10 kHz a 16 kHz, y la tasa de transmisión se fijo a 1000 bps. Debido a la baja velocidad de este canal se introduce un problema inexistente en la implementación óptica: el retraso de la red (el tiempo que tarda un bit en atravesar toda la red) es alto, debido principalmente a la etapa de Reed-Solomon que necesita recibir 256 bytes para comenzar el proceso de decodificación del bloque. Debido a que el canal soporta una velocidad máxima de 1000 bps, el retraso puede alcanzar niveles inaceptables, del orden de los 30 segundos.
+Para la modulación, fue utilizado el algoritmo de OOK (ver figura \ref{arch:ook}), que codifica los bits a transmitir como pulsos. La frecuencia de portadora puede variar de 10 kHz a 16 kHz, y la tasa de transmisión se fijo a 1000 bps. Debido a la baja velocidad de este canal se introduce un problema inexistente en la implementación óptica: el retraso de la red (el tiempo que tarda un bit en atravesar toda la red) es alto, debido principalmente a la etapa de Reed-Solomon que necesita recibir 256 bytes para comenzar el proceso de decodificación del bloque. Debido a que el canal soporta una velocidad máxima de 1000 bps, el retraso puede alcanzar niveles inaceptables, del orden de los 30 segundos.
 Una selección mas apropiada del algoritmo de FEC (tal como BCH) podría reducir reducir el retraso total del sistema.
 Adicionalmente, una etapa de \textit{pulse shaping} o formación de pulso fue implementada, utilizando un filtro pasa-banda a la salida de la modulación y también en la entrada del demodulador. Este filtro ayuda a rechazar interferencia acústica o ruido ambiente.
 
@@ -639,7 +639,7 @@ Adicionalmente, una etapa de \textit{pulse shaping} o formación de pulso fue im
 \end{figure}
 
 
-La sincronización entre un transmisor y un receptor es esencial para la decodificación correcta de la información. Por esta razón, un patrón de sincronización inicial es enviado, para que el receptor pueda ajustar parámetros tales como la fase y nivel de decisión de la señal (ver Fig. \ref{arch:sync}). La deriva \textit{(drift)} del reloj y variabilidad \textit{(jitter)} no son significativas a esta baja velocidad de transmisión y ninguna corrección en tiempo real es requerida, por lo que la implementación del módem por software es simple.
+La sincronización entre un transmisor y un receptor es esencial para la decodificación correcta de la información. Por esta razón, un patrón de sincronización inicial es enviado, para que el receptor pueda ajustar parámetros tales como la fase y nivel de decisión de la señal (ver figura \ref{arch:sync}). La deriva \textit{(drift)} del reloj y variabilidad \textit{(jitter)} no son significativas a esta baja velocidad de transmisión y ninguna corrección en tiempo real es requerida, por lo que la implementación del módem por software es simple.
 El nivel de decisión del demodulador es dinámico, es decir que es constantemente recalculado utilizando los niveles de entrada promediados.
 La fase del símbolo recibido también es corregida utilizando los mismos datos de entrada como referencia.
 

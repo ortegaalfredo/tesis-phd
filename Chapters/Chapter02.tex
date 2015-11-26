@@ -93,7 +93,7 @@ Estas tecnicas apuntan a conferir las siguientes propiedades al sistema de comun
 \item Capacidad de acceso múltiple: varios usuarios pueden transmitir utilizando el mismo medio y la misma área espectral mientras utilicen diferentes códigos.
 \end{enumerate} 
 
-Existen varios métodos de CDMA (ver Fig. \ref{fig_tdmacdma} para una representación gráfica), entre ellos:
+Existen varios métodos de CDMA (ver figura \ref{fig_tdmacdma} para una representación gráfica), entre ellos:
 \begin{enumerate} 
 \item \textit{Direct-Sequence Spread Spectrum} (DSSS): se expande la señal combinándola con un código de pseudoruido o señal de ensanchamiento, mediante la operación lógica XOR, o mediante desplazamientos de fase. Este método es el utilizado en WiFi y WiMAX, redes 3G de celulares \cite{dixon1994spread}, el sistema GPS \cite{kaplan2005understanding}, etc.
 \item \textit{Frequency-Hopping Spread Spectrum} (FHSS): la señal de ensanchamiento o pseudoruido es en este caso utilizada para variar la frecuencia portadora o canal de la señal original. Este método es empleado, por ejemplo, en el sistema BlueTooth de comunicación digital. En este caso se utiliza una variación llamada \textit{Adaptive Frequency Hopping}, un método para evitar frecuencias con mucha interferencia \cite{golmie2003bluetooth}.
@@ -197,7 +197,7 @@ Como el algoritmo propuesto se basa en CDMA del tipo \textit{time hopping}, efec
   \label{fig_use}
 \end{figure}
 
-Podría argumentarse que el sistema es similar al esquema \textit{Time Division Multiple Access} (TDMA, ver Fig. \ref{fig_tdmacdma}) donde también se divide el tiempo en tramas y casilleros. Pero en contraste con TDMA, en el esquema propuesto el atacante necesita interceptar cada una de las fibras ópticas para identificar a cada usuario, ya que no es posible identificar exactamente el casillero de transmisión luego de pasar por el concentrador central. Por último, aún si el atacante pudiera identificar los datos, no podría descifrarlos sin poseer la clave correcta, ya que estos están desordenados por el time hopping y tienen normalizado el peso de Hamming.
+Podría argumentarse que el sistema es similar al esquema \textit{Time Division Multiple Access} (TDMA, ver figura \ref{fig_tdmacdma}) donde también se divide el tiempo en tramas y casilleros. Pero en contraste con TDMA, en el esquema propuesto el atacante necesita interceptar cada una de las fibras ópticas para identificar a cada usuario, ya que no es posible identificar exactamente el casillero de transmisión luego de pasar por el concentrador central. Por último, aún si el atacante pudiera identificar los datos, no podría descifrarlos sin poseer la clave correcta, ya que estos están desordenados por el time hopping y tienen normalizado el peso de Hamming.
 
 
 \section{Estado del Arte}
