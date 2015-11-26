@@ -56,12 +56,12 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 %  \begin{column}{0.60\textwidth}
 
 \begin{itemize}
- \item Tema: Seguridad en redes de acceso \color{red}ópticas\color{black}.
+ \item Tema: seguridad en redes de acceso \color{red}ópticas\color{black}.
 \begin{itemize}
  \item Comunicaciones seguras utilizando CDMA sobre fibra óptica.
  \item Velocidades de 5 GBPS o mas.
 \end{itemize}
- \item Subtema: Comunicaciones \color{red}acústicas \color{black} privadas.
+ \item Subtema: comunicaciones \color{red}acústicas \color{black} privadas.
 \end{itemize}
 
 %\end{column}
@@ -94,7 +94,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{frame}
 %------------------------------------------------------------
 
-\begin{frame}{Solucion propuesta}
+\begin{frame}{Solución propuesta}
 \begin{columns}
   \begin{column}{0.60\textwidth}
 
@@ -126,8 +126,8 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{enumerate}
  \item Sistema capaz de operar a 5 Gbps+
  \item Evitar protocolos de control que debiliten la criptografía
- \item Aislación completa de canales de comunicación, para evitar ataques del tipo side-channel.
- \item Alta performance y bajo costo
+ \item Aislación completa de canales de comunicación, para evitar ataques del tipo \textit{side channel}.
+ \item Bajo costo
  \end{enumerate}
 
   \end{column}
@@ -138,7 +138,8 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
    \centering
    \includegraphics[width=0.80 \textwidth]{../graphs/medicionesPaper/eye71G.png}
    \qquad
-  \caption {Diagramas de ojo, tasa de $7.5$ Gbps, 20ns por división.}
+   Diagramas de ojo, tasa de $7.5$ Gbps, 20 ns por división.
+%  \caption {Diagramas de ojo, tasa de $7.5$ Gbps, 20 ns por división.}
   \label{fig:ImgOjo}
 \end{figure}
 
@@ -203,9 +204,9 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
   \begin{itemize}
 
-    \item Reflectores de tipo rejilla de Bragg (\textit{Bragg Grating}) \cite{torres2002}
+    \item Reflectores de tipo red de Bragg (\textit{Bragg Grating}) \cite{torres2002}
 	  \begin{itemize}
-	  \item Configuración \alert{Fija}
+	  \item Configuración \alert{fija}
 	  \end{itemize}
 
     \vfill\pause
@@ -257,7 +258,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \pause
 \textbf{Ventajas:}
   \begin{itemize}
-  \item Punto-a-punto y Punto-a-\alert{Multipunto}\vfill
+  \item Punto-a-punto y Punto-a-\alert{multipunto}\vfill
   \item \alert{Privacidad}\vfill
   \end{itemize}
 \vfill
@@ -290,13 +291,14 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{figure}[t]
   \centering
     \includegraphics[width=5cm]{../graphs/zchannel.pdf}
-    \caption{Diagrama de probabilidad del un canal binario asimétrico o canal Z}
+    
+    Diagrama de probabilidad del canal binario asimétrico o canal Z.
 \end{figure}
 \end{frame}
 
 %------------------------------------------------------------
 \subsection{Time hopping}
-\begin{frame}{Selección de casillero aleatoria: Time hopping}
+\begin{frame}{Selección de casillero aleatoria: \textit{time hopping}}
 \begin{figure}[t]
   \centering
     \includegraphics[width=8cm]{graphs/slide2.pdf}
@@ -304,7 +306,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{figure}
 \end{frame}
 %------------------------------------------------------------
-\begin{frame}{Selección de casillero aleatoria: Time hopping}
+\begin{frame}{Selección de casillero aleatoria: \textit{time hopping}}
 \begin{figure}[t]
   \centering
     \includegraphics[width=8cm]{graphs/slide3.pdf}
@@ -312,7 +314,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{figure}
 \end{frame}
 %------------------------------------------------------------
-\begin{frame}{Selección de casillero aleatoria: Time hopping}
+\begin{frame}{Selección de casillero aleatoria: \textit{time hopping}}
 \begin{figure}[t]
   \centering
     \includegraphics[width=8cm]{graphs/slide4.pdf}
@@ -347,13 +349,14 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 
 %------------------------------------------------------------
-\subsection{K Óptimo}
-\begin{frame}{K Óptimo}
+\subsection{K óptimo}
+\begin{frame}{K óptimo}
 
 \begin{figure}[!t]
   \centering
     \includegraphics[width=3in]{../graphs/Kcalc}
-    \caption{Estimación de BER vs. tasa de repetición de filtro de Bloom K.}
+    
+    Estimación de BER vs. tasa de repetición de filtro de Bloom K.
     \label{BERvsK}
 \end{figure}
 
@@ -364,9 +367,9 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 %------------------------------------------------------------
 
-\subsection{Minimización de peso de Hamming}
+\subsection{Minimización del peso de Hamming}
 
-\frame{\frametitle{Minimización de peso de Hamming}
+\frame{\frametitle{Minimización del peso de Hamming}
 \framesubtitle{Símbolo de 3-bits, Peso de Hamming=2, expansión a 5 bits}
 \begin{center}
 \begin{tabular}{c c c}
@@ -392,16 +395,17 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 %-------------------------------------------------------------
 
 \section{Implementación y mediciones}
-\subsection{Fibra Óptica}
+\subsection{Fibra óptica}
 
-\begin{frame}{Implementación: Fibra Óptica}
+\begin{frame}{Implementación: Fibra óptica}
 
 \begin{figure}[t]
   \centering
       \subfloat[Distribución via acoplador tipo estrella 1]{{\includegraphics[width=0.4 \textwidth]{graphs/StarCoupler} }}%
     \qquad
     \subfloat[Distribución via EDFA]{{\includegraphics[width=0.4 \textwidth]{graphs/EDFA} }}%
-    \caption{Diseño de red propuesto para la capa óptica}
+    
+    Diseño de red propuesto para la capa óptica
     \label{arch:fig1}
 \end{figure}
 
@@ -417,19 +421,20 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 \end{frame}
 
 %-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica}
+\begin{frame}{Implementación: Fibra óptica}
 
 \begin{figure}[t]
   \centering
     \includegraphics[width=3.3in]{../graphs/fpgadesign.pdf}
-\caption {Diseño lógico de alto nivel sobre FPGA}
+     
+     Diseño lógico de alto nivel sobre FPGA
 \label{fig:fpgadesign}
 \end{figure}
 
 \end{frame}
 
 %-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica, FPGA}
+\begin{frame}{Implementación: Fibra óptica, FPGA}
 
 \begin{figure}[t]
   \centering
@@ -440,12 +445,13 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 \end{frame}
 
 %-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra Óptica, Resultados (Simulaciones)}
+\begin{frame}{Implementación: Fibra óptica, Resultados (Simulaciones)}
 
 \begin{figure}[!t]
   \centering
     \includegraphics[width=4in]{../graphs/BERvsChannelES2}
-    \caption{Performance del sistema con respecto a la expansión de símbolo. Simulación numérica de un enlace de 10 Gbps con 128 clientes, M=4096 y K=9.}
+    
+    Desempeño del sistema con respecto a la expansión de símbolo. Simulación numérica de un enlace de 10 Gbps con 128 clientes, M=4096 y K=9.
     \label{BERvsExpansion}
 \end{figure}
 
@@ -462,7 +468,9 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
    \qquad
    \subfloat[Señal con 48 bits en uno por trama, 1100 ps por bit]{{\includegraphics[width=0.45 \textwidth]{../graphs/expansion2.jpg} }}%
    \qquad
-  \caption {Señal de potencia óptica de un Láser SPF+ Sumitomo de 1330 nm, tasa nominal es de 2.5 Gbps}
+   
+  \vspace{0.2cm}
+  Señal de potencia óptica de un Láser SPF+ de 1330 nm, tasa nominal es de 2.5 Gbps.
   \label{fig:ImgExpansion}
 \end{figure}
 \end{frame}
@@ -470,7 +478,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 %------------------------------------------------------------
 \subsection{Medio acústico}
 
-\begin{frame}{Medio acústico: Introducción}
+\begin{frame}{Medio acústico: introducción}
 
 \begin{figure}[t]
   \centering  
@@ -488,7 +496,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 \end{frame}
 %------------------------------------------------------------
-\begin{frame}{Medio acústico: Modulación}
+\begin{frame}{Medio acústico: modulación}
 
 \begin{columns}
   \begin{column}{0.40\textwidth}
@@ -496,34 +504,36 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
   \begin{figure}[t]
   \centering
     \includegraphics[width=5cm]{graphs/modulated.pdf}
-    \caption{Modulación OOK}
+    
+    Modulación OOK.
     \label{arch:sync}
 \end{figure}
 
   \end{column}
-  \begin{column}{0.40\textwidth}
+  \begin{column}{0.50\textwidth}
 \begin{figure}[th]
   \begin{center}
     \vspace{0.7cm}
-    \includegraphics[width=3cm]{graphs/zchannel}
+    \includegraphics[width=3cm]{../graphs/zchannel}
+    
+    Diagrama de probabilidad: canal Z.
   \end{center}
-  \caption{Diagrama de probabilidad: canal Z}
   \label{fig:Gal}
 \end{figure}
 
   \end{column}
 \end{columns}
-
+\vspace{0.2cm}
 
 \begin{itemize}
  \item Interferencia de OOK se aproxima a la de un canal Z.
- \item Baja densidad espectral ($0.2 bits/s/Hz$)
+ \item Baja densidad espectral (0.2 bits/s/Hz)
 \end{itemize}
 
 \end{frame}
 %------------------------------------------------------------
 
-\begin{frame}{Medio acústico: Sincronización}
+\begin{frame}{Medio acústico: sincronización}
 
 \begin{figure}[t]
   \centering  
@@ -535,7 +545,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 \end{frame}
 %------------------------------------------------------------
 
-\begin{frame}{Medio acústico: Características y espectro}
+\begin{frame}{Medio acústico: características y espectro}
 
 \begin{figure}[t]
   \centering  
@@ -545,32 +555,32 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 \end{figure}
 
 \begin{itemize}
- \item Portadora a 12Khz, modem funcionando a 1Kbps en total
+ \item Portadora a 12 Khz, modem funcionando a 1 Kbps en total
  \item Velocidades de 350 bps (2 usuarios) a 70 bps (10 usuarios)
- \item Dispositivos móviles: buen desempeño Parlante/Micrófono de 100 a 15Khz
+ \item Dispositivos móviles: buen desempeño parlante/micrófono de 100 a 15 Khz
 \end{itemize}
 
 \end{frame}
 
 %------------------------------------------------------------
-\begin{frame}{Medio acústico: Resultados (mediciones)}
+\begin{frame}{Medio acústico: resultados (mediciones)}
   
   \begin{figure}[t]
   \centering  
     \includegraphics[width=8cm]{graphs/medidas_clientes_JIS-fig6}
-    \\ BER $vs.$ Clientes
+    \\ BER $vs.$ número de clientes
     \label{ios_process_mem}
 \end{figure}
 
 \end{frame}
 
 %------------------------------------------------------------
-\begin{frame}{Medio acústico: Resultados (mediciones)}
+\begin{frame}{Medio acústico: resultados (mediciones)}
   
 \begin{figure}[t]
   \centering  
     \includegraphics[width=8cm]{graphs/mediciones-distancia-fig7}
-    \\ BER $vs.$ Distancia
+    \\ BER $vs.$ distancia
     \label{ios_process_mem}
 \end{figure}
 
@@ -583,7 +593,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 \frame{\frametitle{Conclusiónes:}
 \begin{itemize}
-\item Se propuse una arquitectura de red de tipo \alert{time-hopping CDMA}:\pause\vfill
+\item Se propuso una arquitectura de red de tipo \alert{time-hopping CDMA}:\pause\vfill
   \begin{itemize}
   \item Punto-a-Punto, y Punto-a-\alert{Multipunto}.\pause\vfill
   \item \alert{Red Privada} y criptográficamente segura.\pause\vfill
