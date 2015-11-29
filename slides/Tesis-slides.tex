@@ -58,8 +58,8 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{itemize}
  \item Tema: Privacidad en redes de acceso utilizando CDMA.
  \item Algoritmo criptográficamente seguros.
- \item Velocidades de 5 GBPS o mas.
- \item Subtema: comunicaciones \color{red}acústicas \color{black} privadas.
+ \item Medio de difusión (\textit{broadcast}).
+ \item Dos implementaciónes: comunicaciones \color{red}ópticas \color{black} y \color{red}acústicas\color{black}.
 \end{itemize}
 
 %\end{column}
@@ -81,15 +81,115 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \end{frame}
 %------------------------------------------------------------
 
+\begin{frame}{Implementación sobre red \color{red}óptica}
+
+\begin{columns}
+  \begin{column}{0.50\textwidth}
+
+\begin{itemize}
+ \item Capaz de operar a 5 Gbps+
+ \item Distancias hasta 10 km del nodo central (sin amplificación).
+ \item Hasta 128 usuarios simultaneos.
+ \item Diseño digital \textit{custom} sobre FPGA.
+ \item Utiliza transceptores ópticos SFP+ estandard
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.50\textwidth}
+
+ 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85 \textwidth]{../graphs/ftth.pdf} 
+\end{figure}
+
+  \end{column}
+\end{columns}
+
+
+\end{frame}
+
+%------------------------------------------------------------
+
+\begin{frame}{Implementación sobre red \color{red}acústica}
+
+\begin{columns}
+  \begin{column}{0.50\textwidth}
+
+\begin{itemize}
+ \item Modem: 1 Khz de ancho de banda, 1 Kbps, portadora a 12 Khz y 16 Khz (inaudible).
+ \item Distancias hasta 2 m del nodo central.
+ \item Máximo de 8 usuarios.
+ \item Implementación puramente en software.
+ \item Utiliza hardware existente en celulares y notebooks (micrófonos y parlantes).
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.50\textwidth}
+
+ 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85 \textwidth]{../graphs/compucelus.pdf}
+\end{figure}
+
+  \end{column}
+\end{columns}
+
+\end{frame}
+
+
+%------------------------------------------------------------
+
 
 \begin{frame}{Problemas a resolver}
 
 \begin{itemize}
- \item Privacidad de datos en una red que utiliza un medio compartido
- \item Protección ante nodos maliciosos
- \item Eliminar toda fuga de información
+ \item Privacidad de datos en una red que utiliza un medio compartido.
+ \item Protección ante nodos maliciosos. 
+ \item Eliminar toda fuga de información.
  \end{itemize}
 \end{frame}
+
+%------------------------------------------------------------
+
+
+\begin{frame}{Problemas a resolver (red óptica)}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75 \textwidth]{graphs/glimmer1.jpg} 
+\end{figure}
+\end{frame}
+
+%------------------------------------------------------------
+
+
+\begin{frame}{Problemas a resolver (red óptica)}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75 \textwidth]{graphs/glimmer2.jpg} 
+\end{figure}
+\end{frame}
+
+%------------------------------------------------------------
+
+\begin{frame}{Problemas a resolver (red acústica)}
+
+\begin{itemize}
+ \item Transmisión segura de claves/contacto/sistemas de TFA.
+ \item Transacciones comerciales a corta distancia.
+ \item Reemplazo de NFC, sin hardware específico.
+ \item Ej. Google tone: \textit{``An experimental chrome extension for instant sharing over au-
+dio''}
+ \end{itemize}
+ 
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=0.65 \textwidth]{graphs/google_tone.jpg} 
+\end{figure}
+\end{frame}
+
+
 %------------------------------------------------------------
 
 \begin{frame}{Solución propuesta}
@@ -97,8 +197,9 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
   \begin{column}{0.60\textwidth}
 
 \begin{enumerate}
- \item Utilizar CDMA para la separación en canales
- \item Desarrollar algoritmos criptográficamente seguros para la privacidad
+ \item Utilizar \texttt{time hopping} para la separación en canales.
+ \item Utilizar algoritmos criptográficamente seguros para seleccion de canal.
+ \item Ante colisiones, utilizar algoritmos de corrección de errores específicos para canal Z.
  \end{enumerate}
 
   \end{column}
@@ -125,7 +226,8 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
  \item Sistema capaz de operar a 5 Gbps+
  \item Evitar protocolos de control que debiliten la criptografía
  \item Aislación completa de canales de comunicación, para evitar ataques del tipo \textit{side channel}.
- \item Bajo costo
+ \item Bajo costo - utilización de hardware pre-existente.
+ \item En implementación acústica: bajo consumo de potencia y alta frecuencia de portadora.
  \end{enumerate}
 
   \end{column}
@@ -169,15 +271,15 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
   \begin{column}{0.65\textwidth}
 
   \begin{itemize}
-      \item SSH
-      \item SSL
-      \item Kerberos
+      \item SSH - solo punto-a-punto.
+      \item SSL - protocolo muy complejo, muchas vulnerabilidades.
+      \item Kerberos - idem SSL.
   \end{itemize}
   \pause\vfill
   {\bf Desventajas:}
 	  \begin{itemize}
-	  \item Usualmente \alert{mal configurada}
-	  \item Directamente \alert{olvidada}
+	  \item Complejidad y vulnerabilidades de \alert{implementación}.
+	  \item Problemas en la \alert{configuración}.
 	  \end{itemize}	  
 
   \end{column}
@@ -186,8 +288,8 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 }
 
 
-\frame{\frametitle{Seguridad en las capas de red}
-%\framesubtitle{Capa física}
+\frame{
+\frametitle{Seguridad en las capas de red}
 
 \begin{columns}
   \begin{column}{0.40\textwidth}
@@ -219,8 +321,9 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
      
      \vfill\pause
 	  
-    \item CDMA \& códigos Walsh \cite{Nadarajah2006}
+    \item CDMA \& códigos Walsh-Hadamard \cite{Nadarajah2006}
 	  \begin{itemize}
+	  \item Perfectamente ortogonales.
 	  \item Espacio de claves \alert{muy reducido} \cite{Shake:05}
 	  \end{itemize}
 	
@@ -252,7 +355,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \vfill
 \textbf{Basado en:}
 \begin{description}
- \item[Time-hopping CDMA:] El tiempo de transmisión se selecciona mediante un algoritmo generador de números pseudoaleatorios (\alert{PRBS}).
+ \item[Time-hopping Spread Spectrum:] El tiempo de transmisión se selecciona mediante un algoritmo generador de números pseudoaleatorios (\alert{PRBS}).
  \item[Filtro de Bloom:] Provee \alert{corrección de errores} asimétrica (en un canal Z)\vfill
  \item[Minimización de peso de Hamming:] \alert{reducción} de símbolos problemáticos en el canal Z\vfill
 \end{description}
@@ -296,7 +399,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
   \centering
     \includegraphics[width=5cm]{../graphs/zchannel.pdf}
     
-    Diagrama de probabilidad del canal binario asimétrico o canal Z.
+    Diagrama de probabilidad del canal binario asimétrico o canal Z, donde p es la probabilidad de error.
 \end{figure}
 \end{frame}
 
@@ -556,7 +659,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 \begin{figure}[t]
   \centering  
     \includegraphics[width=10cm]{graphs/spectrum.png}
-    \\ Espectro de señal modulada
+    \\ Espectro de señal modulada, salida directa del modem.
     \label{ios_process_mem}
 \end{figure}
 
@@ -595,10 +698,10 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 %-------------------------------------------------------------
 
-\section{Conclusión}
+\section{Conclusiones}
 \frame{\tableofcontents[currentsection,hideallsubsections]}
 
-\frame{\frametitle{Conclusiónes:}
+\frame{\frametitle{Conclusiones:}
 \begin{itemize}
 \item Se propuso una arquitectura de red de tipo \alert{time-hopping CDMA}:\pause\vfill
   \begin{itemize}
@@ -611,7 +714,15 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 }
 
 %-------------------------------------------------------------
+\frame{\frametitle{Trabajos futuros:}
+  \begin{itemize}
+  \item Sincronización encriptada
+  \item Implementación en otros medios. Ej. Radio.
+  \item Autenticación
+  \end{itemize}
+}
 
+%-------------------------------------------------------------
 \begin{frame}{Contribuciones:}
 %\small
 \textbf{Altas velocidades de transferencia en fibra óptica utilizando FPGAs de bajo costo. } \textit{A. A. Ortega, V. A. Bettachini, D.F. Grosz, J. I. Alvarez-Hamelin - Congreso de Microelectrónica Aplicada 2010 BsAs}
@@ -626,6 +737,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 
 \end{frame}
+
 
 \begin{frame}{Contribuciones:}
 %\small
