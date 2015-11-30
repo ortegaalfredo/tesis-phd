@@ -7,6 +7,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{subfig}
+\usepackage{tabto}
 % 
 
 \begin{document}
@@ -149,6 +150,14 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
  \item Protección ante nodos maliciosos. 
  \item Eliminar toda fuga de información.
  \end{itemize}
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75 \textwidth]{graphs/microbend.png}
+  
+  Fugas por Microbend y macrobend en fibra óptica \cite{jay2010}
+\end{figure}
+
 \end{frame}
 
 %------------------------------------------------------------
@@ -476,6 +485,122 @@ dio''}
 
 \subsection{Minimización del peso de Hamming}
 
+\frame{\frametitle{Minimización del peso de Hamming: origen}
+\framesubtitle{Origen de la técnica}
+  \begin{itemize}
+  \item Peso de Hamming: cantidad de '1's en un dígito binario.
+  \item Ej.: $HW(00101010) = 3$
+  \item En un canal Z, los '1' producen interferencia, los '0', no.
+  \item Es un \alert{sistema de numeración}.
+  \end{itemize}
+}
+
+\frame{\frametitle{Minimización del peso de Hamming: origen}
+\framesubtitle{Sistemas de numeración}
+  \begin{itemize}
+  \item Mas extendido: números arábigos.
+  \item Originalmente de India, documentado e introducido a Europa por \alert{Al-Jwarizmi}.
+  \end{itemize}
+Dada un conjunto de $n$ dígitos ordenados $d$,
+
+con posición $p$ y base $B$, el valor numérico $VN$ es:
+
+$$VN=\sum_{n=1}^{n} B^{p}*d$$
+Ej.
+$$1685=10^{3}*1+10^{2}*6+10^{1}*8+10^{0}*9$$
+
+}
+
+\frame{\frametitle{Minimización del peso de Hamming: origen}
+\framesubtitle{Sistemas de numeración: Ejemplos}
+\begin{columns}
+  \begin{column}{0.60\textwidth}
+
+  \begin{itemize}
+  \item Bases no estandard, Ej.: Negabinario, base -2
+        $$VN=\sum_{n=1}^{n} (-2)^{p}*d$$
+  \item Sistema numeral \textit{Quater-imaginario}, base $-2i$, por \cite{knuth1960imaginary}.
+        $$VN=\sum_{n=1}^{n} (2i)^{p}*d$$
+  \end{itemize}
+
+  \end{column}
+  \begin{column}{0.40\textwidth}
+  \begin{figure}[t]
+  \centering
+    \includegraphics[width=1.5in]{graphs/twindragon.png}
+     
+    Dragón de Davis-Knuth : fractal asociado a la base $(-1 \pm i)$
+\end{figure}
+
+
+  \end{column}
+\end{columns}
+
+  
+}
+
+\frame{\frametitle{Minimización del peso de Hamming: origen}
+\framesubtitle{Sistemas de numeración: Ejemplos}
+\begin{columns}
+  \begin{column}{0.60\textwidth}
+
+  \begin{itemize}
+  \item Códigos no regulares: Código Gray
+  \item \alert{Dígitos con signo}. Ej.:
+    $$1685=1000*1+100*6+80*10+5$$
+    pero también:
+    $$1685=169(-5)=1000*1+100*6+90*10+(-5)$$
+    y también:
+    $$1685=169\bar{5}=17\bar{1}\bar{5}$$
+  \item Usado en el lenguaje Punjabi.
+    
+  \end{itemize}
+
+  \end{column}
+  \begin{column}{0.40\textwidth}
+  \begin{figure}[t]
+  \centering
+    \includegraphics[width=1.8in]{graphs/gray.png}
+     
+    Código Gray
+\end{figure}
+
+
+  \end{column}
+\end{columns}
+  
+}
+
+\frame{\frametitle{Minimización del peso de Hamming: origen}
+\framesubtitle{Sistemas de numeración: Dígitos signados}
+\begin{columns}
+  \begin{column}{0.60\textwidth}
+
+  \begin{itemize}
+  \item Existe más de una representación posible por número.
+  \item La representación canónica de dígitos signados (CSD) es util:
+  
+        La probabilidad digitos no-cero es $\frac{1}{3}$.
+        
+        Usando dígitos binarios es $\frac{1}{2}$.
+        
+  \item Primeramente el sistema propuesto utilizó esta representación.
+  \item Luego se utilizó una tabla con símbolos optimizados con un peso de Hamming fijo.
+  \end{itemize}
+
+  \end{column}
+  \begin{column}{0.40\textwidth}
+    Binario: \tab{$001010111$}
+    
+    CSD:     \tab{$010\bar{1}0\bar{1}00\bar{1}$}
+  \end{column}
+\end{columns}
+  
+}
+
+
+
+
 \frame{\frametitle{Minimización del peso de Hamming}
 \framesubtitle{Símbolo de 3-bits, Peso de Hamming=2, expansión a 5 bits}
 \begin{center}
@@ -499,6 +624,52 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 }
 
 
+
+
+%-------------------------------------------------------------
+\section{Simulación}
+\frame{\tableofcontents[currentsection,hideallsubsections]}
+
+\begin{frame}{Simulación: software de prueba}
+
+
+  \begin{itemize}
+  \item Framework de pruebas: Se implementó un módulo independiente por cada etapa.
+  \item Utilizado C, C++ y Boost para mejor desempeño.
+  \item Incluye un simulador de ruido óptico.
+  \item Modulador/demodulador de audio.
+  \item Model cliente/servidor para simulaciones distribuidas.
+  \end{itemize}
+
+
+\end{frame}
+
+\begin{frame}{Simulación: software de prueba}
+
+  \begin{figure}[t]
+    \includegraphics[width=0.90 \textwidth]{../graphs/Soft-stack-sim} 
+    
+    Correspondencia de etapa con módulos de simulación
+\end{figure}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Simulación: software de prueba}
+
+Ejemplo de linea de comando para lanzar la simulación:
+
+\small
+\begin{verbatim}
+ ./rsenc <testfile.in | ./scrambler ${SCRAMBLEBLOCK} >rs.out
+ ./bfenc ${CLIENTES} < rs.out | ./noisesim -c ${CLIENTES} -r 16.6 >bfenc.out
+ ./bfdec ${CLIENTES} <bfenc.out >bf.out
+ ./descramble ${SCRAMBLEBLOCK} <bf.out | ./rsdec >rsdec.out
+\end{verbatim}
+\normalsize
+
+El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{testfile.in} y \textbf{rsdec.out}.
+\end{frame}
 %-------------------------------------------------------------
 
 \section{Implementación y mediciones}
@@ -703,11 +874,11 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 \frame{\frametitle{Conclusiones:}
 \begin{itemize}
-\item Se propuso una arquitectura de red de tipo \alert{time-hopping CDMA}:\pause\vfill
+\item Se propuso una arquitectura de red privada tipo \alert{time-hopping CDMA}:\pause\vfill
   \begin{itemize}
+  \item Para redes de difusión del tipo \alert{canal z}.\pause\vfill
+  \item Utilizando \alert{filtros de Bloom} y minimización de peso de \alert{Hamming}.\pause\vfill
   \item Punto-a-Punto, y Punto-a-\alert{Multipunto}.\pause\vfill
-  \item \alert{Red Privada} y criptográficamente segura.\pause\vfill
-  \item Utilizando Filtros de \alert{Bloom} y minimización de peso de \alert{Hamming}.\pause\vfill
   \item {\bf 29\% de utilización del canal.} \vfill
   \end{itemize}
 \end{itemize}
@@ -716,9 +887,10 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 %-------------------------------------------------------------
 \frame{\frametitle{Trabajos futuros:}
   \begin{itemize}
-  \item Sincronización encriptada
+  \item Sincronización segura.
+  \item Encriptación autenticada.
+  \item Autenticación de nodos y distribución de claves (\textit{Forward Secrecy}).
   \item Implementación en otros medios. Ej. Radio.
-  \item Autenticación
   \end{itemize}
 }
 
@@ -814,6 +986,20 @@ Z.~Wang, L.~Xu, J.~Chang, T.~Wang, and P.~R. Prucnal.
   1410 --1412, oct. 2010.
 \newblock ISSN 1041-1135.
 \newblock \doi{10.1109/LPT.2010.2061223}.
+
+\bibitem[Knuth, Donald E]{knuth1960imaginary}
+Knuth, Donald E.
+\newblock An Imaginary Number System.
+\newblock 1960
+
+
+\bibitem[Jay, John A]{jay2010}
+Jay, John A.
+\newblock An overview of macrobending and microbending of optical fibers.
+\newblock \emph{White Paper WP1212, Corning}.
+\newblock 2010.
+
+
 
 \end{thebibliography}
 
