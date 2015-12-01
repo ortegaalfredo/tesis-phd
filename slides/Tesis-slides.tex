@@ -389,7 +389,7 @@ dio''}
 \frame{\frametitle{Sistema propuesto: diagrama esquemático}
 \begin{figure}[t]
 \centering
-\includegraphics[width=3.5in]{../graphs/Soft-stack3}
+\includegraphics[width=4.5in]{../graphs/Soft-stack3}
 \label{fig_comstack}
 \end{figure}
 }
@@ -483,15 +483,17 @@ dio''}
 
 %------------------------------------------------------------
 
-\subsection{Minimización del peso de Hamming}
+\section{Minimización del peso de Hamming}
+\frame{\tableofcontents[currentsection,hideallsubsections]}
 
 \frame{\frametitle{Minimización del peso de Hamming: origen}
 \framesubtitle{Origen de la técnica}
   \begin{itemize}
   \item Peso de Hamming: cantidad de '1's en un dígito binario.
-  \item Ej.: $HW(00101010) = 3$
   \item En un canal Z, los '1' producen interferencia, los '0', no.
-  \item Es un \alert{sistema de numeración}.
+  \item Ej.: $$HW(00101010) = 3$$
+  $$HW(00100000) = 1$$
+  \item La minimización del HW es una representación o codificación numérica alternativa.
   \end{itemize}
 }
 
@@ -503,9 +505,9 @@ dio''}
   \end{itemize}
 Dada un conjunto de $n$ dígitos ordenados $d$,
 
-con posición $p$ y base $B$, el valor numérico $VN$ es:
+con posición $p$ y base $B$, el valor numérico $V$ es:
 
-$$VN=\sum_{n=1}^{n} B^{p}*d$$
+$$V=\sum_{n=0}^{n-1} B^{p}*d$$
 Ej.
 $$1685=10^{3}*1+10^{2}*6+10^{1}*8+10^{0}*9$$
 
@@ -517,10 +519,10 @@ $$1685=10^{3}*1+10^{2}*6+10^{1}*8+10^{0}*9$$
   \begin{column}{0.60\textwidth}
 
   \begin{itemize}
-  \item Bases no estandard, Ej.: Negabinario, base -2
-        $$VN=\sum_{n=1}^{n} (-2)^{p}*d$$
+  \item Bases no estandard, Ej.: Negabinario, base $-2$.
+        $$V=\sum_{n=0}^{n-1} (-2)^{p}*d$$
   \item Sistema numeral \textit{Quater-imaginario}, base $-2i$, por \cite{knuth1960imaginary}.
-        $$VN=\sum_{n=1}^{n} (2i)^{p}*d$$
+        $$V=\sum_{n=0}^{n-1} (2i)^{p}*d$$
   \end{itemize}
 
   \end{column}
@@ -638,7 +640,7 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
   \item Utilizado C, C++ y Boost para mejor desempeño.
   \item Incluye un simulador de ruido óptico.
   \item Modulador/demodulador de audio.
-  \item Model cliente/servidor para simulaciones distribuidas.
+  \item Modelo cliente/servidor para simulaciones distribuidas.
   \end{itemize}
 
 
