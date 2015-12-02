@@ -249,11 +249,13 @@ Resumiendo, la seguridad de los sistemas de criptografía cuántica se basa en l
 
 \subsection{Corrección de errores en canales asimétricos}
  
-Se denominan códigos de corrección de errores asimétricos o unidireccionales, a todo código de corrección especializado en canales de comunicaciones cuya probabilidad de error no se aplica simétricamente a todos los símbolos. Un caso sencillo, es por ejemplo, el del llamado canal Z, un canal binario (símbolos ``1'' y ``0'') pero cuyos errores sólo pueden afectar a uno de los símbolos, como podría suceder en un sistema donde al transmitir el símbolo ``0'' un error provoque la recepción de un símbolo ``1'', pero donde lo contrario no es posible. En la figura~\ref{fig:Gal} se observa el diagrama de probabilidades del canal binario asimétrico o canal Z. En la sección~\ref{canalZ} se desarrolla el límite de capacidad del canal Z.
+Se denominan códigos de corrección de errores asimétricos o unidireccionales, a todo código de corrección especializado en canales de comunicaciones cuya probabilidad de error no se aplica simétricamente a todos los símbolos. Estos métodos son de especial interés en esta Tesis, debido a que las modulaciones utilizadas en ambos medios seleccionados, el acústico y el óptico, poseen un modelo de ruido esencialmente asimétrico.
+Un caso sencillo, es por ejemplo, el del llamado canal Z, un canal binario (símbolos ``1'' y ``0'') pero cuyos errores sólo pueden afectar a uno de los símbolos, como podría suceder en un sistema donde al transmitir el símbolo ``0'' un error provoque la recepción de un símbolo ``1'', pero donde lo contrario no es posible. En la figura~\ref{fig:Gal} se observa el diagrama de probabilidades del canal binario asimétrico o canal Z. En la sección~\ref{canalZ} se desarrolla el límite de capacidad del canal Z.
+
 
 Recientemente, surgió interés en el campo de la corrección de errores de canales asimétricos, debido a la utilidad de estos algoritmos en sistemas de almacenamiento digitales~\cite{tanakamaru201195}. Sin embargo, el número de artículos publicados sobre el tema sigue siendo mucho menor en comparación con las publicaciones acerca de códigos de corrección para canales convencionales. Como ejemplo de códigos unidireccionales podemos citar los códigos de Berger~\cite{berger1961note} y códigos de Gallager o LDPC unidireccionales~\cite{neri2008gallager}.
 
-\subsection{Sistemas de comunicacion óptica}
+\subsection{Sistemas de comunicacion óptica y soluciones relacionadas}
 \label{defPON}
 Existen muchos esquemas de distribución óptica en redes urbanas basados en redes ópticas pasivas, tales como APON~\cite{kramer2002ethernet} y sus derivados BPON/EPON, utilizados por millones de usuarios en la actualidad~\cite{chanclou2013france}.
 Sin embargo, el sistema que más se aproxima al descrito en esta Tesis es el \textit{Secure Passive Optical Network} (SPON). En los SPONs~\cite{armoredshield}, se agrega una capa de seguridad clásica por sobre un protocolo de comunicaciones pre-existente como \textit{Gigabit Passive Optical Network} (GPON).

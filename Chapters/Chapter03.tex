@@ -113,10 +113,22 @@ Empezaremos primeramente estudiando un modelo simplificado del canal por el cual
 Procederemos a calcular la probabilidad de no-colisión de un cliente.
 
 Sea $M$ la cantidad de casilleros por trama y $n$ la cantidad de clientes o usuarios.
-
-Entonces, la probabilidad de no colisión para un usuario en un slot dado es
+Entonces, seleccionando un casillero cualquiera, la probabilidad de que un cliente dado seleccione el mismo casillero es de:
 \begin{equation}
-P_{nc}=\left(\frac{M-1}{M}\right)^{n-1}
+p=\frac{1}{M}
+\end{equation}
+
+Esto indicaria las chances de colisionar con otro cliente, si existieran solo dos. En el mismo caso, la probabilidad de no colisionar es:
+
+\begin{equation}
+pn=1-\frac{1}{M}
+\end{equation}
+
+
+Dado que en realidad existen $n$ clientes, la posibilidad de no colisión es:
+\begin{equation}
+\label{eq:Pnc}
+P_{nc}=\left(1-\frac{1}{M}\right)^{n}
 \end{equation}
 
 Esta ecuación es válida bajo la hipótesis de que todos los clientes eligen el slot a transmitir de manera aleatoria, y de manera independiente. También consideramos que los usuarios utilizan sólo un slot.
@@ -126,38 +138,23 @@ Para simplificar, hablaremos de 'colisión' de símbolos cuando uno o más usuar
 Siendo $P_{nc}(1)$ la probabilidad de no colisión del símbolo uno, y $P_{nc}(0)$ la probabilidad de no colisión del símbolo cero, la probabilidad total de no colisión para un usuario en un canal Z es
 
 \begin{equation}
+\label{eq:PncSym}
 P_{nc}=P(1)\cdot P_{nc}(1) + P(0) \cdot P_{nc}(0) 
 \end{equation}
-Asumiendo que todos los usuarios transmiten un stream de datos aleatorio, tenemos que $P(1)=P(0)=\frac{1}{2}$. Entonces podemos desarrollar $P_{nc}$ como
+Asumiendo que todos los usuarios transmiten un stream de datos aleatorio, tenemos que $P(1)=P(0)=\frac{1}{2}$.
+El cálculo de $P_{nc}(0)$ es ahora ligéramente diferente que la ecuación \ref{eq:Pnc}, ya que las chances de colisionar con otro cliente se reducen a la mitad, por lo que:
+\begin{equation}
+\label{eq:Pnc0}
+P_{nc}(0)=\left(1-\frac{1}{2M}\right)^{n}
+\end{equation}
 
-\begin{eqnarray}
-P_{nc} & = & \frac{1}{2} \cdot 1 +  \frac{1}{2} \cdot \sum_{i=0}^{n-1} 
-C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{M}\right)^{n-1-i}  \left(\frac{1}{2}\right)^{n-1-i} 
-\end{eqnarray}
+Reemplazando \ref{eq:Pnc0} en \ref{eq:PncSym}:
 
-La complejidad de la ecuación 3.2 se encuentra entonces en el desarrollo de $P_{nc}(0)$. Cada término de la sumatoria del segundo término del RHS de la ecuación 3.3 da la probabilidad de que $(n-i-1)$ usuarios escriban un 1 en el slot seleccionado.
-El factor $C^{n-1}_{i}$ suma sobre todas las combinaciones posibles de canales que no hayan colisionado, que son hechos independientes.
-\noindent Luego, $\left(\frac{M-1}{M}\right)^i$ es la probabilidad de no colisión de $i$ canales (se suma para todo posible número de canales no
-colisionando: $1\leq i\leq n$, que están en otro casillero), $
-\left(\frac{1}{M}\right)^{n-1-i}$ es la probabilidad de colisión de los restantes
-$n-1-i$, y la colisión se produce cuando los otros canales
-transmiten el símbolo $1$ cuya probabilidad es $\left(\frac{1}{2}\right)^{n-1-i}$.
-%El factor combinatorio (C^{n-1}_{i}) me da la cantidad de grupos de i (o de n-1-i) usuarios de entre los (n-1) restantes puedo formar (es decir, la cantidad de formas que puedo escoger grupos de (n-1-i) personas que me sobreescriban mi querido 0).  El segundo factor me da la probabilidad de que i de los restantes (n-1) usuarios seleccionen OTROS slots. El tercer factor me da la probabilidad de que el grupo selecto de (n-1-i) usuarios elijan MI slot. Finalmente, el último factor me da la probabilidad de que los rhdp del grupo selecto de (n-1-i) usuarios escriban un 1 en MI slot
+\begin{equation}
+P_{nc}=\frac{1}{2}+\frac{1}{2}(1-\frac{1}{2M})^{n}
+\end{equation}
 
-
-
-\noindent Teniendo en cuenta que $ \sum_{i=0}^{n-1}
-C^{n-1}_{i} \left(\frac{M-1}{M}\right)^i  \left(\frac{1}{2M}\right)^{n-1-i}$ es la potencia $n-1$ de un binomio, reemplazando tenemos
-\begin{eqnarray}
-P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(\frac{M-1}{M} + \frac{1}{2M} \right)^{n-1} \\
-P_{nc} & = & \frac{1}{2} +  \frac{1}{2} \cdot \left(1- \frac{1}{2M} \right)^{n-1} \\
-P_{nc} & \simeq & \frac{1}{2} +  \frac{1}{2} \cdot e^{\frac{-n}{2M}}
-\end{eqnarray}
-
-%\noindent donde la última aproximación vale para $n=M$ y $n > 2$.
-
-
-Es decir, la probabilidad de no colisión depende de la relación $n/M$. Si $M>>n$, entonces $P_{nc}$ se aproxima a 1, que es una característica deseable en el sistema.
+Si $M>>n$, entonces $P_{nc}$ se aproxima a 1, que es una característica deseable en el sistema.
 \iffalse
 
 \vspace{5mm}
