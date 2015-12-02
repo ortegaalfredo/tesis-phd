@@ -18,7 +18,7 @@
 
 \author{\small Alfredo Adrián Ortega\\
 Instituto Tecnológico de Buenos Aires (ITBA) \\
-     aortega@alu.itba.edu.ar\\    }
+     aortega@itba.edu.ar\\    }
 
 
 
@@ -46,104 +46,28 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 \frame{\frametitle{Contenido}\tableofcontents[hideallsubsections]}
 
+\section{Motivación}
 
-
-
-%------------------------------------------------------------
-\section{Introducción}
-\begin{frame}{Introducción}
-
-%\begin{columns}
-%  \begin{column}{0.60\textwidth}
+\begin{frame}{Motivación}
 
 \begin{itemize}
- \item Tema: Privacidad en redes de acceso utilizando CDMA.
- \item Algoritmo criptográficamente seguros.
- \item Medio de difusión (\textit{broadcast}).
- \item Dos implementaciónes: comunicaciones \color{red}ópticas \color{black} y \color{red}acústicas\color{black}.
-\end{itemize}
-
-%\end{column}
- % \begin{column}{0.40\textwidth}
-
-  \begin{figure}[!t]
-   \centering
-   \subfloat[Red óptica]{{\includegraphics[width=0.25 \textwidth]{../graphs/ftth.pdf} }}%
-   \qquad
-   \subfloat[Red acústica]{{\includegraphics[width=0.25 \textwidth]{../graphs/compucelus.pdf} }}%
-   \qquad
-  %\caption {Diagramas de ojo de la señal óptica a la salida de la fibra. Se observa una degradación importante de la calidad de la señal al aumentar la tasa de bits.}
-  \label{fig:ImgOjo}
-\end{figure}
-
-%  \end{column}
-%\end{columns}
-
-\end{frame}
-%------------------------------------------------------------
-
-\begin{frame}{Implementación sobre red \color{red}óptica}
-
-\begin{columns}
-  \begin{column}{0.50\textwidth}
-
-\begin{itemize}
- \item Capaz de operar a 5 Gbps+
- \item Distancias hasta 10 km del nodo central (sin amplificación).
- \item Hasta 128 usuarios simultaneos.
- \item Diseño digital \textit{custom} sobre FPGA.
- \item Utiliza transceptores ópticos SFP+ estandard
+ \item Lograr privacidad a nivel físico en comunicaciones digitales.
+ \item El costo de las intrusiones y robo de datos en el 2011 en EEUU ascendió en promedio a 5.5 us\$ millones por organización (Symantec).
+ \item Facilidad de robo de datos en medios compartidos.
+ \item Productos comerciales (ID Quantique) intentan solucionar este tipo de problemas. 
  \end{itemize}
 
-  \end{column}
-  \begin{column}{0.50\textwidth}
-
- 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.85 \textwidth]{../graphs/ftth.pdf} 
-\end{figure}
-
-  \end{column}
-\end{columns}
-
-
-\end{frame}
-
-%------------------------------------------------------------
-
-\begin{frame}{Implementación sobre red \color{red}acústica}
-
-\begin{columns}
-  \begin{column}{0.50\textwidth}
-
-\begin{itemize}
- \item Modem: 1 Khz de ancho de banda, 1 Kbps, portadora a 12 Khz y 16 Khz (inaudible).
- \item Distancias hasta 2 m del nodo central.
- \item Máximo de 8 usuarios.
- \item Implementación puramente en software.
- \item Utiliza hardware existente en celulares y notebooks (micrófonos y parlantes).
- \end{itemize}
-
-  \end{column}
-  \begin{column}{0.50\textwidth}
-
- 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.85 \textwidth]{../graphs/compucelus.pdf}
-\end{figure}
-
-  \end{column}
-\end{columns}
+% \begin{figure}[t]
+%  \centering
+%  \includegraphics[width=0.75 \textwidth]{graphs/microbend.png}
+  
+%  Fugas por Microbend y macrobend en fibra óptica \cite{jay2010}
+%\end{figure}
 
 \end{frame}
 
 
-%------------------------------------------------------------
-
-
-\begin{frame}{Problemas a resolver}
+\begin{frame}{Robo de datos en fibras ópticas}
 
 \begin{itemize}
  \item Privacidad de datos en una red que utiliza un medio compartido.
@@ -163,7 +87,9 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 %------------------------------------------------------------
 
 
-\begin{frame}{Problemas a resolver (red óptica)}
+%------------------------------------------------------------
+
+\begin{frame}{Robo de datos en fibras ópticas}
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.75 \textwidth]{graphs/glimmer1.jpg} 
@@ -173,7 +99,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 %------------------------------------------------------------
 
 
-\begin{frame}{Problemas a resolver (red óptica)}
+\begin{frame}{Robo de datos en fibras ópticas}
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.75 \textwidth]{graphs/glimmer2.jpg} 
@@ -182,7 +108,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 
 %------------------------------------------------------------
 
-\begin{frame}{Problemas a resolver (red acústica)}
+\begin{frame}{Privacidad en redes acústicas}
 
 \begin{itemize}
  \item Transmisión segura de claves/contacto/sistemas de TFA.
@@ -201,42 +127,33 @@ dio''}
 
 %------------------------------------------------------------
 
-\begin{frame}{Solución propuesta}
-\begin{columns}
-  \begin{column}{0.60\textwidth}
+\begin{frame}{Red pública con privacidad}
 
 \begin{enumerate}
- \item Utilizar \texttt{time hopping} para la separación en canales.
- \item Utilizar algoritmos criptográficamente seguros para seleccion de canal.
- \item Ante colisiones, utilizar algoritmos de corrección de errores específicos para canal Z.
- \end{enumerate}
-
-  \end{column}
-  \begin{column}{0.40\textwidth}
-
+ \item Red: enlaces punto-a-punto y multipunto.
+ \item Privacidad: nivel físico, criptográficamente fuerte.
+ \item CDMA: acceso asincrónico sin control centralizado.
+ \item Diferentes medios:
+ \begin{enumerate}
+ \item Guiados: Fibra óptica
+ \item No guiados: Electromagnético y acústico.
+\end{enumerate}
  
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.55 \textwidth]{../graphs/tdmacdma} 
-  \label{fig_tdmacdma}
-\end{figure}
-
-  \end{column}
-\end{columns}
+\end{enumerate}
 
 \end{frame}
 %------------------------------------------------------------
 
-\begin{frame}{Desafíos}
+\begin{frame}{Desafíos en medios acústicos y fibra óptica}
 \begin{columns}
   \begin{column}{0.60\textwidth}
 
 \begin{enumerate}
- \item Sistema capaz de operar a 5 Gbps+
  \item Evitar protocolos de control que debiliten la criptografía
  \item Aislación completa de canales de comunicación, para evitar ataques del tipo \textit{side channel}.
  \item Bajo costo - utilización de hardware pre-existente.
- \item En implementación acústica: bajo consumo de potencia y alta frecuencia de portadora.
+ \item Fibra óptica: Sistema capaz de operar a 5 Gbps+ 
+ \item Medio acústico: Bajo consumo de potencia y alta frecuencia de portadora.
  \end{enumerate}
 
   \end{column}
@@ -261,7 +178,7 @@ dio''}
 %-------------------------------------------------------------
 
 \section{Estado del Arte}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
+\frame{\tableofcontents[currentsection]}
 
 \frame{\frametitle{Seguridad en las capas de red}
 %\framesubtitle{ Capas de red}
@@ -358,16 +275,19 @@ dio''}
 %}
 
 \section{Sistema propuesto}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
+\frame{\tableofcontents[currentsection]}
 
 \frame{\frametitle{Sistema propuesto}
 \vfill
 \textbf{Basado en:}
-\begin{description}
- \item[Time-hopping Spread Spectrum:] El tiempo de transmisión se selecciona mediante un algoritmo generador de números pseudoaleatorios (\alert{PRBS}).
- \item[Filtro de Bloom:] Provee \alert{corrección de errores} asimétrica (en un canal Z)\vfill
- \item[Minimización de peso de Hamming:] \alert{reducción} de símbolos problemáticos en el canal Z\vfill
-\end{description}
+\begin{itemize}
+ \item{Medio de tipo bróadcast, modelado como canal Z}
+ \item{Utilización de CDMA}
+ \item{Corrección de errores optimizada para el tipo de canal}
+ %\item[Time-hopping Spread Spectrum:] El tiempo de transmisión se selecciona mediante un algoritmo generador de números pseudoaleatorios (\alert{PRBS}).
+ %\item[Filtro de Bloom:] Provee \alert{corrección de errores} asimétrica (en un canal Z)\vfill
+ %\item[Minimización de peso de Hamming:] \alert{reducción} de símbolos problemáticos en el canal Z\vfill
+\end{itemize}
 \vfill
 \pause
 \textbf{Ventajas:}
@@ -378,31 +298,15 @@ dio''}
 \vfill
 }
 
-\frame{\frametitle{Sistema propuesto: diseño de alto nivel}
-\begin{figure}[t]
-\centering
-\includegraphics[width=2.5in]{../graphs/hub}
-\label{fig_hub}
-\end{figure}
-}
-
-\frame{\frametitle{Sistema propuesto: diagrama esquemático}
-\begin{figure}[t]
-\centering
-\includegraphics[width=4.5in]{../graphs/Soft-stack3}
-\label{fig_comstack}
-\end{figure}
-}
-
-
 
 %-------------------------------------------------------------
 
-\section{Metodología}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
+\subsection{Metodología}
+\frame{\tableofcontents[currentsection,currentsubsection]}
 
 %------------------------------------------------------------
 \subsection{Canal Z}
+
 \begin{frame}{Canal Z}
 \begin{figure}[t]
   \centering
@@ -413,7 +317,9 @@ dio''}
 \end{frame}
 
 %------------------------------------------------------------
-\subsection{Time hopping}
+\subsection{CDMA Time hopping}
+\frame{\tableofcontents[currentsection,currentsubsection]}
+
 \begin{frame}{Selección de casillero aleatoria: \textit{time hopping}}
 \begin{figure}[t]
   \centering
@@ -439,6 +345,8 @@ dio''}
 \end{frame}
 %------------------------------------------------------------
 \subsection{Filtro de Bloom}
+\frame{\tableofcontents[currentsection,currentsubsection]}
+
 \begin{frame}{CDMA + Filtro de Bloom (K=3)}
 \begin{figure}[t]
   \centering
@@ -464,8 +372,12 @@ dio''}
 \end{frame}
 
 
+
+
 %------------------------------------------------------------
 \subsection{K óptimo}
+\frame{\tableofcontents[currentsection,currentsubsection]}
+
 \begin{frame}{K óptimo}
 
 \begin{figure}[!t]
@@ -483,143 +395,52 @@ dio''}
 
 %------------------------------------------------------------
 
-\section{Minimización del peso de Hamming}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
-
-\frame{\frametitle{Minimización del peso de Hamming: origen}
-\framesubtitle{Origen de la técnica}
-  \begin{itemize}
-  \item Peso de Hamming: cantidad de '1's en un dígito binario.
-  \item En un canal Z, los '1' producen interferencia, los '0', no.
-  \item Ej.: $$HW(00101010) = 3$$
-  $$HW(00100000) = 1$$
-  \item La minimización del HW es una representación o codificación numérica alternativa.
-  \end{itemize}
-}
-
-\frame{\frametitle{Minimización del peso de Hamming: origen}
-\framesubtitle{Sistemas de numeración}
-  \begin{itemize}
-  \item Mas extendido: números arábigos.
-  \item Originalmente de India, documentado e introducido a Europa por \alert{Al-Jwarizmi}.
-  \end{itemize}
-Dada un conjunto de $n$ dígitos ordenados $d$,
-
-con posición $p$ y base $B$, el valor numérico $V$ es:
-
-$$V=\sum_{n=0}^{n-1} B^{p}*d$$
-Ej.
-$$1685=10^{3}*1+10^{2}*6+10^{1}*8+10^{0}*9$$
-
-}
-
-\frame{\frametitle{Minimización del peso de Hamming: origen}
-\framesubtitle{Sistemas de numeración: Ejemplos}
-\begin{columns}
-  \begin{column}{0.60\textwidth}
-
-  \begin{itemize}
-  \item Bases no estandard, Ej.: Negabinario, base $-2$.
-        $$V=\sum_{n=0}^{n-1} (-2)^{p}*d$$
-  \item Sistema numeral \textit{Quater-imaginario}, base $-2i$, por \cite{knuth1960imaginary}.
-        $$V=\sum_{n=0}^{n-1} (2i)^{p}*d$$
-  \end{itemize}
-
-  \end{column}
-  \begin{column}{0.40\textwidth}
-  \begin{figure}[t]
-  \centering
-    \includegraphics[width=1.5in]{graphs/twindragon.png}
-     
-    Dragón de Davis-Knuth : fractal asociado a la base $(-1 \pm i)$
+\frame{\frametitle{Diagrama esquemático}
+\begin{figure}[t]
+\centering
+\includegraphics[width=4.5in]{../graphs/Soft-stack3}
+\label{fig_comstack}
 \end{figure}
-
-
-  \end{column}
-\end{columns}
-
-  
 }
 
-\frame{\frametitle{Minimización del peso de Hamming: origen}
-\framesubtitle{Sistemas de numeración: Ejemplos}
-\begin{columns}
-  \begin{column}{0.60\textwidth}
+%------------------------------------------------------------
 
-  \begin{itemize}
-  \item Códigos no regulares: Código Gray
-  \item \alert{Dígitos con signo}. Ej.:
-    $$1685=1000*1+100*6+80*10+5$$
-    pero también:
-    $$1685=169(-5)=1000*1+100*6+90*10+(-5)$$
-    y también:
-    $$1685=169\bar{5}=17\bar{1}\bar{5}$$
-  \item Usado en el lenguaje Punjabi.
-    
-  \end{itemize}
-
-  \end{column}
-  \begin{column}{0.40\textwidth}
-  \begin{figure}[t]
-  \centering
-    \includegraphics[width=1.8in]{graphs/gray.png}
-     
-    Código Gray
-\end{figure}
-
-
-  \end{column}
-\end{columns}
-  
-}
-
-\frame{\frametitle{Minimización del peso de Hamming: origen}
-\framesubtitle{Sistemas de numeración: Dígitos signados}
-\begin{columns}
-  \begin{column}{0.60\textwidth}
-
-  \begin{itemize}
-  \item Existe más de una representación posible por número.
-  \item La representación canónica de dígitos signados (CSD) es util:
-  
-        La probabilidad digitos no-cero es $\frac{1}{3}$.
-        
-        Usando dígitos binarios es $\frac{1}{2}$.
-        
-  \item Primeramente el sistema propuesto utilizó esta representación.
-  \item Luego se utilizó una tabla con símbolos optimizados con un peso de Hamming fijo.
-  \end{itemize}
-
-  \end{column}
-  \begin{column}{0.40\textwidth}
-    Binario: \tab{$001010111$}
-    
-    CSD:     \tab{$010\bar{1}0\bar{1}00\bar{1}$}
-  \end{column}
-\end{columns}
-  
-}
-
-
-
+\subsection{Minimización del peso de Hamming}
+\frame{\tableofcontents[currentsection,currentsubsection]}
 
 \frame{\frametitle{Minimización del peso de Hamming}
-\framesubtitle{Símbolo de 3-bits, Peso de Hamming=2, expansión a 5 bits}
+%\framesubtitle{Origen de la técnica}
+  \begin{itemize}
+  \item Peso de Hamming: cantidad de '1's en un dígito binario.
+  \item Ej.: $$HW(00101010) = 3$$
+  $$HW(00100000) = 1$$
+  \item La minimización del HW es una representación o codificación numérica alternativa. \pause
+  \item En un canal Z, los '1' producen interferencia, los '0', no. 
+  \end{itemize}
+}
+
+
+%------------------------------------------------------------
+
+\frame{\frametitle{Minimización del peso de Hamming}
+\framesubtitle{Símbolo de 8-bits, Peso de Hamming=2, expansión a 24 bits}
 \begin{center}
 \begin{tabular}{c c c}
 
 Dato & Entrada, HW=variable & Expansión HW=2\\
 \hline\hline
-0 & 000 & 00011\\
-1 & 001 & 00110\\
-2 & 010 & 00101\\
-3 & 011 & 01100\\
-4 & 100 & 01010\\
-5 & 101 & 01001\\
-6 & 110 & 10001\\
-7 & \alert{111} & \alert{1}00\alert{1}0\\
+0 & 00000000 & 0000000000000000011\\
+1 & 00000001 & 0000000000000000110\\
+2 & 00000010 & 0000000000000000101\\
+3 & 00000011 & 0000000000000001100\\
+4 & 00000100 & 0000000000000001010\\
+253 & 11111101 & 1001000000000000000\\
+254 & 11111110 & 1010000000000000000\\
+255 & 11111111 & 1100000000000000000
 \end{tabular}
 \end{center}
+
+El peso de Hamming fijo previene ataques estadísticos en los datos codificados.
 
 %Example Hamming minimisation table for a 3-bit input symbol with variable hamming weight,
 %output is a 5-bit expanded symbol with fixed Hamming weight HW=2
@@ -629,10 +450,10 @@ Dato & Entrada, HW=variable & Expansión HW=2\\
 
 
 %-------------------------------------------------------------
-\section{Simulación}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
+\subsection{Simulaciones}
+\frame{\tableofcontents[currentsection,currentsubsection]}
 
-\begin{frame}{Simulación: software de prueba}
+\begin{frame}{Simulaciones: software de prueba}
 
 
   \begin{itemize}
@@ -675,9 +496,39 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 %-------------------------------------------------------------
 
 \section{Implementación y mediciones}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
-
 \subsection{Fibra óptica}
+\frame{\tableofcontents[currentsection,currentsubsection]}
+
+
+\begin{frame}{Implementación sobre red \color{red}óptica}
+
+\begin{columns}
+  \begin{column}{0.50\textwidth}
+
+\begin{itemize}
+ \item Capaz de operar a 5 Gbps+
+ \item Distancias hasta 10 km del nodo central (sin amplificación).
+ \item Hasta 128 usuarios simultaneos.
+ \item Diseño digital \textit{custom} sobre FPGA.
+ \item Utiliza transceptores ópticos SFP+ estandard
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.50\textwidth}
+
+ 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85 \textwidth]{../graphs/ftth.pdf} 
+\end{figure}
+
+  \end{column}
+\end{columns}
+
+
+\end{frame}
+
+%------------------------------------------------------------
 
 \begin{frame}{Implementación: Fibra óptica}
 
@@ -689,6 +540,19 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
     
     Diseño de red propuesto para la capa óptica
     \label{arch:fig1}
+\end{figure}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}{Implementación: Fibra óptica, Resultados (Simulaciones)}
+
+\begin{figure}[!t]
+  \centering
+    \includegraphics[width=4in]{../graphs/BERvsChannelES2}
+    
+    Desempeño del sistema con respecto a la expansión de símbolo. Simulación numérica de un enlace de 10 Gbps con 128 clientes, M=4096 y K=9.
+    \label{BERvsExpansion}
 \end{figure}
 
 \end{frame}
@@ -726,18 +590,6 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 
 \end{frame}
 
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra óptica, Resultados (Simulaciones)}
-
-\begin{figure}[!t]
-  \centering
-    \includegraphics[width=4in]{../graphs/BERvsChannelES2}
-    
-    Desempeño del sistema con respecto a la expansión de símbolo. Simulación numérica de un enlace de 10 Gbps con 128 clientes, M=4096 y K=9.
-    \label{BERvsExpansion}
-\end{figure}
-
-\end{frame}
 
 
 %-------------------------------------------------------------
@@ -759,24 +611,38 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 
 %------------------------------------------------------------
 \subsection{Medio acústico}
+\frame{\tableofcontents[currentsection,currentsubsection]}
 
-\begin{frame}{Medio acústico: introducción}
 
-\begin{figure}[t]
-  \centering  
-    \includegraphics[width=6cm]{graphs/compucelus}
-    \vspace{0.5cm}
-    \\ Esquema de transmisión acústica
-    \label{ios_process_mem}
-\end{figure}
+\begin{frame}{Implementación sobre red \color{red}acústica}
+
+\begin{columns}
+  \begin{column}{0.50\textwidth}
 
 \begin{itemize}
- \item Originalmente plataforma de testing del medio óptico
- \item Fácil de depurar e implementar (100\% software)
- \item Equivalente a un módem por software
-\end{itemize}
+ \item Modem: 1 Khz de ancho de banda, 1 Kbps, portadora a 12 Khz y 16 Khz (inaudible).
+ \item Distancias hasta 2 m del nodo central.
+ \item Máximo de 8 usuarios.
+ \item Implementación puramente en software.
+ \item Utiliza hardware existente en celulares y notebooks (micrófonos y parlantes).
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.50\textwidth}
+
+ 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85 \textwidth]{../graphs/compucelus.pdf}
+\end{figure}
+
+  \end{column}
+\end{columns}
 
 \end{frame}
+
+
+
 %------------------------------------------------------------
 \begin{frame}{Medio acústico: modulación}
 
@@ -845,7 +711,7 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 \end{frame}
 
 %------------------------------------------------------------
-\begin{frame}{Medio acústico: resultados (mediciones)}
+\begin{frame}{Medio acústico: resultados (simulaciones y mediciones)}
   
   \begin{figure}[t]
   \centering  
@@ -872,7 +738,7 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 %-------------------------------------------------------------
 
 \section{Conclusiones}
-\frame{\tableofcontents[currentsection,hideallsubsections]}
+\frame{\tableofcontents[currentsection]}
 
 \frame{\frametitle{Conclusiones:}
 \begin{itemize}

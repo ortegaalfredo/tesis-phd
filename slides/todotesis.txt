@@ -1,0 +1,13 @@
+resaltar grafico de red OSI y grafico de stack de comunicaciones a medida que se describen los modulos.
+
+Grafico de K: Dos columnas, explicar la ecuacion.
+
+Diagrama esquematico: Dibujar varios receptores para simular multipunto
+
+Minimizacion de peso de hamming: Poner 1s en rojo, actualizar columna de Dato, agregar largo de simbolo	y corregir parametros que estan mal.
+
+Implementación: Fibra óptica: Mejorar grafico de xilinx. Agregar tamaño en compuertas/slice, tiempo de compilación, specs, clks, etc.
+
+Implementación: Efectos de señal desbalanceada: Checkear que sea 8b/10 la señal
+
+Agregar grafico de mediciones en el sistema optico
