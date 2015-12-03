@@ -54,7 +54,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
  \item Lograr privacidad a nivel físico en comunicaciones digitales.
  \item El costo de las intrusiones y robo de datos en el 2011 en EEUU ascendió en promedio a 5.5 us\$ millones por organización (Symantec).
  \item Facilidad de robo de datos en medios compartidos.
- \item Productos comerciales (ID Quantique) intentan solucionar este tipo de problemas. 
+ \item Productos comerciales (ID Quantique, NuCrypt, etc.) intentan solucionar este tipo de problemas. 
  \end{itemize}
 
 % \begin{figure}[t]
@@ -102,7 +102,7 @@ Instituto Tecnológico de Buenos Aires (ITBA) \\
 \begin{frame}{Robo de datos en fibras ópticas}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.75 \textwidth]{graphs/glimmer2.jpg} 
+  \includegraphics[width=0.80 \textwidth]{graphs/glimmer2.jpg} 
 \end{figure}
 \end{frame}
 
@@ -199,6 +199,7 @@ dio''}
   \begin{itemize}
       \item SSH - solo punto-a-punto.
       \item SSL - protocolo muy complejo, muchas vulnerabilidades.
+      \item IPSEC - poco difundido, configuración compleja
       \item Kerberos - idem SSL.
   \end{itemize}
   \pause\vfill
@@ -222,7 +223,7 @@ dio''}
 
 \begin{figure}[t]
   \centering
-    \includegraphics[width=0.80\textwidth]{graphs/layers.pdf}
+    \includegraphics[width=0.80\textwidth]{graphs/layers2.pdf}
     \\ Modelo de red OSI simplificado
     \label{ios_process_mem}
 \end{figure}
@@ -380,25 +381,52 @@ dio''}
 
 \begin{frame}{K óptimo}
 
+
+
+\begin{columns}
+  \begin{column}{0.40\textwidth}
+
+  
+
+%\begin{equation}
+
+$\text{BER} \approx \left(1-\left(1-\frac{1}{M}\right)^{N\cdot K\cdot m_1}\right)^K$
+%\end{equation}
+\vspace{0.5cm}
+
+\begin{itemize}
+ \item $M$ es el tamaño de trama.
+ \item $N$ es la cantidad de usuarios.
+ \item $K$ es el parametró de repetición del filtro de Bloom.
+ \item $m_1$ es la cantidad promedio de unos por símbolo.
+\end{itemize}
+
+  \end{column}
+  \begin{column}{0.60\textwidth}
+
+ 
+
 \begin{figure}[!t]
   \centering
-    \includegraphics[width=3in]{../graphs/Kcalc}
+    \includegraphics[width=3.5in]{../graphs/calcK}
     
-    Estimación de BER vs. tasa de repetición de filtro de Bloom K.
-    \label{BERvsK}
+    Estimación del BER en función de $K$ para $M=4096$, $m_{1}$ varía de 2 a 4 y $N=128$.
 \end{figure}
 
-\begin{equation}
-\text{BER} \approx \frac{n}{2} m_0 z_{\bar{R},\bar{S}} \approx \frac{n}{2} m_0 \left(1-e^{-W_1/M}\right)^K.
-\end{equation}
+  \end{column}
+\end{columns}
+
+
 \end{frame}
+
+
 
 %------------------------------------------------------------
 
 \frame{\frametitle{Diagrama esquemático}
 \begin{figure}[t]
 \centering
-\includegraphics[width=4.5in]{../graphs/Soft-stack3}
+\includegraphics[width=4.5in]{graphs/Soft-stack3}
 \label{fig_comstack}
 \end{figure}
 }
@@ -415,7 +443,7 @@ dio''}
   \item Ej.: $$HW(00101010) = 3$$
   $$HW(00100000) = 1$$
   \item La minimización del HW es una representación o codificación numérica alternativa. \pause
-  \item En un canal Z, los '1' producen interferencia, los '0', no. 
+  \item En un canal Z, los \alert{'1'} producen interferencia, los '0', no. 
   \end{itemize}
 }
 
@@ -429,14 +457,14 @@ dio''}
 
 Dato & Entrada, HW=variable & Expansión HW=2\\
 \hline\hline
-0 & 00000000 & 0000000000000000011\\
-1 & 00000001 & 0000000000000000110\\
-2 & 00000010 & 0000000000000000101\\
-3 & 00000011 & 0000000000000001100\\
-4 & 00000100 & 0000000000000001010\\
-253 & 11111101 & 1001000000000000000\\
-254 & 11111110 & 1010000000000000000\\
-255 & 11111111 & 1100000000000000000
+0 & 00000000 & 00000000000000000\alert{11}\\
+1 & 0000000\alert{1} & 0000000000000000\alert{11}0\\
+2 & 000000\alert{1}0 & 0000000000000000\alert{1}0\alert{1}\\
+3 & 000000\alert{11} & 000000000000000\alert{11}00\\
+4 & 00000\alert{1}00 & 000000000000000\alert{1}0\alert{1}0\\
+253 & \alert{111111}0\alert{1} & \alert{1}00\alert{1}000000000000000\\
+254 & \alert{1111111}0 & \alert{1}0\alert{1}0000000000000000\\
+255 & \alert{11111111} & \alert{11}00000000000000000
 \end{tabular}
 \end{center}
 
@@ -566,27 +594,50 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 
 \end{frame}
 
-%-------------------------------------------------------------
-\begin{frame}{Implementación: Fibra óptica}
 
-\begin{figure}[t]
-  \centering
-    \includegraphics[width=3.3in]{../graphs/fpgadesign.pdf}
-     
-     Diseño lógico de alto nivel sobre FPGA
-\label{fig:fpgadesign}
-\end{figure}
-
-\end{frame}
 
 %-------------------------------------------------------------
 \begin{frame}{Implementación: Fibra óptica, FPGA}
 
-\begin{figure}[t]
+
+\begin{columns}
+  \begin{column}{0.35\textwidth}
+
+   
+\begin{itemize}
+ \item CPU Microblaze (Debugging), 75 Mhz, sin DRAM
+ \item Coprocesador, 100 Mhz
+ \item Utilización (\textit{Slices}): 9446 de 11200, \alert{84\%}
+ \item Tiempo de sintetizado: aprox. 40 minutos (Core i7 2da generación)
+ 
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.65\textwidth}
+
+  \begin{figure}[t]
   \centering
     \includegraphics[width=3.5in]{../graphs/diagramaXilinx.png}
 \label{fig:fpgahard}
 \end{figure}
+
+  \end{column}
+\end{columns}
+
+
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}{Implementación: Fibra óptica, FPGA}
+
+ \begin{figure}[t]
+  \centering
+    \includegraphics[width=5.5in]{graphs/fpgamap.jpg}
+\label{fig:fpgahard}
+\end{figure}
+
 
 \end{frame}
 
@@ -607,6 +658,38 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
   Señal de potencia óptica de un Láser SPF+ de 1330 nm, tasa nominal es de 2.5 Gbps.
   \label{fig:ImgExpansion}
 \end{figure}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}{Mediciones ópticas}
+
+
+\begin{columns}
+  \begin{column}{0.40\textwidth}
+
+\begin{itemize}
+\item Atenuador fijo en 10.85 DB
+\item Velocidad de enlace: 2.5 gbps
+\item SFP de link: sumitomo-electric-scp681 (S-16.1DDM)
+\item SFP de ruido: sumitomo-electric-scp681 (L-16.1)
+ \end{itemize}
+
+  \end{column}
+  \begin{column}{0.70\textwidth}
+
+\begin{figure}[!t]
+   \includegraphics[width=0.90 \textwidth]{graphs/medicion-optica-ber-sumitomo}
+   \qquad
+   
+  \vspace{0.2cm}
+  BER antes de corrección de errores
+\end{figure}
+
+  \end{column}
+\end{columns}
+
+
+
 \end{frame}
 
 %------------------------------------------------------------
@@ -760,7 +843,9 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
   \item Autenticación de nodos y distribución de claves (\textit{Forward Secrecy}).
   \item Implementación en otros medios. Ej. Radio.
   \end{itemize}
+  
 }
+
 
 %-------------------------------------------------------------
 \begin{frame}{Contribuciones:}
@@ -794,6 +879,12 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
 \
 \end{frame}
 
+\frame{\frametitle{Fin de la presentación}
+
+Muchas gracias por su asistencia.
+
+}
+
 %-------------------------------------------------------------
 
 \footnotesize
@@ -807,9 +898,6 @@ El BER (\textit{bit error rate}) se calcula con la diferencia entre \textbf{test
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Daemen et~al.(1998)]{Daemen98aesproposal:}
- J.~Daemen and V.~Rijmen.
-\newblock Aes proposal: Rijndael, 1998.
 
 \bibitem[Mosso et~al.(2011)]{mosso2011all}
 F.~Mosso, J.~Barrera, M.~Tebaldi, N.~Bolognini, and R.~Torroba.
@@ -827,12 +915,6 @@ N.~Nadarajah, E.~Wong, and a.~Nirmalathas.
 \newblock URL
   \url{http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=1576846}.
 
-\bibitem[Ortega et~al.(2011)]{ortega11}
-A.~A. Ortega, V.~A. Bettachini, J.~I. Alvarez-Hamelin, and D.~F. Grosz.
-\newblock Point-to-point and point-to-multipoint cdma access network with
-  enhanced security.
-\newblock In \emph{Access Networks and In-house Communications, OSA Technical
-  Digest (CD), paper ATuB6}, Toronto, Canada, June 2011.
 
 \bibitem[Shake(2005)]{Shake:05}
 T.~Shake.
@@ -846,26 +928,9 @@ P.~Torres, L.~Valente, and M.~Carvalho.
   gratings.
 \newblock 50:\penalty0 13--16, Jan. 2002.
 
-\bibitem[Wang et~al.(2010)]{Wang:10}
-Z.~Wang, L.~Xu, J.~Chang, T.~Wang, and P.~R. Prucnal.
-\newblock Secure optical transmission in a point-to-point link with encrypted
-  cdma codes.
-\newblock \emph{IEEE Photonics Technology Letters}, 22\penalty0 (19):\penalty0
-  1410 --1412, oct. 2010.
-\newblock ISSN 1041-1135.
-\newblock \doi{10.1109/LPT.2010.2061223}.
-
-\bibitem[Knuth, Donald E]{knuth1960imaginary}
-Knuth, Donald E.
-\newblock An Imaginary Number System.
-\newblock 1960
-
-
 \bibitem[Jay, John A]{jay2010}
-Jay, John A.
-\newblock An overview of macrobending and microbending of optical fibers.
-\newblock \emph{White Paper WP1212, Corning}.
-\newblock 2010.
+Jay, John A., An overview of macrobending and microbending of optical fibers.
+\newblock \emph{White Paper WP1212, Corning}, 2010.
 
 
 

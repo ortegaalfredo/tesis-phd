@@ -408,48 +408,33 @@ Por lo tanto, el número esperado de errores será $n/2$.
 \end{enumerate}
 
 Definiremos las siguientes probabilidades: 
-$P_{s1}$ como la probabilidad de sobre-escribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros.
-$P_{st}$ como la probabilidad de sobrescribir con unos todas las $K$ repeticiones de uno de los $m_0$ ceros.
+$P_{0}$ como la probabilidad de decodificar un bit en cero, como un bit en uno. O sea, el BER.
 
-Entonces, el BER está dado por
-\begin{equation}
-%\text{BER} = \frac{n}{2}\prob{\text{sobre-escribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros}}.
-\text{BER} = \frac{n}{2}P_{s1}.
-\label{eq:ber_01}
-\end{equation}
-Por la cota de la unión (union bound), 
-%\begin{multline}
-\begin{equation}
-%\prob{\text{sobrescribir con unos las $K$ repeticiones de por lo menos uno de los $m_0$ ceros}}\leq \\
-%\leq m_0\prob{\text{sobrescribir con unos las $K$ repeticiones de uno de los $m_0$ ceros}}.
-P_{s1}\leq P_{st}.
-\label{eq:union_bound}
-\end{equation}
-%\end{multline}
-Por lo tanto, prestemos atención a uno de los $m_0$ ceros. Si los $W_{1}$ transmitidos (por todos los usuarios) ocupan $s$ casilleros y las $K$ repeticiones del cero dado usa $r ( \leq K)$ casilleros, entonces una condición necesaria para el error es que $s \geq r$. Entonces, asumimos que existan $s$ unos en una trama de $M$ bits. Dados $r$ lugares en la trama, la probabilidad de que los unos ocupen esas $r$ posiciones está dada por 
-\begin{equation}
-z_{r,s} = \frac{\nchoosek{M-r}{s-r}}{\nchoosek{M}{s}}= \frac{\frac{(M-r)!}{(M-s)! (s-r)!}}{\frac{M!}{(M-s)!s!}} = \frac{(M-r)!}{M!}\frac{s!}{(s-r)!}\approx (\frac{s}{M})^r,
-\end{equation}
-
-Suponiendo que $N,s\gg r$, si $M \gg K$, no es difícil ver que las $K$ repeticiones de un cero dado ocupan $\mu_{R} \approx K$ casilleros en promedio. También puede demostrarse que el número promedio de casilleros ocupados por los $W_{1}$ unos transmitidos por todos los usuarios es
+La ecuación \ref{eq:Pnc}, define la posibilidad de colisión de un cliente con cualquier otro. Ahora podemos asumir que en la trama, existiran $W_1 = N\cdot K\cdot m_1$ unos. Por lo tanto, la posibilidad de colisión $P_{c0}$ de un bit en cero con cualquier bit en uno es:
 
 \begin{equation}
-\mu_{S} \approx M (1-e^{-W_1/M})
-\end{equation}
- 
-De esas ecuaciones, una estimación de la cota superior del BER para un determinado usuario es
-\begin{equation}
-\text{BER} \approx \frac{n}{2} m_0 z_{\bar{R},\bar{S}} \approx \frac{n}{2} m_0 \left(1-e^{-W_1/M}\right)^K.
+\label{eq:Pnc1}
+P_{c0}=1-\left(1-\frac{1}{M}\right)^{N\cdot K\cdot m_1}
 \end{equation}
 
-La figura \ref{BERvsK} muestra la estimación en función de $K$ para $M=2014$, $m_{0} = 22$, $m_{1} = 2$, $n = 8$ y $N=38$. Es interesante notar que existe un valor óptimo de la tasa de repetición $K$ que minimiza la tasa de error. Este resultado es relevante en el diseño de un sistema de comunicaciones. Debido a los bajos valores de BER alcanzados, es posible utilizar en la siguiente etapa algoritmos eficientes que aceptan bajos límites de error, tal como Reed-Solomon, para reducir aún mas el BER total de sistema y asi llevarlo a tasas aceptables para aplicaciones prácticas.
+Debido a que el filtro de Bloom mutiplica la cantidad de unos por $K$, y cada símbolo posee en promedio $m_1$ unos.
+Ahora, debido también al filtro de Bloom, para que se produzca un error es necesario que todos los $K$ ceros transmitidos colisionen con unos. Esto reduce la probabilidad de error, y puede representarse como la probabilidad de error post-filtro de Bloom $P_{bf}$ de esta manera:
 
 \begin{figure}[!t]
   \centering
-    \includegraphics[width=5in]{graphs/Kcalc}
-    \caption{Estimación de BER vs. tasa de repetición de filtro de Bloom K.}
+    \includegraphics[width=5in]{graphs/calcK}
+    \caption{Estimación de BER vs. tasa de repetición de filtro de Bloom K. Se observan distintas curvas correspondientes a diferentes pesos de Hamming. Puede apreciarse una reducción considerable del BER estimado a medida que el peso de Hamming disminuye.}
     \label{BERvsK}
 \end{figure}
+
+\begin{equation}
+\label{eq:Pnc2}
+P_{bf}=\left(1-\left(1-\frac{1}{M}\right)^{N\cdot K\cdot m_1}\right)^K
+\end{equation}
+
+Podemos tomar la probabilidad $P_{bf}$ como una estimación del BER del sistema. Finalmente, al aplicar la codificación de reducción del peso de Hamming en \ref{eq:Pnc2}, el efecto es la reducción del parámetro $m_1$. Nótese que la cantidad de bits en cero no afectan esta ecuación, por lo que la expansión en largo del símbolo no tiene ningun efecto.
+
+La figura \ref{BERvsK} muestra la estimación del BER en función de $K$ para $M=4096$, $m_{1}$ varía de 2 a 4 y $N=128$. Es interesante notar que existe un valor óptimo de la tasa de repetición $K$ que minimiza la tasa de error. Este resultado es relevante en el diseño de un sistema de comunicaciones. Debido a los bajos valores de BER alcanzados, es posible utilizar en la siguiente etapa algoritmos eficientes que aceptan bajos límites de error, tal como Reed-Solomon, para reducir aún mas el BER total de sistema y asi llevarlo a tasas aceptables para aplicaciones prácticas.
 
 \section{Códigos de pseudoruido}
 Como se explica en la sección \ref{PRNGs} la seguridad del sistema depende de la correcta selección e implementación de un algoritmo de PRNG criptográficamente seguro \textit{(CS-PRNG)}.
